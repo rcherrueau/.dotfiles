@@ -1,0 +1,48 @@
+[user]
+        name = RFish ⚓
+        email = RonanCherrueau@gmail.com
+[diff]
+        tool = vimdiff
+[core]
+        excludesfile = ~/.gitignore_global
+
+[color]
+        ui = auto
+[alias]
+        st = status
+        ci = commit
+        lg = log --graph --pretty=tformat:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%an %ar)%Creset'
+[core]
+        pager = cat
+        editor = emacs 
+        whitespace = -trailing-space
+[diff]
+        mnemonicPrefix = true
+        wordRegex = .
+[fetch]
+        recurseSubmodules = on-demand
+[grep]
+        extendedRegexp = true
+[log]
+        abbrevCommit = true
+[merge]
+        conflictStyle = diff3
+[mergetool]
+        # keepBackup = false
+        # keepTemporaries = false
+        # prompt = false
+[pull]
+        # This is GREAT… when you know what you're doing and are careful
+        # not to pull --no-rebase over a local line containing a true merge.
+        # rebase = true
+        # WARNING! This option, which does away with the one gotcha of
+        # auto-rebasing on pulls, is only available from 1.8.5 onwards.
+        # rebase = preserve
+[push]
+        default = upstream
+[rerere]
+        # If, like me, you like rerere, decomment these
+        # autoupdate = true
+        # enabled = true
+[status]
+        submoduleSummary = true

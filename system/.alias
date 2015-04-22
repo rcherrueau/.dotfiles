@@ -1,0 +1,14 @@
+# Define shortcuts for commands
+
+# colored ls
+case ${OS} in
+OSX) alias ls="ls -G" ;;
+*)   alias ls="ls --color" ;;
+esac
+
+# use p unsted to open ap
+case ${OS} in
+OSX) alias p="open" ;;
+*)   alias p="gnome-open" ;;
+esac
+
