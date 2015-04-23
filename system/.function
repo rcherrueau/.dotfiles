@@ -2,7 +2,7 @@
 # stand-alone script
 
 # Unzip all zip from the current directory into there dedicated directory
-function unzipall() {
+unzipall() {
     for ZIP in *.zip; do
         # Get file name and create directory if needed
         FILENAME=$(basename "$ZIP")
@@ -10,17 +10,17 @@ function unzipall() {
 
         if [ ! -d "${DIRECTORY}" ]; then
             # Create directory
-            mkdir ${DIRECTORY}
+            mkdir "${DIRECTORY}"
         fi
 
         # Unzip jar in directory
-        unzip -d ${DIRECTORY} ${ZIP}
+        unzip -d "${DIRECTORY}" "${ZIP}"
     done
 }
 
 # Simple calculator
 # https://github.com/mathiasbynens/dotfiles/blob/master/.functions
-function calc() {
+calc() {
 	local result="";
 	result="$(printf "scale=10;$*\n" | bc --mathlib | tr -d '\\\n')";
 	#                       └─ default (when `--mathlib` is used) is 20
