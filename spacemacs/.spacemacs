@@ -21,6 +21,7 @@
      ;; markdown
      org
      auctex
+     scala
      ;; osx
      ;; syntax-checking
      ;; --------------------------------------------------------
@@ -138,13 +139,25 @@ before layers configuration."
   "Configuration function.
 This function is called at the very end of Spacemacs initialization after
 layers configuration."
+  ;; Appearance
+  (setq powerline-default-separator 'arrow)
+  (setq powerline-default-separator-dir '(right . right))
+  ;; Normal mode: Orange
+  (set-face-attribute 'hl-line nil :background "#4A2F59")
+  (set-face-attribute 'region nil :background "#6B3654")
+  ;; Never insert tabs
+  (set-default 'indent-tabs-mode nil)
+
+  ;; Mac-os key
   (setq mac-option-modifier 'none)
   (setq mac-command-modifier 'meta)
   (setq ns-function-modifier 'hyper)
+
+  ;; org
   (remove-hook 'org-mode-hook 'org-indent-mode)
+
+  ;; LaTeX
   (add-hook 'doc-view-mode-hook 'auto-revert-mode)
-  (set-face-attribute 'hl-line nil :background "#4A2F59")
-  (set-face-attribute 'region nil :background "#6B3654")
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
