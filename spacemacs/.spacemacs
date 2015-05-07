@@ -28,7 +28,11 @@
      ;; org-setup
      )
    ;; A list of packages and/or extensions that will not be install and loaded.
-   dotspacemacs-excluded-packages '()
+   dotspacemacs-excluded-packages
+   '(
+     ;; Do not print a ~ to indicate the end of file
+     vi-tilde-fringe
+     )
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
    ;; are declared in a layer which is not a member of
    ;; the list `dotspacemacs-configuration-layers'
@@ -142,11 +146,36 @@ layers configuration."
   ;; Appearance
   (setq powerline-default-separator 'arrow)
   (setq powerline-default-separator-dir '(right . right))
+  ;; Display - in the fringe line for EOF
+  (setq-default indicate-empty-lines t)
+  ;; Set the fringe bitmaps as emacs default values
+  (setq-default fringe-indicator-alist
+                '((truncation left-arrow right-arrow)
+                  (continuation left-curly-arrow right-curly-arrow)
+                  (overlay-arrow . right-triangle)
+                  (up . up-arrow)
+                  (down . down-arrow)
+                  (top top-left-angle top-right-angle)
+                  (bottom bottom-left-angle
+                          bottom-right-angle
+                          top-right-angle
+                          top-left-angle)
+                  (top-bottom left-bracket
+                              right-bracket
+                              top-right-angle
+                              top-left-angle)
+                  (empty-line . empty-line)
+                  (unknown . question-mark)))
+  ;; Stop truncate lines
+  (add-hook 'text-mode-hook (lambda ()
+                              (setq truncate-lines nil)))
   ;; Normal mode: Orange
   (set-face-attribute 'hl-line nil :background "#4A2F59")
   (set-face-attribute 'region nil :background "#6B3654")
   ;; Never insert tabs
   (set-default 'indent-tabs-mode nil)
+  ;; Delete trailing whitespace before saving
+  (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
   ;; Mac-os key
   (setq mac-option-modifier 'none)
