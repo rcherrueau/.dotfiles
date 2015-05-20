@@ -113,11 +113,11 @@ before layers configuration."
    ;; A value from the range (0..100), in increasing opacity, which describes
    ;; the transparency level of a frame when it's active or selected.
    ;; Transparency can be toggled through `toggle-transparency'.
-   dotspacemacs-active-transparency 90
+   dotspacemacs-active-transparency 97
    ;; A value from the range (0..100), in increasing opacity, which describes
    ;; the transparency level of a frame when it's inactive or deselected.
    ;; Transparency can be toggled through `toggle-transparency'.
-   dotspacemacs-inactive-transparency 90
+   dotspacemacs-inactive-transparency 97
    ;; If non nil unicode symbols are displayed in the mode line.
    dotspacemacs-mode-line-unicode-symbols t
    ;; If non nil smooth scrolling (native-scrolling) is enabled. Smooth
@@ -143,9 +143,14 @@ before layers configuration."
   "Configuration function.
 This function is called at the very end of Spacemacs initialization after
 layers configuration."
-  ;; Appearance
+  ;; -- Appearance
+  (toggle-transparency)
+
+  ;; Powerline
   (setq powerline-default-separator 'arrow)
   (setq powerline-default-separator-dir '(right . right))
+
+  ;; Fringeline
   ;; Display - in the fringe line for EOF
   (setq-default indicate-empty-lines t)
   ;; Set the fringe bitmaps as emacs default values
@@ -166,27 +171,47 @@ layers configuration."
                               top-left-angle)
                   (empty-line . empty-line)
                   (unknown . question-mark)))
+
+  ;; Line behavior
+  (setq-default default-fill-column 70)
   ;; Stop truncate lines
   (add-hook 'text-mode-hook (lambda ()
                               (setq truncate-lines nil)))
-  ;; Normal mode: Orange
-  (set-face-attribute 'hl-line nil :background "#4A2F59")
-  (set-face-attribute 'region nil :background "#6B3654")
   ;; Never insert tabs
   (set-default 'indent-tabs-mode nil)
   ;; Delete trailing whitespace before saving
   (add-hook 'before-save-hook 'delete-trailing-whitespace)
+  ;; Highlight current line
+  (set-face-attribute 'hl-line nil :background "#4A2F59")
+  (set-face-attribute 'region nil :background "#6B3654")
 
-  ;; Mac-os key
-  (setq mac-option-modifier 'none)
-  (setq mac-command-modifier 'meta)
-  (setq ns-function-modifier 'hyper)
-
+  ;; -- Modes
   ;; org
   (remove-hook 'org-mode-hook 'org-indent-mode)
 
   ;; LaTeX
   (add-hook 'doc-view-mode-hook 'auto-revert-mode)
+
+  ;; helm
+  (setq helm-recentf-fuzzy-match t)
+  (setq helm-M-x-fuzzy-match t)
+  (setq helm-apropos-fuzzy-match t)
+  (setq helm-locate-fuzzy-match t)
+  (setq helm-semantic-fuzzy-match t)
+  (setq helm-semantic-fuzzy-match t)
+  (setq helm-semantic-fuzzy-match t)
+
+  ;; recentf
+  (use-package recentf
+    :config
+    (add-to-list 'recentf-exclude (expand-file-name spacemacs-cache-directory))
+    (add-to-list 'recentf-exclude (expand-file-name package-user-dir)))
+
+  ;; -- Key bindings
+  ;; Mac-os key
+  (setq mac-option-modifier 'none)
+  (setq mac-command-modifier 'meta)
+  (setq ns-function-modifier 'hyper)
 
   ;; Window split
   ;; http://emacswiki.org/emacs/ToggleWindowSplit
