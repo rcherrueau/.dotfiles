@@ -22,10 +22,12 @@
      org
      auctex
      scala
+     racket
      ;; osx
      ;; syntax-checking
      ;; --------------------------------------------------------
      ;; org-setup
+     proverif
      )
    ;; A list of packages and/or extensions that will not be install and loaded.
    dotspacemacs-excluded-packages
