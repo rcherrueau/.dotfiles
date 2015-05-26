@@ -187,6 +187,14 @@ layers configuration."
   (set-face-attribute 'hl-line nil :background "#4A2F59")
   (set-face-attribute 'region nil :background "#6B3654")
 
+  ;; Highlight the following words in comments
+  (defun add-watchwords ()
+    (font-lock-add-keywords
+     nil '(("\\<\\(TODO\\|FIXME\\|HACK\\|XXX\\|BUG\\|Note\\):"
+            1 font-lock-warning-face t))))
+
+  (add-hook 'prog-mode-hook #'add-watchwords)
+
   ;; -- Modes
   ;; org
   (remove-hook 'org-mode-hook 'org-indent-mode)
