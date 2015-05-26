@@ -1,14 +1,17 @@
 # Define shortcuts for commands
 
-# colored ls
+# colored support
 case ${OS} in
 OSX) alias ls="ls -G" ;;
-*)   alias ls="ls --color" ;;
+*)   alias ls="ls --color=auto"
+     alias grep="grep --color=auto"
+     alias fgrep="fgrep --color=auto"
+     alias egrep="egrep --color=auto"
+;;
 esac
 
 # use p unsted to open ap
 case ${OS} in
 OSX) alias p="open" ;;
-*)   alias p="gnome-open" ;;
+*)   alias p="xdg-open" ;;
 esac
-

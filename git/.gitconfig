@@ -1,22 +1,19 @@
 [user]
         name = RFish ⚓
         email = RonanCherrueau@gmail.com
-[diff]
-        tool = vimdiff
 [core]
         excludesfile = ~/.gitignore_global
-
+        pager = cat
+        editor = emacs
+        whitespace = -trailing-space
 [color]
         ui = auto
 [alias]
         st = status
         ci = commit
         lg = log --graph --pretty=tformat:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%an %ar)%Creset'
-[core]
-        pager = cat
-        editor = emacs 
-        whitespace = -trailing-space
 [diff]
+        tool = vimdiff
         mnemonicPrefix = true
         wordRegex = .
 [fetch]
