@@ -4,4 +4,3 @@
 stow --target="$HOME" bash
 stow --target="$HOME" git
 stow --target="$HOME" spacemacs
-stow --target="$HOME" emacs
