@@ -23,8 +23,10 @@
      auctex
      scala
      racket
+     emacs-lisp
+     shell
+     syntax-checking
      ;; osx
-     ;; syntax-checking
      ;; --------------------------------------------------------
      ;; org-setup
      proverif
@@ -34,6 +36,8 @@
    '(
      ;; Do not print a ~ to indicate the end of file
      vi-tilde-fringe
+     magit
+     org-bullets
      )
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
    ;; are declared in a layer which is not a member of
@@ -197,7 +201,8 @@ layers configuration."
 
   ;; -- Modes
   ;; org
-  (remove-hook 'org-mode-hook 'org-indent-mode)
+  (setq org-startup-indented nil)
+  (setq org-src-fontify-natively t)
 
   ;; LaTeX
   (add-hook 'doc-view-mode-hook 'auto-revert-mode)
@@ -210,12 +215,6 @@ layers configuration."
   (setq helm-semantic-fuzzy-match t)
   (setq helm-semantic-fuzzy-match t)
   (setq helm-semantic-fuzzy-match t)
-
-  ;; recentf
-  (use-package recentf
-    :config
-    (add-to-list 'recentf-exclude (expand-file-name spacemacs-cache-directory))
-    (add-to-list 'recentf-exclude (expand-file-name package-user-dir)))
 
   ;; -- Key bindings
   ;; Mac-os key

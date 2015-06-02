@@ -10,18 +10,16 @@
 ;;
 ;;; License: GPLv3
 
-(defvar proverif-pre-extensions
+(setq proverif-pre-extensions
   '(
     ;; pre extension names go here
     proverif
-    )
-  "List of all extensions to load before the packages.")
+    ))
 
-(defvar proverif-post-extensions
+(setq proverif-post-extensions
   '(
     ;; post extension names go here
-    )
-  "List of all extensions to load after the packages.")
+    ))
 
 ;; For each extension, define a function NAME/init-<extension-name>
 ;;
@@ -41,3 +39,4 @@
     ("\\.horn$" . proverif-horn-mode)
     ("\\.horntype$" . proverif-horntype-mode))
   )
+
