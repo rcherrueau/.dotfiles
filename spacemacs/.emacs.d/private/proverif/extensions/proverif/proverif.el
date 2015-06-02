@@ -52,9 +52,14 @@
   )
 )
 
-(define-derived-mode proverif-pv-mode fundamental-mode
+(define-derived-mode proverif-pv-mode prog-mode
   (setq font-lock-defaults '(proverif-pvKeywords))
   (setq mode-name "ProVerif Typed Pi")
+
+  ;; Manage comment
+  (setq-local comment-start "(*")
+  (setq-local comment-end "*)")
+  (setq-local comment-multi-line t)
 
 ;; comment highlighting
   (modify-syntax-entry ?\( "()1" proverif-pv-mode-syntax-table)

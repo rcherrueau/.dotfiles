@@ -24,7 +24,8 @@
      scala
      racket
      emacs-lisp
-     shell
+     ; FIXME: variable doesn't work
+     shell :variables shell-default-shell 'shell
      syntax-checking
      ;; osx
      ;; --------------------------------------------------------
@@ -196,7 +197,6 @@ layers configuration."
     (font-lock-add-keywords
      nil '(("\\<\\(TODO\\|FIXME\\|HACK\\|XXX\\|BUG\\|Note\\):"
             1 font-lock-warning-face t))))
-
   (add-hook 'prog-mode-hook #'add-watchwords)
 
   ;; -- Modes
@@ -215,6 +215,9 @@ layers configuration."
   (setq helm-semantic-fuzzy-match t)
   (setq helm-semantic-fuzzy-match t)
   (setq helm-semantic-fuzzy-match t)
+
+  ;; shell
+  (setq shell-default-shell 'shell)
 
   ;; -- Key bindings
   ;; Mac-os key
