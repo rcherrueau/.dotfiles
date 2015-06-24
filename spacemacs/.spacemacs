@@ -216,6 +216,22 @@ layers configuration."
   (setq org-startup-indented nil)
   (setq org-src-fontify-natively t)
 
+  ;; I generally cite publication with an org-mode link
+  ;; `[[file:file.bib::key][key]]' and I want to get this back a
+  ;; `\cite' in LaTeX export.
+  (defun my-filter-cite (link backend info)
+    "Ensure that 'my-way-of-cite' is properly handled in LaTeX
+  export."
+    ;; Ensure that the filter will only be applied when using `latex'
+    (when (org-export-derived-backend-p backend 'latex)
+      (replace-regexp-in-string "\\href{.+\.bib}{\\(.+\\)}"
+                                "\cite{\\1}"
+                                link)))
+
+  (setq org-export-filter-link-functions nil)
+  (add-to-list 'org-export-filter-link-functions
+               'my-filter-cite)
+
   ;; LaTeX
   (add-hook 'doc-view-mode-hook 'auto-revert-mode)
 
