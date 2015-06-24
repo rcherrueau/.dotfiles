@@ -162,6 +162,12 @@ before layers configuration."
   "Configuration function.
 This function is called at the very end of Spacemacs initialization after
 layers configuration."
+  ;; Are we on a mac?
+  (setq is-mac (equal system-type 'darwin))
+
+  ;; Are we using a mac-keyboard
+  (setq mac-keyboard t)
+
   ;; -- Appearance
   (toggle-transparency)
 
@@ -256,9 +262,14 @@ layers configuration."
 
   ;; -- Key bindings
   ;; Mac-os key
-  (setq mac-option-modifier 'none)
-  (setq mac-command-modifier 'meta)
-  (setq ns-function-modifier 'hyper)
+  (when mac-keyboard
+   (setq x-meta-keysym 'super)
+   (setq x-super-keysym 'meta))
+
+  (when is-mac
+   (setq mac-option-modifier 'none)
+   (setq mac-command-modifier 'meta)
+   (setq ns-function-modifier 'hyper))
 
   ;; Window split
   ;; http://emacswiki.org/emacs/ToggleWindowSplit
