@@ -6,7 +6,7 @@
   "Configuration Layers declaration."
   (setq-default
    ;; List of additional paths where to look for configuration layers.
-   ;; Paths must have a trailing slash (ie. `~/.mycontribs/')
+   ;; Paths must have a trailing slash (i.e. `~/.mycontribs/')
    dotspacemacs-configuration-layer-path '()
    ;; List of configuration layers to load. If it is the symbol `all' instead
    ;; of a list then all discovered layers will be installed.
@@ -23,29 +23,31 @@
      ;;      git-gutter-use-fringe t)
      ;; markdown
      org
-     auctex
      scala
      racket
      emacs-lisp
-     ; FIXME: variable doesn't work
-     shell :variables shell-default-shell 'shell
+     ;; shell rather than eshell, ansi, ...
+     ;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
+     (shell :variables shell-default-shell 'shell)
      syntax-checking
      ;; osx
      ;; --------------------------------------------------------
      ;; org-setup
      proverif
      )
-   ;; List of additional packages that will be installed wihout being
+   ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages then consider to create a layer, you can also put the
    ;; configuration in `dotspacemacs/config'.
-   dotspacemacs-additional-packages '(idris-mode)
+   dotspacemacs-additional-packages '(prop-menu
+                                      idris-mode
+                                      tao-theme)
    ;; A list of packages and/or extensions that will not be install and loaded.
    dotspacemacs-excluded-packages
    '(
      ;; Do not print a ~ to indicate the end of file
      vi-tilde-fringe
-     magit
+     ;; Do not show symbol as bullet for headers in org
      org-bullets
      )
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
@@ -79,7 +81,7 @@ before layers configuration."
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(zenburn
-                         monokai)
+                         tao)
    ;; If non nil the cursor color matches the state color.
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
@@ -103,6 +105,11 @@ before layers configuration."
    ;; By default the command key is `:' so ex-commands are executed like in Vim
    ;; with `:' and Emacs commands are executed with `<leader> :'.
    dotspacemacs-command-key ":"
+   ;; Location where to auto-save files. Possible values are `original' to
+   ;; auto-save the file in-place, `cache' to auto-save the file to another
+   ;; file stored in the cache directory and `nil' to disable auto-saving.
+   ;; Default value is `cache'.
+   dotspacemacs-auto-save-file-location 'cache
    ;; If non nil then `ido' replaces `helm' for some commands. For now only
    ;; `find-files' (SPC f f) is replaced.
    dotspacemacs-use-ido nil
@@ -219,7 +226,9 @@ layers configuration."
 
   ;; -- Modes
   ;; org
+  ;; Do not auto-indent lines depending on the depth on the node.
   (setq org-startup-indented nil)
+  ;; Do not fontify headline
   (setq org-src-fontify-natively t)
 
   ;; I generally cite publication with an org-mode link
@@ -238,6 +247,11 @@ layers configuration."
   (add-to-list 'org-export-filter-link-functions
                'my-filter-cite)
 
+  ;; (defun org-open-cite (path)
+  ;;   (org-open-file path nil nil  ))
+  ;; (org-add-link-type "cite" 'org-open-cite)
+
+
   ;; LaTeX
   (add-hook 'doc-view-mode-hook 'auto-revert-mode)
 
@@ -249,11 +263,6 @@ layers configuration."
   (setq helm-semantic-fuzzy-match t)
   (setq helm-semantic-fuzzy-match t)
   (setq helm-semantic-fuzzy-match t)
-
-  ;; shell
-  ;; shell rather than eshell, ansi, ...
-  ;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
-  (setq shell-default-shell 'shell)
 
   ;; vc-mode
   ;; Visit symbolic link to a file. This bypass the emacs version
