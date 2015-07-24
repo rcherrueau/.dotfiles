@@ -17,18 +17,20 @@
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-     ;; auto-completion
      ;; better-defaults
      ;; (git :variables
      ;;      git-gutter-use-fringe t)
      ;; markdown
+     (auto-completion :variables
+                      auto-completion-enable-help-tooltip t)
      org
      scala
      racket
      emacs-lisp
      ;; shell rather than eshell, ansi, ...
      ;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
-     (shell :variables shell-default-shell 'shell)
+     (shell :variables
+            shell-default-shell 'shell)
      syntax-checking
      ;; osx
      ;; --------------------------------------------------------
@@ -86,11 +88,11 @@ before layers configuration."
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
    ;; size to make separators look not too crappy.
-   dotspacemacs-default-font '("Ubuntu Mono"
-                               :size 13
+   dotspacemacs-default-font '("Source Code Pro"
+                               :size 12
                                :weight normal
                                :width normal
-                               :powerline-scale 1.4)
+                               :powerline-scale 0.9)
    ;; The leader key
    dotspacemacs-leader-key "SPC"
    ;; The leader key accessible in `emacs state' and `insert state'
