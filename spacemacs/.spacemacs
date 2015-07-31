@@ -225,6 +225,7 @@ layers configuration."
      nil '(("\\<\\(TODO\\|FIXME\\|HACK\\|XXX\\|BUG\\|Note\\):"
             1 font-lock-warning-face t))))
   (add-hook 'prog-mode-hook #'add-watchwords)
+  (add-hook 'org-mode-hook #'add-watchwords)
 
   ;; -- Modes
   ;; org
@@ -236,8 +237,8 @@ layers configuration."
   ;; I generally cite publication with an org-mode link
   ;; `[[file:file.bib::key][key]]' and I want to get this back a
   ;; `\cite' in LaTeX export.
-  (defun my-filter-cite (link backend info)
-    "Ensure that 'my-way-of-cite' is properly handled in LaTeX
+  (defun org/latex-filter-cite (link backend info)
+    "Ensure that 'my way of cite' is properly handled in LaTeX
   export."
     ;; Ensure that the filter will only be applied when using `latex'
     (when (org-export-derived-backend-p backend 'latex)
@@ -247,7 +248,48 @@ layers configuration."
 
   (setq org-export-filter-link-functions nil)
   (add-to-list 'org-export-filter-link-functions
-               'my-filter-cite)
+               'org/latex-filter-cite)
+
+  (defun org/latex-filter-cites (final-output backend info)
+    "Make a multiple cite of adjacent cites in LaTeX export"
+    (when (org-export-derived-backend-p backend 'latex)
+      (replace-regexp-in-string "\\\\cite{.+?}\\(?:[\s\n]*\\\\cite{.+?}\\)+"
+                                (lambda (cites)
+                                  (save-match-data
+                                    (concat "\\\\cite{"
+                                            (string-join
+                                             (mapcar (lambda (cite)
+                                                       (replace-regexp-in-string "\\\\cite{\\(.+?\\)}"
+                                                                                 "\\1"
+                                                                                 cite))
+                                                     (split-string cites))
+                                             ",")
+                                            "}")
+                                    ))
+                                final-output)))
+
+  (setq org-export-filter-final-output-functions nil)
+  (add-to-list 'org-export-filter-final-output-functions
+               'org/latex-filter-cites)
+
+      ;; http://www.emacswiki.org/emacs/ElispCookbook#toc2
+      ;; (with-temp-buffer
+      ;;   (insert final-output)
+      ;;   (let ((ast '())
+      ;;         (startPos (point-min)))
+      ;;     (goto-char (point-min))
+      ;;     (while (re-search-forward "\\\\cite{\\(.+?\\)}" nil t)
+      ;;       (setq startCitePos (match-beginning 0))
+
+      ;;       (setq text (buffer-substring-no-properties startPos startCitePos))
+      ;;       (setq cite (match-string-no-properties 1))
+
+      ;;       (setq ast (cons (list 'cite cite) (cons (list 'text  text) ast)))
+
+      ;;       (setq startPos (match-end 0)))
+      ;;     (reverse ast)))))
+
+
 
   ;; (defun org-open-cite (path)
   ;;   (org-open-file path nil nil  ))
@@ -311,6 +353,3 @@ layers configuration."
 
   (evil-leader/set-key "w|" 'toggle-window-split)
   )
-
-;; Do not write anything past this comment. This is where Emacs will
-;; auto-generate custom variable definitions.
