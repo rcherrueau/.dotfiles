@@ -171,6 +171,7 @@ before layers configuration."
   "Configuration function.
 This function is called at the very end of Spacemacs initialization after
 layers configuration."
+  ;; -- Hardware setup
   ;; Are we on a mac?
   (setq is-mac (equal system-type 'darwin))
 
@@ -229,6 +230,7 @@ layers configuration."
 
   ;; -- Modes
   ;; org
+  (require 'org)
   ;; Do not auto-indent lines depending on the depth on the node.
   (setq org-startup-indented nil)
   ;; Do not fontify headline
@@ -237,64 +239,87 @@ layers configuration."
   ;; I generally cite publication with an org-mode link
   ;; `[[file:file.bib::key][key]]' and I want to get this back a
   ;; `\cite' in LaTeX export.
-  (defun org/latex-filter-cite (link backend info)
-    "Ensure that 'my way of cite' is properly handled in LaTeX
-  export."
-    ;; Ensure that the filter will only be applied when using `latex'
-    (when (org-export-derived-backend-p backend 'latex)
-      (replace-regexp-in-string "\\href{.+\.bib}{\\(.+\\)}"
-                                "\cite{\\1}"
-                                link)))
+  ;; (defun org/latex-filter-cite (link backend info)
+  ;;   "Ensures that 'my way of cite' is properly handled in LaTeX
+  ;; export."
+  ;;   ;; Ensure that the filter will only be applied when using `latex'
+  ;;   (when (org-export-derived-backend-p backend 'latex)
+  ;;     (replace-regexp-in-string "\\href{.+\.bib}{\\(.+\\)}"
+  ;;                               "\cite{\\1}"
+  ;;                               link)))
 
-  (setq org-export-filter-link-functions nil)
-  (add-to-list 'org-export-filter-link-functions
-               'org/latex-filter-cite)
+  ;; (setq org-export-filter-link-functions nil)
+  ;; (add-to-list 'org-export-filter-link-functions
+  ;;              'org/latex-filter-cite)
 
   (defun org/latex-filter-cites (final-output backend info)
-    "Make a multiple cite of adjacent cites in LaTeX export"
+    "Makes a multiple cite of adjacent cites in LaTeX export"
+    ;; http://www.emacswiki.org/emacs/ElispCookbook#toc2
     (when (org-export-derived-backend-p backend 'latex)
-      (replace-regexp-in-string "\\\\cite{.+?}\\(?:[\s\n]*\\\\cite{.+?}\\)+"
-                                (lambda (cites)
-                                  (save-match-data
-                                    (concat "\\\\cite{"
-                                            (string-join
-                                             (mapcar (lambda (cite)
-                                                       (replace-regexp-in-string "\\\\cite{\\(.+?\\)}"
-                                                                                 "\\1"
-                                                                                 cite))
-                                                     (split-string cites))
-                                             ",")
-                                            "}")
-                                    ))
-                                final-output)))
+      (replace-regexp-in-string
+       "\\\\cite{[a-zA-Z0-9+]+}\\(?:[\s\n]*\\\\cite{[a-zA-Z0-9+]+}\\)+"
+       (lambda (cites)
+         (save-match-data
+           (concat "\\\\cite{"
+                   (string-join
+                    (mapcar (lambda (cite)
+                              (replace-regexp-in-string
+                               "\\\\cite{\\([a-zA-Z0-9+]+\\)}"
+                               "\\1"
+                               cite))
+                            (split-string cites))
+                    ",")
+                   "}")))
+       final-output)))
 
   (setq org-export-filter-final-output-functions nil)
   (add-to-list 'org-export-filter-final-output-functions
                'org/latex-filter-cites)
 
-      ;; http://www.emacswiki.org/emacs/ElispCookbook#toc2
-      ;; (with-temp-buffer
-      ;;   (insert final-output)
-      ;;   (let ((ast '())
-      ;;         (startPos (point-min)))
-      ;;     (goto-char (point-min))
-      ;;     (while (re-search-forward "\\\\cite{\\(.+?\\)}" nil t)
-      ;;       (setq startCitePos (match-beginning 0))
+  ;; Agnostic cite hyperlink
+  (setq org-bibref-file
+        "/Users/rcherr12/prog/emn_perso/phd/thesis/thesis.bib")
 
-      ;;       (setq text (buffer-substring-no-properties startPos startCitePos))
-      ;;       (setq cite (match-string-no-properties 1))
+  (defun org-cite-open (key)
+    "Visit the reference on KEY.
+  KEY shoulb be a citation key available in the `org-bibref-file'"
+    (let ((path org-bibref-file)
+          (arg 'emacs)
+          (search key))
+      ;; org-open-file is a function defines in org.el. It is used in
+      ;; `org-open-at-point' arround line 10548.
+      (org-open-file path arg nil search)))
 
-      ;;       (setq ast (cons (list 'cite cite) (cons (list 'text  text) ast)))
+  (defun org-cite-export (key desc format)
+    "Create the export version of a cite link."
+    (cond
+     ((eq format 'latex) (format "\\cite{%s}" key))
+     (t (format "[%s]" key))))
 
-      ;;       (setq startPos (match-end 0)))
-      ;;     (reverse ast)))))
+  ;; see org-ascii-link and org-latex-link for inspiration
+  ;; (defun org-cite-export (cite desc format)
+  ;;   "Transcode a CITE object from Org to FORMAT"
+  ;;   (let ((raw-link (org-element-property :raw-link cite)))
+  ;;     (message "rw %s" raw-link))
+  ;;   ""
+  ;;   )
 
+  ;; (defun org-cite-store-link ()
+  ;;   "Store a link to a citation."
+  ;;   (let* ((key (org-cite-get-key))
+  ;;          (link (concat "cite:" key))
+  ;;          (description (fomat "Citation for %s in %s" key org-bibref-file)))
+  ;;     (org-store-link-props
+  ;;      :type "cite"
+  ;;      :link link
+  ;;      :decription description)))
+
+  (org-add-link-type "cite" 'org-cite-open 'org-cite-export)
 
 
   ;; (defun org-open-cite (path)
   ;;   (org-open-file path nil nil  ))
   ;; (org-add-link-type "cite" 'org-open-cite)
-
 
   ;; LaTeX
   (add-hook 'doc-view-mode-hook 'auto-revert-mode)
@@ -353,3 +378,23 @@ layers configuration."
 
   (evil-leader/set-key "w|" 'toggle-window-split)
   )
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ahs-case-fold-search nil)
+ '(ahs-default-range (quote ahs-range-whole-buffer))
+ '(ahs-idle-interval 0.25)
+ '(ahs-idle-timer 0 t)
+ '(ahs-inhibit-face-list nil)
+ '(ring-bell-function (quote ignore) t)
+ '(safe-local-variable-values (quote ((org-export-initial-scope quote subtree)))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:foreground "#DCDCCC" :background "#3F3F3F"))))
+ '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
+ '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil)))))
