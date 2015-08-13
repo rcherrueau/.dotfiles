@@ -171,6 +171,20 @@ before layers configuration."
   "Configuration function.
 This function is called at the very end of Spacemacs initialization after
 layers configuration."
+
+  ;; -- Utils
+  (defun string/ends-with (string suffix)
+    "Return t if STRING ends with SUFFIX."
+    (and (string-match (rx-to-string `(: ,suffix eos) t)
+                       string)
+         t))
+
+  (defun string/starts-with (string prefix)
+    "Return t if STRING starts with prefix."
+    (and (string-match (rx-to-string `(: bos ,prefix) t)
+                       string)
+         t))
+
   ;; -- Hardware setup
   ;; Are we on a mac?
   (setq is-mac (equal system-type 'darwin))
@@ -235,6 +249,31 @@ layers configuration."
   (setq org-startup-indented nil)
   ;; Do not fontify headline
   (setq org-src-fontify-natively t)
+
+  ;; A footnote reference starting with `:margin:' is transformed as a
+  ;; \marginpar in LaTeX. The `:margin:' key word is simply deleted in
+  ;; other backend.
+  (defun org/latex-filter-ref-margin (fnote backend info)
+    (if (org-export-derived-backend-p backend 'latex)
+        ;; If LaTeX backend
+        (cond
+         ((string/starts-with fnote "\\footnote{:margin: ")
+            (concat "\\marginpar{"
+                    (substring fnote (length "\\footnote{:margin: "))))
+         ((string/starts-with fnote "\\footnote{:margin:")
+          (concat "\\marginpar{"
+                  (substring fnote (length "\\footnote{:margin:")))))
+        ;; Other backend
+      (progn
+        (message "fnoteref: %s" fnote)
+        (replace-regexp-in-string ":margin: " "" fnote))))
+
+  ;; TODO: Put filter in a org layer, thus org-export-* will be loaded
+  ;; and the following forward declaration will not be required
+  ;; anymore
+  (setq org-export-filter-footnote-reference-functions nil)
+  (add-to-list 'org-export-filter-footnote-reference-functions
+               'org/latex-filter-ref-margin)
 
   ;; I generally cite publication with an org-mode link
   ;; `[[file:file.bib::key][key]]' and I want to get this back a
