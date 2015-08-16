@@ -10,7 +10,10 @@ OSX) alias ls="ls -G" ;;
 ;;
 esac
 
-# use p unsted to open ap
+alias l='ls -alh'
+alias ll='ls -l'
+
+# use p unsted to open application
 case ${OS} in
 OSX) alias p="open" ;;
 *)   alias p="xdg-open" ;;

@@ -88,11 +88,11 @@ before layers configuration."
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
    ;; size to make separators look not too crappy.
-   dotspacemacs-default-font '("Source Code Pro"
-                               :size 12
+   dotspacemacs-default-font '("Ubuntu Mono"
+                               :size 13
                                :weight normal
                                :width normal
-                               :powerline-scale 0.9)
+                               :powerline-scale 1.1)
    ;; The leader key
    dotspacemacs-leader-key "SPC"
    ;; The leader key accessible in `emacs state' and `insert state'
@@ -428,7 +428,10 @@ layers configuration."
  '(ahs-idle-timer 0 t)
  '(ahs-inhibit-face-list nil)
  '(ring-bell-function (quote ignore) t)
- '(safe-local-variable-values (quote ((org-export-initial-scope quote subtree)))))
+ '(safe-local-variable-values
+   (quote
+    ((org-bibref-file . "Bibliography.bib")
+     (org-export-initial-scope quote subtree)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
