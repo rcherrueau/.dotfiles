@@ -16,5 +16,7 @@ alias ll='ls -l'
 # use p unsted to open application
 case ${OS} in
 OSX) alias p="open" ;;
-*)   alias p="xdg-open" ;;
+*)   myopen(){ xdg-open "$1" & }
+     alias p="myopen"
+;;
 esac
