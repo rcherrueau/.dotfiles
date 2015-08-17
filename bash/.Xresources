@@ -32,7 +32,7 @@ Xft*rgba:            rgb
 ! Black
 *color0:             #3f3f3f
 ! Red
-*color1:             #dca3a3 
+*color1:             #705050 
 ! Green
 *color2:             #60b48a 
 ! Yellow
@@ -48,7 +48,7 @@ Xft*rgba:            rgb
 ! Gray
 *color8:             #709080 
 ! LRed
-*color9:             #705050 
+*color9:             #dca3a3 
 ! LGreen
 *color10:            #c3bf9f 
 ! LYellow
@@ -61,7 +61,7 @@ Xft*rgba:            rgb
 *color14:            #93e0e3 
 ! White
 *color15:            #ffffff 
-*cursorColor:        #dc8cc3
+*cursorColor:        #6b3644
 
 URxvt*font:            xft:Ubuntu Mono:size=10
 URxvts*.letterSpace:   -1
@@ -71,6 +71,6 @@ URxvt*jumpScroll:      true
 URxvt*visualBell:      false
 URxvt*pointerBlank:    true
 URxvt*saveLines:       4000
-URxvt*cursorColor:     #dc8cc3
+URxvt*cursorColor:     #6b3654
 URxvt*colorUL:         #c3bf9f
 URxvt*underlineColor:  #c3bf9f

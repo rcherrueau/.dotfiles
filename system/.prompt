@@ -1,7 +1,9 @@
+COLOR="1;31m"
+PS1="[\u@\h:\W]"
 # Git prompt
 # http://www.git-attitude.fr/2013/05/22/prompt-git-qui-dechire/
 export GIT_PS1_SHOWDIRTYSTATE=1 GIT_PS1_SHOWSTASHSTATE=1
 export GIT_PS1_SHOWUNTRACKEDFILES=1
 export GIT_PS1_SHOWUPSTREAM=verbose GIT_PS1_DESCRIBE_STYLE=branch
 export GIT_PS1_SHOWCOLORHINTS=1
-export PROMPT_COMMAND='__git_ps1 "\n\[\033[1;35m\][\u@\h:\w]\033[0m\]" "\033[1;35m\]\\\$\033[0m\] "'
+export PROMPT_COMMAND='__git_ps1 "\n\[\033[$COLOR\]$PS1\[\033[0m\]" "\[\033[$COLOR\]\\$\[\033[0m\] "'
