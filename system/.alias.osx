@@ -9,5 +9,3 @@ command -v sha1sum > /dev/null || alias sha1sum="shasum"
 # Lock the screen (when going AFK)
 alias afk="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
 
-# emacs
-alias emacs="${EMACS_HOME}/Emacs --no-window-system"
