@@ -63,7 +63,7 @@ Xft*rgba:            rgb
 *color15:            #ffffff 
 *cursorColor:        #6b3644
 
-URxvt*font:            xft:Ubuntu Mono:size=10
+URxvt*font:            xft:FiraMono:size=9
 URxvts*.letterSpace:   -1
 URxvt*scrollBar:       false
 URxvt*internalBorder:  0
