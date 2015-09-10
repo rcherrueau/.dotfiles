@@ -244,11 +244,13 @@ layers configuration."
 
   ;; -- Modes
   ;; org
-  (require 'org)
+  (require 'org) ;; BHOOOOO, todo layer-org!
   ;; Do not auto-indent lines depending on the depth on the node.
   (setq org-startup-indented nil)
   ;; Do not fontify headline
   (setq org-src-fontify-natively t)
+  ;; Preserve my indentation during source block export
+  (setq org-src-preserve-indentation t)
 
   ;; A footnote reference starting with `:margin:' is transformed as a
   ;; \marginpar in LaTeX. The `:margin:' key word is simply deleted in
