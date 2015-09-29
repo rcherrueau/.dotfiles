@@ -26,7 +26,6 @@ values."
      emacs-lisp
      racket
      idris
-
      ;; --------------------------------------------------------- others
      nixos
      org
@@ -37,19 +36,22 @@ values."
             shell-default-position 'bottom
             shell-default-shell 'ainsi-term)
      spell-checking
-     ;; git
-     ;; markdown
-     ;; org
-     ;; syntax-checking
-     ;; version-control
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages then consider to create a layer, you can also put the
    ;; configuration in `dotspacemacs/config'.
-   dotspacemacs-additional-packages '()
+   dotspacemacs-additional-packages '(tao-theme)
    ;; A list of packages and/or extensions that will not be install and loaded.
-   dotspacemacs-excluded-packages '()
+   dotspacemacs-excluded-packages '(
+     ;; Do not print a ~ to indicate the end of file
+     vi-tilde-fringe
+     ;; Do not show symbol as bullet for headers in org
+     org-bullets
+     ;; Do not highlight the surrounding parentheses: Show Paren Mode
+     ;; and Rainbow Delimiters are sufficient
+     highlight-parentheses
+     )
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
    ;; are declared in a layer which is not a member of
    ;; the list `dotspacemacs-configuration-layers'. (default t)
@@ -85,7 +87,7 @@ values."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(zenburn)
+   dotspacemacs-themes '(zenburn tao-theme)
    ;; If non nil the cursor color matches the state color.
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
@@ -197,6 +199,19 @@ user code."
   "Configuration function for user code.
  This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
+  ;; ------------------------------------------------------------- Utils
+  (defun string/starts-with (string prefix)
+    "Return t if STRING starts with prefix."
+    (and (string-match (rx-to-string `(: bos ,prefix) t)
+                       string)
+         t))
+
+  (defun string/ends-with (string suffix)
+    "Return t if STRING ends with SUFFIX."
+    (and (string-match (rx-to-string `(: ,suffix eos) t)
+                       string)
+         t))
+
   ;; ---------------------------------------------------- Hardware setup
   ;; Are we on a mac?
   (setq is-mac (equal system-type 'darwin))
@@ -289,6 +304,8 @@ layers configuration. You are free to put any user code."
   (add-hook 'prog-mode-hook #'add-watchwords)
   (add-hook 'org-mode-hook #'add-watchwords)
 
+  ;; TODO: update powerline
+
   ;; ------------------------------------------------------------- Modes
   ;; -- Org
   (with-eval-after-load 'org
@@ -297,16 +314,16 @@ layers configuration. You are free to put any user code."
     ;; Syntax highlighting of source block
     (setq org-src-fontify-natively t)
     ;; Preserve my indentation during source block export
+    (setq org-src-preserve-indentation t)
 
-    ;; Agnostic cite hyperlink
-    (setq org-bibref-file
-          (when is-mac
-            "/Users/rcherr12/prog/emn_perso/phd/thesis/thesis.bib"
-            "/home/rfish/prog/emn_perso/phd/thesis/thesis.bib"))
+    ;; Set the external pdf application to zathura for org-open-file
+    ;; on my nixos
+    (when (not is-mac)
+      (setcdr (assoc "\\.pdf\\'" org-file-apps) "zathura %s")))
 
-    )
-
-  (with-eval-after-load 'org-export-dispatch
+  (with-eval-after-load 'ox
+    ;; -- Supports marginpar in LaTeX
+    ;;
     ;; A footnote reference starting with `:margin:' is transformed as a
     ;; \marginpar in LaTeX. The `:margin:' key word is simply deleted in
     ;; other backend.
@@ -325,29 +342,34 @@ layers configuration. You are free to put any user code."
           (message "fnoteref: %s" fnote)
           (replace-regexp-in-string ":margin: " "" fnote))))
 
-    ;; TODO: Put filter in a org layer, thus org-export-* will be loaded
-    ;; and the following forward declaration will not be required
-    ;; anymore
-    ;; FIXME: (setq org-export-filter-footnote-reference-functions nil)
     (add-to-list 'org-export-filter-footnote-reference-functions
                  'org/latex-filter-ref-margin)
 
-    ;; I generally cite publication with an org-mode link
-    ;; `[[file:file.bib::key][key]]' and I want to get this back a
-    ;; `\cite' in LaTeX export.
-    ;; (defun org/latex-filter-cite (link backend info)
-    ;;   "Ensures that 'my way of cite' is properly handled in LaTeX
-    ;; export."
-    ;;   ;; Ensure that the filter will only be applied when using `latex'
-    ;;   (when (org-export-derived-backend-p backend 'latex)
-    ;;     (replace-regexp-in-string "\\href{.+\.bib}{\\(.+\\)}"
-    ;;                               "\cite{\\1}"
-    ;;                               link)))
+    ;; -- Agnostic cite hyperlink; support in LaTeX
+    ;;
+    ;; A link of the form `cite:mykey' is transformed as a
+    ;; \cite{mykey} in LaTeX.
+    (defun org-cite-export (key desc format)
+      "Create the export version of a cite link."
+      (cond
+       ((eq format 'latex) (format "\\cite{%s}" key))
+       (t (format "[%s]" key))))
 
-    ;; (setq org-export-filter-link-functions nil)
-    ;; (add-to-list 'org-export-filter-link-functions
-    ;;              'org/latex-filter-cite)
+    ;; Follows a bib key and visits the bibfile. The bibfile path must
+    ;; be defined in `org-bibref-file'.
+    (defun org-cite-open (key)
+      "Visit the reference on KEY.
+  KEY shoulb be a citation key available in the `org-bibref-file'"
+      (let ((path org-bibref-file)
+            (arg 'emacs)
+            (search key))
+        ;; org-open-file is a function defines in org.el. It is used in
+        ;; `org-open-at-point' arround line 10548.
+        (org-open-file path arg nil search)))
 
+    (org-add-link-type "cite" 'org-cite-open 'org-cite-export)
+
+    ;; Transforms many following cites into one multiple cite.
     (defun org/latex-filter-cites (final-output backend info)
       "Makes a multiple cite of adjacent cites in LaTeX export"
       ;; http://www.emacswiki.org/emacs/ElispCookbook#toc2
@@ -367,26 +389,8 @@ layers configuration. You are free to put any user code."
                       ",")
                      "}")))
          final-output)))
-
-    ;; FIXME: (setq org-export-filter-final-output-functions nil)
     (add-to-list 'org-export-filter-final-output-functions
                  'org/latex-filter-cites)
-
-    (defun org-cite-open (key)
-      "Visit the reference on KEY.
-  KEY shoulb be a citation key available in the `org-bibref-file'"
-      (let ((path org-bibref-file)
-            (arg 'emacs)
-            (search key))
-        ;; org-open-file is a function defines in org.el. It is used in
-        ;; `org-open-at-point' arround line 10548.
-        (org-open-file path arg nil search)))
-
-    (defun org-cite-export (key desc format)
-      "Create the export version of a cite link."
-      (cond
-       ((eq format 'latex) (format "\\cite{%s}" key))
-       (t (format "[%s]" key))))
 
     ;; see org-ascii-link and org-latex-link for inspiration
     ;; (defun org-cite-export (cite desc format)
@@ -406,13 +410,15 @@ layers configuration. You are free to put any user code."
     ;;      :link link
     ;;      :decription description)))
 
-    (org-add-link-type "cite" 'org-cite-open 'org-cite-export)
-
-
     ;; (defun org-open-cite (path)
     ;;   (org-open-file path nil nil  ))
     ;; (org-add-link-type "cite" 'org-open-cite)
     )
+
+  ;; -- vc-mode
+  ;; Visit symbolic link to a file. This bypass the emacs version
+  ;; control system, but I don't use it!
+  (setq vc-follow-symlinks nil)
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
