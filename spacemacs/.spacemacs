@@ -214,13 +214,15 @@ layers configuration. You are free to put any user code."
                        string)
          t))
 
+  ;; Finds the name of the closest tag with `which-function'
+  ;; You should activate which-function-mode
+  (setq which-func-imenu-joiner-function (lambda (x) (string-join x ":")))
+
+  (defun closest-tag ())
+
   ;; ---------------------------------------------------- Hardware setup
   ;; Are we using a mac-keyboard
   (setq mac-keyboard t)
-
-  ;; Powerline
-  (setq powerline-default-separator 'arrow)
-  (setq powerline-default-separator-dir '(right . right))
 
   ;; -- Key bindings
   ;; Mac-os key
@@ -307,7 +309,9 @@ layers configuration. You are free to put any user code."
   (add-hook 'prog-mode-hook #'add-watchwords)
   (add-hook 'org-mode-hook #'add-watchwords)
 
-  ;; TODO: update powerline
+  ;; Powerline
+  (setq powerline-default-separator 'arrow)
+  (setq powerline-default-separator-dir '(right . right))
 
   ;; ------------------------------------------------------------- Modes
   ;; -- Org
@@ -428,6 +432,7 @@ layers configuration. You are free to put any user code."
   ;; -------------------------------------------------------------- Misc
   ;; Revert gc threshold to the default value after initalization.
   ;; I've got lag on key-up in big org files such as my timeline
+  ;; https://github.com/syl20bnr/spacemacs/issues/3011
   (setq gc-cons-threshold 800000)
 )
 
