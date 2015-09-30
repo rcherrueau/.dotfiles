@@ -218,6 +218,10 @@ layers configuration. You are free to put any user code."
   ;; Are we using a mac-keyboard
   (setq mac-keyboard t)
 
+  ;; Powerline
+  (setq powerline-default-separator 'arrow)
+  (setq powerline-default-separator-dir '(right . right))
+
   ;; -- Key bindings
   ;; Mac-os key
   (when mac-keyboard
@@ -420,6 +424,11 @@ layers configuration. You are free to put any user code."
   (setq vc-follow-symlinks nil)
   ;; Fully disable vc-mode
   (setq vc-handled-backends ())
+
+  ;; -------------------------------------------------------------- Misc
+  ;; Revert gc threshold to the default value after initalization.
+  ;; I've got lag on key-up in big org files such as my timeline
+  (setq gc-cons-threshold 800000)
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
