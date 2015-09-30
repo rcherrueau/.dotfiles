@@ -193,6 +193,8 @@ values."
   "Initialization function for user code.
 It is called immediately after `dotspacemacs/init'.  You are free to put any
 user code."
+  ;; Are we on a mac?
+  (setq is-mac (equal system-type 'darwin))
   )
 
 (defun dotspacemacs/user-config ()
@@ -213,9 +215,6 @@ layers configuration. You are free to put any user code."
          t))
 
   ;; ---------------------------------------------------- Hardware setup
-  ;; Are we on a mac?
-  (setq is-mac (equal system-type 'darwin))
-
   ;; Are we using a mac-keyboard
   (setq mac-keyboard t)
 
@@ -419,6 +418,8 @@ layers configuration. You are free to put any user code."
   ;; Visit symbolic link to a file. This bypass the emacs version
   ;; control system, but I don't use it!
   (setq vc-follow-symlinks nil)
+  ;; Fully disable vc-mode
+  (setq vc-handled-backends ())
 )
 
 ;; Do not write anything past this comment. This is where Emacs will
