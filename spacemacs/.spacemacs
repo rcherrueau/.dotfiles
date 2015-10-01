@@ -463,6 +463,29 @@ are currently in."
     ;; (defun org-open-cite (path)
     ;;   (org-open-file path nil nil  ))
     ;; (org-add-link-type "cite" 'org-open-cite)
+
+    ;; -- Do not launch error on resolve link
+    ;; `org-export-resolve-fuzzy-link' `org-export-before-processing-hook'
+    ;; http://comments.gmane.org/gmane.emacs.orgmode/100754
+    ;; http://emacs.stackexchange.com/a/16914
+    ;; http://emacs.stackexchange.com/a/9494
+    ;; http://orgmode.org/worg/dev/org-element-api.html
+    (defun org-drop-unlinked-link (orig-fun link info)
+      "Do not launch error on unresolved link"
+      (condition-case err
+          (funcall orig-fun link info)
+        (user-error (org-element-property :path link))))
+
+    (advice-add 'org-export-resolve-id-link :around #'org-drop-unlinked-link)
+
+    ;; (defun org-drop-unliked-link (backend)
+    ;;   "Drop links which don't point to a target"
+    ;;   (org-element-map (org-element-parse-buffer) 'link
+    ;;     (lambda (link)
+    ;;       (when (string= (org-element-property :type link) "file")
+    ;;         (org-element-property :path link)))))
+
+    ;; (add-hook 'org-export-before-processing-hook #'org-drop-unliked-link)
     )
 
   ;; -- vc-mode
