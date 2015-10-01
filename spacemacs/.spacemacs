@@ -51,6 +51,8 @@ values."
      ;; Do not highlight the surrounding parentheses: Show Paren Mode
      ;; and Rainbow Delimiters are sufficient
      highlight-parentheses
+     ;;
+     anzu
      )
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
    ;; are declared in a layer which is not a member of
@@ -214,11 +216,17 @@ layers configuration. You are free to put any user code."
                        string)
          t))
 
-  ;; Finds the name of the closest tag with `which-function'
-  ;; You should activate which-function-mode
-  (setq which-func-imenu-joiner-function (lambda (x) (string-join x ":")))
-
-  (defun closest-tag ())
+  ;; Gets the healdlines path of your current position in org-mode
+  ;; https://github.com/fmdkdd/dotfiles/blob/master/spacemacs/.emacs.d/private/fmdkdd/packages.el#L172
+  (defun fmdkdd/org-full-outline-path ()
+    "Concatenate the results of `org-get-outline-path' and
+`org-get-heading' to get the full outline path to the heading we
+are currently in."
+    (unless (org-before-first-heading-p)
+      (let* ((path (append (org-get-outline-path)
+                           (cons (org-get-heading t t) nil))))
+        (org-format-outline-path path 10)))) ; XXX: not sure if the width
+                                             ; argument works right
 
   ;; ---------------------------------------------------- Hardware setup
   ;; Are we using a mac-keyboard
@@ -264,8 +272,13 @@ layers configuration. You are free to put any user code."
 
   (evil-leader/set-key "w|" 'toggle-window-split)
 
+  ;; -- Customize
+  ;; Set custome variables in a specific file
+  (setq custom-file (locate-user-emacs-file "mine-pref.el"))
+  (load custom-file)
+
   ;; -------------------------------------------------------- Appearance
-  ;; Fringeline
+  ;; -- Fringeline
   ;; Display - in the fringe line for EOF
   (setq-default indicate-empty-lines t)
   ;; Set the fringe bitmaps as emacs default values
@@ -309,9 +322,39 @@ layers configuration. You are free to put any user code."
   (add-hook 'prog-mode-hook #'add-watchwords)
   (add-hook 'org-mode-hook #'add-watchwords)
 
-  ;; Powerline
+  ;; -- Powerline
   (setq powerline-default-separator 'arrow)
   (setq powerline-default-separator-dir '(right . right))
+
+  ;; Powerline segment for orgmode
+  (spacemacs|define-mode-line-segment org-path
+    (fmdkdd/org-full-outline-path)
+    ;; Displays in org-mode when window is focused
+    :when (eq major-mode 'org-mode))
+
+  (setq spacemacs-mode-line-left
+        '(((workspace-number window-number)
+           :fallback state-tag
+           :separator "|"
+           :face state-face)
+          (buffer-modified buffer-encoding-abbrev line-column
+           "⚓" buffer-id remote-host)
+          major-mode
+          ((flycheck-errors flycheck-warnings flycheck-infos)
+           :when active)
+          ((minor-modes process)
+           :when active)
+          (erc-track :when active)
+          (org-pomodoro :when active)
+          (org-clock :when active)
+          (org-path :when active)))
+
+  (setq spacemacs-mode-line-right
+        '(selection-info
+         ((global-mode new-version)
+          :when active)
+         buffer-position hud))
+
 
   ;; ------------------------------------------------------------- Modes
   ;; -- Org
