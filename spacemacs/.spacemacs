@@ -465,16 +465,39 @@ are currently in."
     ;; (org-add-link-type "cite" 'org-open-cite)
 
     ;; -- Do not launch error on resolve link
+    ;; The good way:
     ;; `org-export-resolve-fuzzy-link' `org-export-before-processing-hook'
     ;; http://comments.gmane.org/gmane.emacs.orgmode/100754
     ;; http://emacs.stackexchange.com/a/16914
     ;; http://emacs.stackexchange.com/a/9494
-    ;; http://orgmode.org/worg/dev/org-element-api.html
+    ;; The easy way ; AOP!:
     (defun org-drop-unlinked-link (orig-fun link info)
       "Do not launch error on unresolved link"
       (condition-case err
           (funcall orig-fun link info)
-        (user-error (org-element-property :path link))))
+        ;; The function that uses the link resolver has two flows:
+        ;; - The link resolver returns an org-element, then the
+        ;;   exporter produces one reference to that link.
+        ;; - The link resolver returns a string, then the exporter
+        ;;   produces an url link.
+        ;; Because we consider custom-id on healines, we are
+        ;; interested in the first flow. Hence, if the custom-id is
+        ;; not reachable, we have to construct a fake headline
+        ;; org element.
+        ;; http://orgmode.org/worg/dev/org-element-api.html
+        (user-error
+         (progn
+           (message
+            "Unresolvable link %s; fallback using `org-drop-unlinked-link'"
+            (org-element-property :path link))
+           (org-element-create
+            'headline
+            ;; Sets reference of the fake headline with the
+            ;; path of our link
+            `(:CUSTOM_ID ,(org-element-property :path link)
+            ;; Sets the level to prevent error while
+            ;; `org-export-numbered-headline-p'
+              :level     0))))))
 
     (advice-add 'org-export-resolve-id-link :around #'org-drop-unlinked-link)
 
