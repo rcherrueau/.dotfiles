@@ -395,6 +395,46 @@ are currently in."
     (add-to-list 'org-export-filter-footnote-reference-functions
                  'org/latex-filter-ref-margin)
 
+    ;; Transforming footnote into margin put a mess in the footnote
+    ;; numbering. This function provides the good numbering.
+    (defun org/get-footnote-number/margin
+        (orig-fun footnote info &optional data body-first)
+      (let ((count 0)
+            (seen)
+            (label (org-element-property :label footnote)))
+        (catch 'exit
+          (org-export--footnote-reference-map
+           (lambda (f)
+             (let* ((l (org-element-property :label f))
+                   ;; Gets the defintion of the ref
+                    (d (org-trim
+                          (org-export-data
+                           (org-export-get-footnote-definition f info)
+                           info)))
+                    ;; Test if this is a margin or not
+                    (is-margin (string-match ":margin:" d)))
+               (message "match %s %s" is-margin d)
+               (cond
+                ;; Anonymous footnote match: return number.
+                ((and (not l) (not label) (eq footnote f))
+                 (throw 'exit
+                        ;; If this is a margin, then don't count
+                        (if is-margin count (1+ count))))
+                ;; Labels match: return number.
+                ((and label l (string= label l))
+                 (throw 'exit
+                        ;; If this is a margin, then don't count
+                        (if is-margin count (1+ count))))
+                ;; Otherwise store label and increase counter if label
+                ;; wasn't encountered yet.
+                ((not l) (if is-margin count (incf count)))
+                ((not (member l seen)) (push l seen)
+                 (if is-margin count (incf count))))))
+           (or data (plist-get info :parse-tree)) info body-first))))
+
+    (advice-add 'org-export-get-footnote-number :around
+                #'org/get-footnote-number/margin)
+
     ;; -- Agnostic cite hyperlink; support in LaTeX
     ;;
     ;; A link of the form `cite:mykey' is transformed as a
@@ -471,7 +511,7 @@ are currently in."
     ;; http://emacs.stackexchange.com/a/16914
     ;; http://emacs.stackexchange.com/a/9494
     ;; The easy way ; AOP!:
-    (defun org-drop-unlinked-link (orig-fun link info)
+    (defun org/drop-unlinked-link (orig-fun link info)
       "Do not launch error on unresolved link"
       (condition-case err
           (funcall orig-fun link info)
@@ -499,7 +539,7 @@ are currently in."
             ;; `org-export-numbered-headline-p'
               :level     0))))))
 
-    (advice-add 'org-export-resolve-id-link :around #'org-drop-unlinked-link)
+    (advice-add 'org-export-resolve-id-link :around #'org/drop-unlinked-link)
 
     ;; (defun org-drop-unliked-link (backend)
     ;;   "Drop links which don't point to a target"
