@@ -397,7 +397,7 @@ are currently in."
 
     ;; Transforming footnote into margin put a mess in the footnote
     ;; numbering. This function provides the good numbering.
-    (defun org/get-footnote-number/margin
+    (defun org-export-get-footnote-number/margin
         (orig-fun footnote info &optional data body-first)
       (let ((count 0)
             (seen)
@@ -433,7 +433,10 @@ are currently in."
            (or data (plist-get info :parse-tree)) info body-first))))
 
     (advice-add 'org-export-get-footnote-number :around
-                #'org/get-footnote-number/margin)
+                #'org-export-get-footnote-number/margin)
+
+    ;; (advice-add 'org-latex-footnote-reference :around
+    ;;             #'org-latex-footnote-reference/margin)
 
     ;; -- Agnostic cite hyperlink; support in LaTeX
     ;;
