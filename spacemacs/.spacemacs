@@ -369,7 +369,13 @@ are currently in."
     ;; Set the external pdf application to zathura for org-open-file
     ;; on my nixos
     (when (not is-mac)
-      (setcdr (assoc "\\.pdf\\'" org-file-apps) "zathura %s")))
+      (setcdr (assoc "\\.pdf\\'" org-file-apps) "zathura %s"))
+
+    ;; Adds abbreviation for the todo special block (if nothing is
+    ;; already bind on "T"). See Easy template in org manual
+    (add-to-list 'org-structure-template-alist
+                 '("T" "#+BEGIN_TODO ?\n\n#+END_TODO"))
+    )
 
   (with-eval-after-load 'ox
     ;; -- Supports marginpar in LaTeX
