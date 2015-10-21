@@ -374,7 +374,7 @@ are currently in."
     ;; Adds abbreviation for the todo special block (if nothing is
     ;; already bind on "T"). See Easy template in org manual
     (add-to-list 'org-structure-template-alist
-                 '("T" "#+BEGIN_TODO ?\n\n#+END_TODO"))
+                 '("T" "#+BEGIN_TODO ?\nTODO:\n#+END_TODO"))
     )
 
   (with-eval-after-load 'ox
