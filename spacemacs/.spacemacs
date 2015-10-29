@@ -366,22 +366,72 @@ are currently in."
     ;; Preserve my indentation during source block export
     (setq org-src-preserve-indentation t)
 
-    ;; Set the external pdf application to zathura for org-open-file
-    ;; on my nixos
+    ;; Set the external pdf application to zathura on my nixos
     (when (not is-mac)
       (setcdr (assoc "\\.pdf\\'" org-file-apps) "zathura %s"))
 
+    ;; -- Easy template
+    ;;
     ;; Adds abbreviation for the todo special block (if nothing is
-    ;; already bind on "T"). See Easy template in org manual
+    ;; already bind on "T"). See Easy template in the org manual.
     (add-to-list 'org-structure-template-alist
                  '("T" "#+BEGIN_TODO\nTODO: ?\n#+END_TODO"))
+
+    ;; -- Agnostic cite hyperlink; support in LaTeX
+    ;;
+    ;; A link of the form `cite:mykey' is transformed as a
+    ;; \cite{mykey} in LaTeX.
+    ;; see org-ascii-link and org-latex-link for inspiration
+    (defun org-cite-export (key desc format)
+      "Create the export version of a cite link."
+      (cond
+       ((eq format 'latex) (format "\\cite{%s}" key))
+       (t (format "[%s]" key))))
+
+    ;; Follows a bib key and visits the bibfile. The bibfile path must
+    ;; be defined in `org-bibref-file'.
+    (defun org-cite-open (key)
+      "Visit the reference on KEY.
+  KEY shoulb be a citation key available in the `org-bibref-file'
+  file"
+      (let ((path org-bibref-file)
+            (arg 'emacs)
+            (search key))
+        ;; org-open-file is a function defines in org.el. It is used in
+        ;; `org-open-at-point' arround line 10548.
+        (org-open-file path arg nil search)))
+
+    (org-add-link-type "cite" 'org-cite-open 'org-cite-export)
+
+    ;; Same as `cite' but year only This feature is only available
+    ;; with natbib with the author-year scheme.
+    ;;
+    ;; A link of the form `citey:mykey' is transformed as a
+    ;; \citeyearpar{mykey} in LaTeX.
+    (defun org-citey-export (key desc format)
+      "Create the export version of a year cite link."
+      (cond
+       ((eq format 'latex) (format "\\citeyearpar{%s}" key))
+       (t (format "[%s]" key))))
+
+    (org-add-link-type "citey" 'org-cite-open 'org-citey-export)
+
+    ;; (defun org-cite-store-link ()
+    ;;   "Store a link to a citation."
+    ;;   (let* ((key (org-cite-get-key))
+    ;;          (link (concat "cite:" key))
+    ;;          (description (fomat "Citation for %s in %s" key org-bibref-file)))
+    ;;     (org-store-link-props
+    ;;      :type "cite"
+    ;;      :link link
+    ;;      :decription description)))
     )
 
   (with-eval-after-load 'ox
     ;; -- Supports marginpar in LaTeX
     ;;
-    ;; A footnote reference starting with `:margin:' is transformed as a
-    ;; \marginpar in LaTeX. The `:margin:' key word is simply deleted in
+    ;; A footnote reference starting with `:margin:' is transformed as
+    ;; a \marginpar in LaTeX. The `:margin:' key word is deleted in
     ;; other backend.
     (defun org/latex-filter-ref-margin (fnote backend info)
       (if (org-export-derived-backend-p backend 'latex)
@@ -401,7 +451,7 @@ are currently in."
     (add-to-list 'org-export-filter-footnote-reference-functions
                  'org/latex-filter-ref-margin)
 
-    ;; Transforming footnote into margin put a mess in the footnote
+    ;; Transforming footnote into margin puts a mess in the footnote
     ;; numbering. This function provides the good numbering.
     (defun org-export-get-footnote-number/margin
         (orig-fun footnote info &optional data body-first)
@@ -441,33 +491,6 @@ are currently in."
     (advice-add 'org-export-get-footnote-number :around
                 #'org-export-get-footnote-number/margin)
 
-    ;; (advice-add 'org-latex-footnote-reference :around
-    ;;             #'org-latex-footnote-reference/margin)
-
-    ;; -- Agnostic cite hyperlink; support in LaTeX
-    ;;
-    ;; A link of the form `cite:mykey' is transformed as a
-    ;; \cite{mykey} in LaTeX.
-    (defun org-cite-export (key desc format)
-      "Create the export version of a cite link."
-      (cond
-       ((eq format 'latex) (format "\\cite{%s}" key))
-       (t (format "[%s]" key))))
-
-    ;; Follows a bib key and visits the bibfile. The bibfile path must
-    ;; be defined in `org-bibref-file'.
-    (defun org-cite-open (key)
-      "Visit the reference on KEY.
-  KEY shoulb be a citation key available in the `org-bibref-file'"
-      (let ((path org-bibref-file)
-            (arg 'emacs)
-            (search key))
-        ;; org-open-file is a function defines in org.el. It is used in
-        ;; `org-open-at-point' arround line 10548.
-        (org-open-file path arg nil search)))
-
-    (org-add-link-type "cite" 'org-cite-open 'org-cite-export)
-
     ;; Transforms many following cites into one multiple cite.
     (defun org/latex-filter-cites (final-output backend info)
       "Makes a multiple cite of adjacent cites in LaTeX export"
@@ -491,34 +514,21 @@ are currently in."
     (add-to-list 'org-export-filter-final-output-functions
                  'org/latex-filter-cites)
 
-    ;; see org-ascii-link and org-latex-link for inspiration
-    ;; (defun org-cite-export (cite desc format)
-    ;;   "Transcode a CITE object from Org to FORMAT"
-    ;;   (let ((raw-link (org-element-property :raw-link cite)))
-    ;;     (message "rw %s" raw-link))
-    ;;   ""
-    ;;   )
-
-    ;; (defun org-cite-store-link ()
-    ;;   "Store a link to a citation."
-    ;;   (let* ((key (org-cite-get-key))
-    ;;          (link (concat "cite:" key))
-    ;;          (description (fomat "Citation for %s in %s" key org-bibref-file)))
-    ;;     (org-store-link-props
-    ;;      :type "cite"
-    ;;      :link link
-    ;;      :decription description)))
-
-    ;; (defun org-open-cite (path)
-    ;;   (org-open-file path nil nil  ))
-    ;; (org-add-link-type "cite" 'org-open-cite)
-
-    ;; -- Do not launch error on resolve link
+    ;; -- Do not launch error on unresolved link
+    ;;
     ;; The good way:
     ;; `org-export-resolve-fuzzy-link' `org-export-before-processing-hook'
     ;; http://comments.gmane.org/gmane.emacs.orgmode/100754
     ;; http://emacs.stackexchange.com/a/16914
     ;; http://emacs.stackexchange.com/a/9494
+    ;; (defun org-drop-unliked-link (backend)
+    ;;   "Drop links which don't point to a target"
+    ;;   (org-element-map (org-element-parse-buffer) 'link
+    ;;     (lambda (link)
+    ;;       (when (string= (org-element-property :type link) "file")
+    ;;         (org-element-property :path link)))))
+    ;; (add-hook 'org-export-before-processing-hook #'org-drop-unliked-link)
+    ;;
     ;; The easy way ; AOP!:
     (defun org/drop-unlinked-link (orig-fun link info)
       "Do not launch error on unresolved link"
@@ -549,15 +559,6 @@ are currently in."
               :level     0))))))
 
     (advice-add 'org-export-resolve-id-link :around #'org/drop-unlinked-link)
-
-    ;; (defun org-drop-unliked-link (backend)
-    ;;   "Drop links which don't point to a target"
-    ;;   (org-element-map (org-element-parse-buffer) 'link
-    ;;     (lambda (link)
-    ;;       (when (string= (org-element-property :type link) "file")
-    ;;         (org-element-property :path link)))))
-
-    ;; (add-hook 'org-export-before-processing-hook #'org-drop-unliked-link)
     )
 
   ;; -- vc-mode
