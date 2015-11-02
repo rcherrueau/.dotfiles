@@ -376,9 +376,10 @@ are currently in."
     ;; already bind on "T"). See Easy template in the org manual.
     (add-to-list 'org-structure-template-alist
                  '("T" "#+BEGIN_TODO\nTODO: ?\n#+END_TODO"))
-    (add-to-list 'org-structure-template-alist
-                 '("TL"
-                   "#+ATTR_LATEX: :option []\n#+BEGIN_TODO\nTODO: ?\n#+END_TODO"))
+    (add-to-list
+     'org-structure-template-alist
+      '("TL"
+        "#+ATTR_LATEX: :options []\n#+BEGIN_TODO\nTODO: ?\n#+END_TODO"))
 
 
     ;; -- Agnostic cite hyperlink; support in LaTeX
