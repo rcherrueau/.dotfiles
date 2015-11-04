@@ -390,7 +390,13 @@ are currently in."
     (defun org-cite-export (key desc format)
       "Create the export version of a cite link."
       (cond
-       ((eq format 'latex) (format "\\cite{%s}" key))
+       ((eq format 'latex)
+        (message "%s -> %s" key desc)
+        (if (null desc)
+            (format "~\\cite{%s}" key)
+          ;; If you provide a description, then use that description
+          ;; (defcitealias is available with natbib)
+          (format "\\defcitealias{%s}{%s}\\citetalias{%s}" key desc key)))
        (t (format "[%s]" key))))
 
     ;; Follows a bib key and visits the bibfile. The bibfile path must
@@ -408,15 +414,15 @@ are currently in."
 
     (org-add-link-type "cite" 'org-cite-open 'org-cite-export)
 
-    ;; Same as `cite' but year only This feature is only available
-    ;; with natbib with the author-year scheme.
+    ;; Same as `cite' but year only This feature is available for
+    ;; instance with natbib and biblatex with the author-year scheme.
     ;;
     ;; A link of the form `citey:mykey' is transformed as a
     ;; \citeyearpar{mykey} in LaTeX.
     (defun org-citey-export (key desc format)
       "Create the export version of a year cite link."
       (cond
-       ((eq format 'latex) (format "\\citeyearpar{%s}" key))
+       ((eq format 'latex) (format "~\\citeyear{%s}" key))
        (t (format "[%s]" key))))
 
     (org-add-link-type "citey" 'org-cite-open 'org-citey-export)
