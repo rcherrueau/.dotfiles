@@ -393,7 +393,7 @@ are currently in."
        ((eq format 'latex)
         (message "%s -> %s" key desc)
         (if (null desc)
-            (format "~\\cite{%s}" key)
+            (format "\\cite{%s}" key)
           ;; If you provide a description, then use that description
           ;; (defcitealias is available with natbib)
           (format "\\defcitealias{%s}{%s}\\citetalias{%s}" key desc key)))
