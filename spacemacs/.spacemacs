@@ -27,6 +27,7 @@ values."
      racket
      idris
      ;; --------------------------------------------------------- others
+     erc
      nixos
      org
      ;; ANSI rather than eshell, shell, ...
@@ -379,7 +380,7 @@ are currently in."
     (add-to-list
      'org-structure-template-alist
       '("TL"
-        "#+ATTR_LATEX: :options []\n#+BEGIN_TODO\nTODO: ?\n#+END_TODO"))
+        "#+ATTR_LATEX: :options [inline]\n#+BEGIN_TODO\nTODO: ?\n#+END_TODO"))
 
 
     ;; -- Agnostic cite hyperlink; support in LaTeX
