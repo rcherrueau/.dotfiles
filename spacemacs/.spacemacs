@@ -371,6 +371,9 @@ are currently in."
     (when (not is-mac)
       (setcdr (assoc "\\.pdf\\'" org-file-apps) "zathura %s"))
 
+    ;; Highlight LaTeX related syntax
+    (setf org-highlight-latex-and-related '(latex))
+
     ;; -- Easy template
     ;;
     ;; Adds abbreviation for the todo special block (if nothing is
@@ -392,7 +395,7 @@ are currently in."
       "Create the export version of a cite link."
       (cond
        ((eq format 'latex)
-        (message "%s -> %s" key desc)
+        (message "[[ %s ][ %s ]]" key desc)
         (if (null desc)
             (format "\\cite{%s}" key)
           ;; If you provide a description, then use that description
@@ -533,6 +536,7 @@ are currently in."
     ;; http://comments.gmane.org/gmane.emacs.orgmode/100754
     ;; http://emacs.stackexchange.com/a/16914
     ;; http://emacs.stackexchange.com/a/9494
+    ;; http://kdr2.com/tech/emacs/orgmode-export-process.html
     ;; (defun org-drop-unliked-link (backend)
     ;;   "Drop links which don't point to a target"
     ;;   (org-element-map (org-element-parse-buffer) 'link
