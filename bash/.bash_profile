@@ -1,7 +1,4 @@
 # https://medium.com/@webprolific/getting-started-with-dotfiles-43c3602fd789
-# If not running interactively, don't do anything
-[ -z "$PS1" ] && return
-
 # OS
 if [ "$(uname -s)" = "Darwin" ]; then
     OS="OSX"
@@ -29,12 +26,12 @@ DOTFILES_DIR="$( cd -P "$( dirname "$SOURCE" )/.." && pwd )"
 # alias: shortcuts for commands
 # prompt: custom prompt
 for DOTFILE in "$DOTFILES_DIR"/system/.{function,env,alias,prompt}; do
-    [ -f "$DOTFILE" ] && source "$DOTFILE"
+    [ -f "$DOTFILE" ] && . "$DOTFILE"
 done
 
 # OSX specific
 if [ ${OS} = "OSX" ]; then
     for DOTFILE in "$DOTFILES_DIR"/system/.{env,alias,custom}.osx; do
-        [ -f "$DOTFILE" ] && source "$DOTFILE"
+        [ -f "$DOTFILE" ] && . "$DOTFILE"
     done
 fi
