@@ -1,0 +1,2 @@
+#!/bin/sh
+feh  --bg-fill '/home/rfish/Sync/Pictures/mount-everest.jpg' '/home/rfish/Sync/Pictures/mount-everest.jpg' 

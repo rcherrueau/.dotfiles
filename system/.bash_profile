@@ -50,3 +50,7 @@ if [ ${OS} = "OSX" ]; then
         [ -f "$DOTFILE" ] && . "$DOTFILE"
     done
 fi
+
+# NixOS specific initlializations
+sh ~/.fehbg &
+sh ~/.xcape &
