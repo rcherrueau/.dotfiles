@@ -1,4 +1,19 @@
 # https://medium.com/@webprolific/getting-started-with-dotfiles-43c3602fd789
+#
+# http://unix.stackexchange.com/a/50667 ; man bash
+# Gentle reminder about bash:
+# - Interactive :: As the term implies: Interactive means that the
+#     commands are run with user-interaction from keyboard. E.g. the
+#     shell can prompt the user to enter input.
+# - Login :: Means that the shell is run as part of the login of the
+#     user to the system. Typically used to do any configuration that
+#     a user needs/wants to establish his work-environment.
+# - `/etc/profile` :: The systemwide initialization file, executed for
+#     login shells.
+# - `~/.bash_profile` (or old `~/.profile`) :: The personal
+#     initialization file, executed for login shells.
+# - `~/.bashrc` :: The individual per-interactive-shell startup file
+
 # OS
 if [ "$(uname -s)" = "Darwin" ]; then
     OS="OSX"
@@ -25,13 +40,13 @@ DOTFILES_DIR="$( cd -P "$( dirname "$SOURCE" )/.." && pwd )"
 # env: environment variables
 # alias: shortcuts for commands
 # prompt: custom prompt
-for DOTFILE in "$DOTFILES_DIR"/system/.{function,env,alias,prompt}; do
+for DOTFILE in "$DOTFILES_DIR"/bash/.{function,env,alias,prompt}; do
     [ -f "$DOTFILE" ] && . "$DOTFILE"
 done
 
 # OSX specific
 if [ ${OS} = "OSX" ]; then
-    for DOTFILE in "$DOTFILES_DIR"/system/.{env,alias,custom}.osx; do
+    for DOTFILE in "$DOTFILES_DIR"/bash/.{env,alias,custom}.osx; do
         [ -f "$DOTFILE" ] && . "$DOTFILE"
     done
 fi
