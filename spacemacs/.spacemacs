@@ -35,7 +35,7 @@ values."
      (shell :variables
             shell-default-height 30
             shell-default-position 'bottom
-            shell-default-shell 'ansi-term)
+            shell-default-shell 'eshell)
      spell-checking
      )
    ;; List of additional packages that will be installed without being
@@ -358,6 +358,19 @@ are currently in."
 
 
   ;; ------------------------------------------------------------- Modes
+  ;; -- eshell
+  ;; (with-eval-after-load 'eshell
+  ;;   (let* ((cmd (concat "alias | sed -E "
+  ;;                       "\"s/^alias ([^=]+)='(.*)'$/alias \1 \2 \$*/g;"
+  ;;                       "s/'\\\''/'/g;\""))
+  ;;          (eshell-aliases (shell-command-to-string cmd)))
+  ;;     (message cmd)
+  ;;     (message eshell-aliases)
+  ;;     )
+
+  ;;   eshell-aliases-file
+  ;;   )
+
   ;; -- Org
   (with-eval-after-load 'org
     ;; Do not auto-indent lines depending on the depth on the node.
