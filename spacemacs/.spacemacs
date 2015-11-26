@@ -24,8 +24,10 @@ values."
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------- lang
      emacs-lisp
-     racket
+     html
      idris
+     javascript
+     racket
      ;; --------------------------------------------------------- others
      erc
      nixos
