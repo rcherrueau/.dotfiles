@@ -196,8 +196,8 @@ values."
   "Initialization function for user code.
 It is called immediately after `dotspacemacs/init'.  You are free to put any
 user code."
-  ;; Are we on a mac?
-  (setq is-mac (equal system-type 'darwin))
+  ;; Are we using a mac-keyboard
+  (setq mac-keyboard t)
   )
 
 (defun dotspacemacs/user-config ()
@@ -230,16 +230,13 @@ are currently in."
                                              ; argument works right
 
   ;; ---------------------------------------------------- Hardware setup
-  ;; Are we using a mac-keyboard
-  (setq mac-keyboard t)
-
   ;; -- Key bindings
   ;; Mac-os key
   (when mac-keyboard
    (setq x-meta-keysym 'super)
    (setq x-super-keysym 'meta))
 
-  (when is-mac
+  (when (spacemacs/system-is-mac)
    (setq mac-option-modifier 'none)
    (setq mac-command-modifier 'meta)
    (setq ns-function-modifier 'hyper))
@@ -381,7 +378,7 @@ are currently in."
     (setq org-src-preserve-indentation t)
 
     ;; Set the external pdf application to zathura on my nixos
-    (when (not is-mac)
+    (when (spacemacs/system-is-linux)
       (setcdr (assoc "\\.pdf\\'" org-file-apps) "zathura %s"))
 
     ;; Highlight LaTeX related syntax
