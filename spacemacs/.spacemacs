@@ -405,7 +405,6 @@ are currently in."
       "Create the export version of a cite link."
       (cond
        ((eq format 'latex)
-        (message "[[ %s ][ %s ]]" key desc)
         (if (null desc)
             (format "\\cite{%s}" key)
           ;; If you provide a description, then use that description
@@ -470,7 +469,8 @@ are currently in."
                     (substring fnote (length "\\footnote{:margin:")))))
         ;; Other backend
         (progn
-          (message "fnoteref: %s" fnote)
+          ;; DEBUG:
+          ;; (message "fnoteref: %s" fnote)
           (replace-regexp-in-string ":margin: " "" fnote))))
 
     (add-to-list 'org-export-filter-footnote-reference-functions
@@ -494,7 +494,8 @@ are currently in."
                            info)))
                     ;; Test if this is a margin or not
                     (is-margin (string-match ":margin:" d)))
-               (message "match %s %s" is-margin d)
+               ;; DEBUG:
+               ;; (message "match %s %s" is-margin d)
                (cond
                 ;; Anonymous footnote match: return number.
                 ((and (not l) (not label) (eq footnote f))
