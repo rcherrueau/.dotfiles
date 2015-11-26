@@ -52,5 +52,8 @@ if [ ${OS} = "OSX" ]; then
 fi
 
 # NixOS specific initlializations
-sh ~/.fehbg &
-sh ~/.xcape &
+if [ "${OS}" = "Linux" ]; then
+  sh ~/.fehbg &
+  sh ~/.xcape &
+fi
+
