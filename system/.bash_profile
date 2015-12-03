@@ -40,7 +40,7 @@ export DOTFILES_DIR="$( cd -P "$( dirname "$SOURCE" )/.." && pwd )"
 # Source dotfiles (order matters)
 # functions: commands that are too complex for an alias
 # env: environment variables
-for DOTFILE in "$DOTFILES_DIR"/bash/.{function,env}; do
+for DOTFILE in "$DOTFILES_DIR"/bash/.env; do
     [ -f "$DOTFILE" ] && . "$DOTFILE"
 done
 

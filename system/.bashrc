@@ -19,7 +19,7 @@
 # Source dotfiles (order matters)
 # alias: shortcuts for commands
 # prompt: custom prompt
-for DOTFILE in "$DOTFILES_DIR"/bash/.{alias,prompt}; do
+for DOTFILE in "$DOTFILES_DIR"/bash/.{function,alias,prompt}; do
     [ -f "$DOTFILE" ] && . "$DOTFILE"
 done
 
