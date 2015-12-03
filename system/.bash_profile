@@ -45,8 +45,8 @@ for DOTFILE in "$DOTFILES_DIR"/bash/.{function,env}; do
 done
 
 # OSX specific
-if [ ${OS} = "OSX" ]; then
-    for DOTFILE in "$DOTFILES_DIR"/bash/.{env}.osx; do
+if [ "${OS}" = "OSX" ]; then
+    for DOTFILE in "$DOTFILES_DIR"/bash/.env.osx; do
         [ -f "$DOTFILE" ] && . "$DOTFILE"
     done
 fi
