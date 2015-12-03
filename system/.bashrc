@@ -26,7 +26,7 @@ done
 # OSX specific
 if [ "${OS}" = "OSX" ]; then
     . /usr/local/etc/bash_completion.d/git-prompt.sh
-    for DOTFILE in "$DOTFILES_DIR"/bash/.{alias}.osx; do
+    for DOTFILE in "$DOTFILES_DIR"/bash/.alias.osx; do
         [ -f "$DOTFILE" ] && . "$DOTFILE"
     done
 fi
