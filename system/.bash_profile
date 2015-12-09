@@ -54,6 +54,7 @@ fi
 # NixOS specific initlializations
 if [ "${OS}" = "Linux" ]; then
   sh ~/.fehbg &
-  sh ~/.xcape &
+  if [ ! $(pgrep -x "xcape") ]; then
+    xcape -e 'Control_L=Escape'
+  fi
 fi
-
