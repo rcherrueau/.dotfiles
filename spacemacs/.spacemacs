@@ -30,7 +30,7 @@ values."
      racket
      ;; --------------------------------------------------------- others
      erc
-     nixos
+     ;; nixos
      org
      ;; ANSI rather than eshell, shell, ...
      ;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
@@ -368,6 +368,11 @@ are currently in."
     ;; Preserve my indentation during source block export
     (setq org-src-preserve-indentation t)
 
+    ;; evil-org binds "J" to `org-shiftdown'. Let's bind "J" to
+    ;; `evil-join' instead.
+    (evil-define-key 'normal evil-org-mode-map
+      "J" 'evil-join)
+
     ;; Set the external pdf application to zathura on my nixos
     (when (spacemacs/system-is-linux)
       (setcdr (assoc "\\.pdf\\'" org-file-apps) "zathura %s"))
@@ -505,8 +510,22 @@ are currently in."
                  (if is-margin count (incf count))))))
            (or data (plist-get info :parse-tree)) info body-first))))
 
-    (advice-add 'org-export-get-footnote-number :around
-                #'org-export-get-footnote-number/margin)
+    ;; The new numbering only works when we are during a latex export.
+    ;; So we make it available only during latex export.
+    (defun cflow-org-export-latex (orig-fun backend &rest args)
+      (when (org-export-derived-backend-p backend 'latex)
+        (advice-add 'org-export-get-footnote-number :around
+                    #'org-export-get-footnote-number/margin))
+
+      (let ((res (apply orig-fun backend args)))
+
+        (when (org-export-derived-backend-p backend 'latex)
+          (advice-remove 'org-export-get-footnote-number
+                         #'org-export-get-footnote-number/margin))
+        res))
+
+    (advice-add 'org-export-as :around #'cflow-org-export-latex)
+
 
     ;; Transforms many following cites into one multiple cite.
     (defun org/latex-filter-cites (final-output backend info)
