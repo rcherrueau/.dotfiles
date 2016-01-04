@@ -317,10 +317,10 @@ are currently in."
 
   ;; -- Customize
   ;; Set custome variables in a specific file
-  (let ((custom-file (locate-user-emacs-file "mine-pref.el")))
-    (unless (file-exists-p custom-file)
-      (write-region "" nil custom-file))
-    (load custom-file))
+  (setq custom-file (locate-user-emacs-file "mine-pref.el"))
+  (unless (file-exists-p custom-file)
+    (write-region "" nil custom-file))
+  (load custom-file)
 
   ;; -------------------------------------------------------- Appearance
   ;; -- Fringeline
