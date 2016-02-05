@@ -26,10 +26,11 @@ values."
      emacs-lisp
      html
      idris
+     ;; java
      javascript
      racket
      ;; --------------------------------------------------------- others
-     erc
+     ;; erc
      ;; nixos
      org
      ;; ANSI rather than eshell, shell, ...
@@ -39,11 +40,12 @@ values."
             shell-default-position 'bottom)
      spell-checking
      ;; --------------------------------------------------------- perso
+     mine-java
      proverif
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
-   ;; packages then consider to create a layer, you can also put the
+   ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
    dotspacemacs-additional-packages '(tao-theme)
    ;; A list of packages and/or extensions that will not be install and loaded.
@@ -100,7 +102,7 @@ values."
    ;; directory. A string value must be a path to an image format supported
    ;; by your Emacs build.
    ;; If the value is nil then no banner is displayed. (default 'official)
-   dotspacemacs-startup-banner 'official
+   dotspacemacs-startup-banner 'random
    ;; List of items to show in the startup buffer. If nil it is disabled.
    ;; Possible values are: `recents' `bookmarks' `projects'.
    ;; (default '(recents projects))
@@ -108,10 +110,12 @@ values."
    ;; Number of recent files to show in the startup buffer. Ignored if
    ;; `dotspacemacs-startup-lists' doesn't include `recents'. (default 5)
    dotspacemacs-startup-recent-list-size 5
+   ;; Default major mode of the scratch buffer (default `text-mode')
+   dotspacemacs-scratch-mode 'emacs-lisp-mode
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(zenburn tao-theme)
+   dotspacemacs-themes '(misterioso zenburn tao-yang)
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
@@ -235,10 +239,12 @@ values."
    ;; specified with an installed package.
    ;; Not used for now. (default nil)
    dotspacemacs-default-package-repository nil
-   ;; Delete whitespace while saving buffer. Possible values are `all',
-   ;; `trailing', `changed' or `nil'. Default is `changed' (cleanup whitespace
-   ;; on changed lines) (default 'changed)
-   dotspacemacs-whitespace-cleanup 'changed
+   ;; Delete whitespace while saving buffer. Possible values are `all'
+   ;; to aggressively delete empty line and long sequences of whitespace,
+   ;; `trailing' to delete only the whitespace at end of lines, `changed'to
+   ;; delete only whitespace for changed lines or `nil' to disable cleanup.
+   ;; (default nil)
+   dotspacemacs-whitespace-cleanup 'trailing
    ))
 
 (defun dotspacemacs/user-init ()
@@ -354,8 +360,8 @@ are currently in."
   (set-default 'indent-tabs-mode nil)
 
   ;; Highlight current line
-  (set-face-attribute 'hl-line nil :background "#4A2F59")
-  (set-face-attribute 'region nil :background "#6B3654")
+  ;; (set-face-attribute 'hl-line nil :background "#4A2F59")
+  ;; (set-face-attribute 'region nil :background "#6B3654")
 
   ;; Highlight the following words in comments
   (defun add-watchwords ()
@@ -401,6 +407,11 @@ are currently in."
   ;;        buffer-position hud))
 
   ;; ------------------------------------------------------------- Modes
+  ;; ;; -- CC-mode
+  ;; (with-eval-after-load 'cc-mode
+  ;;   (setq c-basic-offset 2)
+  ;;   )
+
   ;; -- helm
   (with-eval-after-load 'helm-files
     ;; Don't show files matching regexp in
@@ -409,6 +420,10 @@ are currently in."
 
     ;; Add Idris compiled files to the list of boring files
     (add-to-list 'helm-boring-file-regexp-list "\\.ibc$"))
+
+  ;; -- Idris
+  (with-eval-after-load 'idris
+    (turn-off-idris-simple-indent))
 
   ;; -- Org
   (with-eval-after-load 'org
