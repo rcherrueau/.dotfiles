@@ -26,7 +26,6 @@ values."
      emacs-lisp
      html
      idris
-     ;; java
      javascript
      racket
      ;; --------------------------------------------------------- others
@@ -38,6 +37,7 @@ values."
      (shell :variables
             shell-default-height 30
             shell-default-position 'bottom)
+            ; shell-default-term-shell "/run/current-system/sw/bin/bash")
      spell-checking
      ;; --------------------------------------------------------- perso
      mine-java
@@ -407,11 +407,6 @@ are currently in."
   ;;        buffer-position hud))
 
   ;; ------------------------------------------------------------- Modes
-  ;; ;; -- CC-mode
-  ;; (with-eval-after-load 'cc-mode
-  ;;   (setq c-basic-offset 2)
-  ;;   )
-
   ;; -- helm
   (with-eval-after-load 'helm-files
     ;; Don't show files matching regexp in
