@@ -4,6 +4,8 @@
         (pmd :location local)))
 
 (defun pmd-current-sbt-project ()
+  "Run pmd with the sbt project as a root"
+  (interactive)
   (pmd-file-or-dir (sbt:find-root)))
 
 (defun mine-java/init-cc-mode ()
@@ -23,7 +25,7 @@
       ;; PMD
       ;; I have to put this here since pmd is lazy load
       "pb" 'pmd-current-buffer
-      "pp" 'pmd-current-sbt-project
+      "ps" 'pmd-current-sbt-project
 
 
       )))
@@ -54,4 +56,9 @@
     ;; FIXME
     ;; :defer t
     :init
-    (push 'pmd company-backends-java-mode)))
+    (push 'pmd company-backends-java-mode)
+    :config
+    ;; Point to the correct directories on my NixOs
+    (when (spacemacs/system-is-linux)
+      (setq pmd-home "~/.nix-profile/")
+      (setq pmd-java-home "/usr/bin/env java"))))
