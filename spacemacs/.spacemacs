@@ -413,8 +413,18 @@ are currently in."
     ;; `helm-boring-file-regexp-list' after a =SPC f f=
     (setq helm-ff-skip-boring-files t)
 
-    ;; Add Idris compiled files to the list of boring files
-    (add-to-list 'helm-boring-file-regexp-list "\\.ibc$"))
+    ;; Adds Idris compiled files to the list of boring files
+    (add-to-list 'helm-boring-file-regexp-list "\\.ibc$")
+
+    ;; Removes the 2 first dot files "current/path/." and
+    ;; "current/path/.."
+    ;; https://www.reddit.com/r/emacs/comments/3f55nm/how_to_remove_2_first_dot_files_from_helmfindfiles/
+    (advice-add 'helm-ff-filter-candidate-one-by-one
+                :around (lambda (fcn file)
+                          (unless
+                              (string-match "\\(?:/\\|\\`\\)\\.\\{1,2\\}\\'"
+                                            file)
+                            (funcall fcn file)))))
 
   ;; -- Idris
   (with-eval-after-load 'idris
