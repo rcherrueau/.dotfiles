@@ -3,31 +3,44 @@
         sbt-mode
         (pmd :location local)))
 
-(defun pmd-current-sbt-project ()
-  "Run pmd with the sbt project as a root"
-  (interactive)
-  (pmd-file-or-dir (sbt:find-root)))
-
 (defun mine-java/init-cc-mode ()
   (use-package cc-mode
     :defer t
     :config
     (setq c-basic-offset 2)
 
+    ;; List of specific rules for pmd
+    (setq pmd-specific-rules '(("prU" . "unusedcode")
+                               ("prE" . "empty")
+                               ("prN" . "unnecessary")
+                               ("prB" . "basic")
+                               ("prI" . "imports")))
+
+    ;; Generates spacemacs binding to call each specific rule
+    ;; - first, generates interactive function
+    (mapc (lambda (r) (eval `(mk-pmd-rule-function ,(cdr r))))
+          pmd-specific-rules)
+    ;; - then, creates spacemacs shortcut to this call.
+    (mapc (lambda (r)
+            (let ((plabel (car r))
+                  (pfun (intern (concat "pmd-project-" (cdr r))))
+                  (blabel (downcase (car r)))
+                  (bfun (intern (concat "pmd-buffer-" (cdr r)))))
+              (spacemacs/set-leader-keys-for-major-mode
+                'java-mode plabel pfun blabel bfun)))
+          pmd-specific-rules)
+
     (spacemacs/set-leader-keys-for-major-mode 'java-mode
       ;; SBT
       ;; I have to put this here since sbt is lazy load
       "c" 'sbt-command
-      "e" 'next-error
       "r" 'sbt-run-previous-command
       "h" 'sbt-find-definitions
 
       ;; PMD
       ;; I have to put this here since pmd is lazy load
       "pb" 'pmd-current-buffer
-      "ps" 'pmd-current-sbt-project
-
-
+      "pp" 'pmd-current-sbt-project
       )))
 
 (defun mine-java/post-init-mine-java-mode ()
@@ -53,12 +66,12 @@
 
 (defun mine-java/init-pmd ()
   (use-package pmd
-    ;; FIXME
-    ;; :defer t
-    :init
-    (push 'pmd company-backends-java-mode)
+    :commands (pmd-current-buffer pmd-file-or-dir)
+    ;; :init
+    ;; (push 'pmd company-backends-java-mode)
     :config
-    ;; Point to the correct directories on my NixOs
-    (when (spacemacs/system-is-linux)
-      (setq pmd-home "~/.nix-profile/")
-      (setq pmd-java-home "/usr/bin/env java"))))
+    ;; Point to the correct directories for java and pmd-home
+    (setq pmd-java-home "/usr/bin/env java")
+    (setq pmd-home (if (spacemacs/system-is-linux)
+                       "~/.nix-profile/"
+                     "/usr/local/pmd/"))))
