@@ -115,7 +115,7 @@ values."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(misterioso zenburn tao-yang)
+   dotspacemacs-themes '(zenburn misterioso tao-yang)
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
@@ -852,6 +852,29 @@ contextual information."
     (advice-add 'org-latex-src-block :around #'fmdkdd//org-latex-src-block)
     )
 
+  ;; -- web-mode
+  (with-eval-after-load 'web-mode
+    (defun firefox-reload ()
+      "Saves the current-buffer and reloads the firefox window
+that lastly got the focus"
+      (interactive)
+      (save-buffer)
+      (if (spacemacs/system-is-mac)
+          (shell-command-to-string
+           "osascript ~/.dotfiles/system/apple-scripts/reload-firefox.scpt")
+        ;; TODO: shell script for linux
+        ""))
+
+    (spacemacs/set-leader-keys-for-major-mode 'web-mode
+      "r" 'firefox-reload
+      ;; rebind old , r * to , w *
+      "wc" 'web-mode-element-clone
+      "wd" 'web-mode-element-vanish
+      "wk" 'web-mode-element-kill
+      "wr" 'web-mode-element-rename
+      "ww" 'web-mode-element-wrap
+      )
+    )
   ;; -- vc-mode
   ;; Visit symbolic link to a file. This bypass the emacs version
   ;; control system, but I don't use it!
