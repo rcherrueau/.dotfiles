@@ -7,7 +7,25 @@
   (use-package cc-mode
     :defer t
     :config
+    ;; Indentation level to two
     (setq c-basic-offset 2)
+
+    ;; C-mode by default align parameter with the end of the method,
+    ;; e.g:
+    ;; > public void foo(
+    ;; >                 String a,
+    ;; >                 String b) { }
+    ;;
+    ;; Aligning the second parameter on the first one is really good.
+    ;; However, I'm not a big fan of the alignment of the first
+    ;; parameter with the method. I rather prefer something like that:
+    ;; > public void foo(
+    ;; >   String a,
+    ;; >   String b) { }
+    ;;
+    ;; The following fixes this issue.
+    ;; See http://stackoverflow.com/a/1365821
+    (setq c-offsets-alist '((arglist-intro +)))
 
     ;; List of specific rules for pmd
     (setq pmd-specific-rules '(("prU" . "unusedcode")
