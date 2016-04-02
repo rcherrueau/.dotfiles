@@ -8,7 +8,7 @@ Xft*rgba:            rgb
 ! Zenburn Color
 ! COLOR_FG                  #dcdccc
 ! COLOR_BG                  #3f3f3f
-! 
+!
 ! COLOR_TERM_BLACK          COLOR_BG
 ! COLOR_TERM_DARK_RED       #705050
 ! COLOR_TERM_DARK_GREEN     #60b48a
@@ -17,7 +17,7 @@ Xft*rgba:            rgb
 ! COLOR_TERM_DARK_MAGENTA   #dc8cc3
 ! COLOR_TERM_DARK_CYAN      #8cd0d3
 ! COLOR_TERM_LIGHT_GRAY     COLOR_FG
-! 
+!
 ! COLOR_TERM_DARK_GRAY      #709080
 ! COLOR_TERM_LIGHT_RED      #dca3a3
 ! COLOR_TERM_LIGHT_GREEN    #c3bf9f
@@ -32,35 +32,35 @@ Xft*rgba:            rgb
 ! Black
 *color0:             #3f3f3f
 ! Red
-*color1:             #705050 
+*color1:             #705050
 ! Green
-*color2:             #60b48a 
+*color2:             #60b48a
 ! Yellow
-*color3:             #dfaf8f 
+*color3:             #dfaf8f
 ! Blue
-*color4:             #506070 
+*color4:             #506070
 ! Magenta
-*color5:             #dc8cc3 
+*color5:             #dc8cc3
 ! Cyan
-*color6:             #8cd0d3 
+*color6:             #8cd0d3
 ! LGray
 *color7:             #cdcdcc
 ! Gray
-*color8:             #709080 
+*color8:             #709080
 ! LRed
-*color9:             #dca3a3 
+*color9:             #dca3a3
 ! LGreen
-*color10:            #c3bf9f 
+*color10:            #c3bf9f
 ! LYellow
-*color11:            #f0dfaf 
+*color11:            #f0dfaf
 ! LBlue
-*color12:            #94bff3 
+*color12:            #94bff3
 ! LMagenta
-*color13:            #ec93d3 
+*color13:            #ec93d3
 ! LCyan
-*color14:            #93e0e3 
+*color14:            #93e0e3
 ! White
-*color15:            #ffffff 
+*color15:            #ffffff
 *cursorColor:        #6b3644
 
 URxvt*font:            xft:FiraMono:size=9
@@ -74,3 +74,28 @@ URxvt*saveLines:       4000
 URxvt*cursorColor:     #6b3654
 URxvt*colorUL:         #c3bf9f
 URxvt*underlineColor:  #c3bf9f
+
+! ----------------------------------------------------------------------
+! $ man rofi
+! $ rofi -dump-xresources
+! ----------------------------------------------------------------------
+rofi.kb-row-up: Control+k,Control+p,Up
+rofi.kb-row-down: Control+j,Control+n,Down
+! Set selected item as input text
+rofi.kb-row-select: Tab
+rofi.kb-row-tab:
+! Use extended color scheme
+rofi.color-enabled: true
+! bg Background color row
+! fg Text color
+! bgalt Background color alternating row
+! hlfg Foreground color selected row
+! hlbg Background color selected row
+! State:           'bg',    'fg',    'bgalt', 'hlbg',  'hlfg'
+rofi.color-normal: #2f1e2e, #b4b4b4, #2f1e2e, #4a3255, #ffffff
+rofi.color-urgent: #2f1e2e, #ef6155, #2f1e2e, #4a3255, #ef6155
+rofi.color-active: #2f1e2e, #4a3255, #2f1e2e, #4a3255, #4a3255
+!                  'background', 'border'
+rofi.color-window: #2f1e2e,       #ef6155, #ef6155
+! Separator style (none, dash, solid)
+rofi.separator-style: dash
