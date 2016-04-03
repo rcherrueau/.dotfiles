@@ -12,8 +12,12 @@ esac
 
 alias l='ls -alh'
 alias ll='ls -l'
+alias please='sudo $(history -p !!)'
 
-# use p unsted to open application
+alias encrypt="openssl enc -aes-256-cbc -salt"
+alias decrypt="openssl enc -aes-256-cbc -salt -d"
+
+# use p to open any file unsted of calling correct app explicitly
 case ${OS} in
 OSX) alias p="open" ;;
 *)   myopen(){ xdg-open "$1" & }
