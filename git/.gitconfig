@@ -12,6 +12,8 @@
         st = status
         ci = commit
         lg = log --graph --pretty=tformat:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%an %ar)%Creset'
+        # Do ssh-add if no entity is laoded inside ssh-agent
+        purr = !ssh-add -l > /dev/null || ssh-add && git-pull --rebase
 [diff]
         tool = vimdiff
         mnemonicPrefix = true
