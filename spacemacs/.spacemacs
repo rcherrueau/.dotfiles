@@ -102,7 +102,7 @@ values."
    ;; directory. A string value must be a path to an image format supported
    ;; by your Emacs build.
    ;; If the value is nil then no banner is displayed. (default 'official)
-   dotspacemacs-startup-banner 'random
+   dotspacemacs-startup-banner 'official
    ;; List of items to show in the startup buffer. If nil it is disabled.
    ;; Possible values are: `recents' `bookmarks' `projects'.
    ;; (default '(recents projects))
@@ -249,9 +249,11 @@ values."
 
 (defun dotspacemacs/user-init ()
   "Initialization function for user code.
-It is called immediately after `dotspacemacs/init'.  You are free to put almost any
-user code here.  The exception is org related code, which should be placed in
-`dotspacemacs/user-config'."
+It is called immediately after `dotspacemacs/init', before layer configuration
+executes.
+ This function is mostly useful for variables that need to be set
+before packages are loaded. If you are unsure, you should try in setting them in
+`dotspacemacs/user-config' first."
   ;; Are we using a mac-keyboard
   (setq mac-keyboard t)
   )
@@ -360,8 +362,8 @@ are currently in."
   (set-default 'indent-tabs-mode nil)
 
   ;; Highlight current line
-  ;; (set-face-attribute 'hl-line nil :background "#4A2F59")
-  ;; (set-face-attribute 'region nil :background "#6B3654")
+  (set-face-attribute 'hl-line nil :background "#4A2F59")
+  (set-face-attribute 'region nil :background "#6B3654")
 
   ;; Highlight the following words in comments
   (defun add-watchwords ()
