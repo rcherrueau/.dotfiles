@@ -17,6 +17,8 @@ alias please='sudo $(history -p !!)'
 alias encrypt="openssl enc -aes-256-cbc -salt"
 alias decrypt="openssl enc -aes-256-cbc -salt -d"
 
+alias r="ranger"
+
 # use p to open any file unsted of calling correct app explicitly
 case ${OS} in
 OSX) alias p="open" ;;
