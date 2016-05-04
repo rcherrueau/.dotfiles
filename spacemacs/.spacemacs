@@ -778,7 +778,6 @@ are currently in."
                  (funcall orig-fun src-block contents info))))))
 
     (advice-add 'org-latex-src-block :around #'org/wraps-lstlisting-in-figure)
-    (advice-remove 'org-latex-src-block #'fmdkdd//org-latex-src-block)
     )
 
   ;; -- web-mode
