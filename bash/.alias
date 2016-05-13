@@ -13,6 +13,7 @@ esac
 alias l='ls -alh'
 alias ll='ls -l'
 alias please='sudo $(history -p !!)'
+alias 49.3='sudo $(history -p !!)'
 
 alias encrypt="openssl enc -aes-256-cbc -salt"
 alias decrypt="openssl enc -aes-256-cbc -salt -d"
