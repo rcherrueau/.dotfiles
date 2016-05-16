@@ -447,6 +447,18 @@ are currently in."
     ;; Preserve my indentation during source block export
     (setq org-src-preserve-indentation t)
 
+    ;; Todo Keywords
+    (setq org-todo-keywords
+          '((sequence "TODO" "FEEDBACK" "FAIR"
+                      "|" "DONE" "DELEGATED" "INVALID" "FIXED")
+          ))
+
+    ;; Todo Special Colors
+    ;; http://orgmode.org/manual/Faces-for-TODO-keywords.html
+    (setq org-todo-keyword-faces
+          '(("FEEDBACK" . "orange")
+            ("FAIR" . "orange")))
+
     ;; Note: Seems fix with the 0.105 v of spacemacs
     ;; ;; evil-org binds "J" to `org-shiftdown'. Let's bind "J" to
     ;; ;; `evil-join' instead.
