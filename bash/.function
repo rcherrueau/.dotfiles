@@ -74,5 +74,6 @@ function gi() { curl -L -s https://www.gitignore.io/api/$@ ;}
 # Open an article based on its key
 function ppp() {
   KEY="*$1*"
-  `p "$(find ~/Sync/Papers/ -name $KEY -print)"`
+  # `p "$(find ~/Sync/Papers/ -name $KEY -print)"`
+  find ~/Sync/Papers/ -name $KEY -printf "'%p'\n"
 }
