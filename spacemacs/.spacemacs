@@ -472,17 +472,6 @@ are currently in."
     ;; Highlight LaTeX related syntax
     (setf org-highlight-latex-and-related '(latex))
 
-    ;; -- Easy template
-    ;;
-    ;; Adds abbreviation for the todo special block (if nothing is
-    ;; already bind on "T"). See Easy template in the org manual.
-    (add-to-list 'org-structure-template-alist
-                 '("T" "#+BEGIN_TODO\nTODO: ?\n#+END_TODO"))
-    (add-to-list
-     'org-structure-template-alist
-      '("TL"
-        "#+ATTR_LATEX: :options [inline]\n#+BEGIN_TODO\nTODO: ?\n#+END_TODO"))
-
 
     ;; -- Agnostic cite hyperlink; support in LaTeX
     ;;
@@ -540,85 +529,6 @@ are currently in."
     )
 
   (with-eval-after-load 'ox
-    ;; -- Supports marginpar in LaTeX
-    ;;
-    ;; A footnote reference starting with `:margin:' is transformed as
-    ;; a \marginpar in LaTeX. The `:margin:' key word is deleted in
-    ;; other backend.
-    (defun org/latex-filter-ref-margin (fnote backend info)
-      (if (org-export-derived-backend-p backend 'latex)
-          ;; If LaTeX backend
-          (cond
-           ((string/starts-with fnote "\\footnote{:margin: ")
-            (concat "\\marginpar{"
-                    (substring fnote (length "\\footnote{:margin: "))))
-           ((string/starts-with fnote "\\footnote{:margin:")
-            (concat "\\marginpar{"
-                    (substring fnote (length "\\footnote{:margin:")))))
-        ;; Other backend
-        (progn
-          ;; DEBUG:
-          ;; (message "fnoteref: %s" fnote)
-          (replace-regexp-in-string ":margin: " "" fnote))))
-
-    (add-to-list 'org-export-filter-footnote-reference-functions
-                 'org/latex-filter-ref-margin)
-
-    ;; Transforming footnote into margin puts a mess in the footnote
-    ;; numbering. This function provides the good numbering.
-    (defun org-export-get-footnote-number/margin
-        (orig-fun footnote info &optional data body-first)
-      (let ((count 0)
-            (seen)
-            (label (org-element-property :label footnote)))
-        (catch 'exit
-          (org-export--footnote-reference-map
-           (lambda (f)
-             (let* ((l (org-element-property :label f))
-                   ;; Gets the defintion of the ref
-                    (d (org-trim
-                          (org-export-data
-                           (org-export-get-footnote-definition f info)
-                           info)))
-                    ;; Test if this is a margin or not
-                    (is-margin (string-match ":margin:" d)))
-               ;; DEBUG:
-               ;; (message "match %s %s" is-margin d)
-               (cond
-                ;; Anonymous footnote match: return number.
-                ((and (not l) (not label) (eq footnote f))
-                 (throw 'exit
-                        ;; If this is a margin, then don't count
-                        (if is-margin count (1+ count))))
-                ;; Labels match: return number.
-                ((and label l (string= label l))
-                 (throw 'exit
-                        ;; If this is a margin, then don't count
-                        (if is-margin count (1+ count))))
-                ;; Otherwise store label and increase counter if label
-                ;; wasn't encountered yet.
-                ((not l) (if is-margin count (incf count)))
-                ((not (member l seen)) (push l seen)
-                 (if is-margin count (incf count))))))
-           (or data (plist-get info :parse-tree)) info body-first))))
-
-    ;; The new numbering only works when we are during a latex export.
-    ;; So we make it available only during latex export.
-    (defun cflow-org-export-latex (orig-fun backend &rest args)
-      (when (org-export-derived-backend-p backend 'latex)
-        (advice-add 'org-export-get-footnote-number :around
-                    #'org-export-get-footnote-number/margin))
-
-      (let ((res (apply orig-fun backend args)))
-
-        (when (org-export-derived-backend-p backend 'latex)
-          (advice-remove 'org-export-get-footnote-number
-                         #'org-export-get-footnote-number/margin))
-        res))
-
-    (advice-add 'org-export-as :around #'cflow-org-export-latex)
-
-
     ;; Transforms many following cites into one multiple cite.
     (defun org/latex-filter-cites (final-output backend info)
       "Makes a multiple cite of adjacent cites in LaTeX export"
@@ -687,110 +597,7 @@ are currently in."
             ;; `org-export-numbered-headline-p'
               :level     0))))))
 
-    (advice-add 'org-export-resolve-id-link :around #'org/drop-unlinked-link)
-
-    ;; -- Export listings in a figure environment
-    ;;
-    ;; Redefines `org-latex-src-block' with an advice to override the
-    ;; way BEGIN_SRC blocks are exported. This wraps listings in a
-    ;; figure environment for captions in the margin to work. The user
-    ;; should give a caption to make this feature available. The
-    ;; placement of the figure is controlled by the value of the LaTeX
-    ;; specific attribute `:float'.
-    ;;
-    ;; See
-    ;; https://github.com/fmdkdd/phd-thesis/blob/master/tex/export-setup.el#L34
-    (defun org/wraps-lstlisting-in-figure (orig-fun src-block contents info)
-      (when (org-string-nw-p (org-element-property :value src-block))
-        (let* ((lang (org-element-property :language src-block))
-               (caption (org-element-property :caption src-block))
-               (caption-above-p (org-latex--caption-above-p src-block info))
-               (label (org-element-property :name src-block))
-               (custom-env (and lang
-                                (cadr (assq (intern lang)
-                                            org-latex-custom-lang-environments))))
-               (num-start (case (org-element-property :number-lines src-block)
-                            (continued (org-export-get-loc src-block info))
-                            (new 0)))
-               (retain-labels (org-element-property :retain-labels src-block))
-               (attributes (org-export-read-attribute :attr_latex src-block))
-               (float (plist-get attributes :float))
-               (listings (plist-get info :latex-listings)))
-          (cond ((and listings                    ;; Not case 1
-                      (not custom-env)            ;; Not case 2
-                      (not (eq listings 'minted)) ;; Not case 3
-                      caption)                    ;; caption is set.
-                 ;; Wraps lstlisting in a figure
-                 (let ((lst-lang
-                        (or (cadr (assq (intern lang)
-                                        (plist-get info :latex-listings-langs)))
-                            lang))
-                       (caption-str
-                        (when caption
-                          (let ((main (org-export-get-caption src-block))
-                                (secondary (org-export-get-caption src-block t)))
-                            (if (not secondary)
-                                (format "{%s}" (org-export-data main info))
-                              (format "{[%s]%s}"
-                                      (org-export-data secondary info)
-                                      (org-export-data main info))))))
-                       (lst-opt (plist-get info :latex-listings-options)))
-                   (concat
-                    "\\SetListingFigureName\n"
-                    (format "\\begin{figure}[%s]\n" (or float "htb"))
-                    ;; Options.
-                    (format
-                     "\\lstset{%s}\n"
-                     (concat
-                      (org-latex--make-option-string
-                       (append
-                        lst-opt
-                        (cond
-                         ((and (not float) (plist-member attributes :float)) nil)
-                         ((string= "multicolumn" float) '(("float" "*")))
-                         ((and float (not (assoc "float" lst-opt)))
-                          `(("float" ,(plist-get info :latex-default-figure-position)))))
-                        `(("language" ,lst-lang))
-                        ;; (if label `(("label" ,label)) '(("label" " ")))
-                        ;; (if caption-str `(("caption" ,caption-str)) '(("caption" " ")))
-                        ;; `(("captionpos" ,(if caption-above-p "t" "b")))
-                        (cond ((assoc "numbers" lst-opt) nil)
-                              ((not num-start) '(("numbers" "none")))
-                              ((zerop num-start) '(("numbers" "left")))
-                              (t `(("firstnumber" ,(number-to-string (1+ num-start)))
-                                   ("numbers" "left"))))))
-                      (let ((local-options (plist-get attributes :options)))
-                        (and local-options (concat "," local-options)))))
-                    ;; Source code.
-                    (format
-                     "\\begin{lstlisting}\n%s\\end{lstlisting}"
-                     (let* ((code-info (org-export-unravel-code src-block))
-                            (max-width
-                             (apply 'max
-                                    (mapcar 'length
-                                            (org-split-string (car code-info) "\n")))))
-                       (org-export-format-code
-                        (car code-info)
-                        (lambda (loc num ref)
-                          (concat
-                           loc
-                           (when ref
-                             ;; Ensure references are flushed to the right,
-                             ;; separated with 6 spaces from the widest line of
-                             ;; code
-                             (concat (make-string (+ (- max-width (length loc)) 6) ? )
-                                     (format "(%s)" ref)))))
-                        nil (and retain-labels (cdr code-info)))))
-                    (if caption-str (format "\n\\caption{%s}" caption-str) "")
-                    (if label (format "\n\\label{%s}" label) "")
-                    "\n\\end{figure}"
-                    "\n\\UnsetListingFigureName")))
-                ;; Else, proceed with normal export
-                (t
-                 (funcall orig-fun src-block contents info))))))
-
-    (advice-add 'org-latex-src-block :around #'org/wraps-lstlisting-in-figure)
-    )
+    (advice-add 'org-export-resolve-id-link :around #'org/drop-unlinked-link))
 
   ;; -- web-mode
   (with-eval-after-load 'web-mode
