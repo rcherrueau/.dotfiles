@@ -75,5 +75,6 @@ function gi() { curl -L -s https://www.gitignore.io/api/$@ ;}
 function ppp() {
   KEY="*$1*"
   # `p "$(find ~/Sync/Papers/ -name $KEY -print)"`
-  find ~/Sync/Papers/ -name $KEY -printf "'%p'\n"
+  # find ~/Sync/Papers/ -iname $KEY -printf "'%p'\n"
+  find /home/rfish/Sync/Papers/ -iname "*dow*" | sed "s/'/'\\\''/g" | sed "s/.*/'&'/g"
 }
