@@ -413,6 +413,7 @@ are currently in."
   (add-to-list 'page-break-lines-modes 'web-mode)
   (add-to-list 'page-break-lines-modes 'js-mode)
   (add-to-list 'page-break-lines-modes 'css-mode)
+  (add-to-list 'page-break-lines-modes 'proverif-pv-mode)
 
   ;; ------------------------------------------------------------- Modes
   ;; -- helm
