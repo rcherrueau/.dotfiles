@@ -436,8 +436,11 @@ are currently in."
                             (funcall fcn file)))))
 
   ;; -- Idris
-  (with-eval-after-load 'idris
-    (turn-off-idris-simple-indent))
+  (with-eval-after-load 'idris-mode
+    (message "---- There ---")
+    (setq idris-stay-in-current-window-on-compiler-error t)
+    (setq idris-enable-elab-prover t)
+    (setq idris-simple-indent-mode nil))
 
   ;; -- Org
   (with-eval-after-load 'org
