@@ -413,6 +413,7 @@ are currently in."
   (add-to-list 'page-break-lines-modes 'web-mode)
   (add-to-list 'page-break-lines-modes 'js-mode)
   (add-to-list 'page-break-lines-modes 'css-mode)
+  (add-to-list 'page-break-lines-modes 'idris-mode)
   (add-to-list 'page-break-lines-modes 'proverif-pv-mode)
 
   ;; ------------------------------------------------------------- Modes
@@ -437,7 +438,6 @@ are currently in."
 
   ;; -- Idris
   (with-eval-after-load 'idris-mode
-    (message "---- There ---")
     (setq idris-stay-in-current-window-on-compiler-error t)
     (setq idris-enable-elab-prover t)
     (setq idris-simple-indent-mode nil))
