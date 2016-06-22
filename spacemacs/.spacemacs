@@ -206,11 +206,11 @@ values."
    ;; A value from the range (0..100), in increasing opacity, which describes
    ;; the transparency level of a frame when it's active or selected.
    ;; Transparency can be toggled through `toggle-transparency'. (default 90)
-   dotspacemacs-active-transparency 90
+   dotspacemacs-active-transparency 97
    ;; A value from the range (0..100), in increasing opacity, which describes
    ;; the transparency level of a frame when it's inactive or deselected.
    ;; Transparency can be toggled through `toggle-transparency'. (default 90)
-   dotspacemacs-inactive-transparency 90
+   dotspacemacs-inactive-transparency 97
    ;; If non nil unicode symbols are displayed in the mode line. (default t)
    dotspacemacs-mode-line-unicode-symbols t
    ;; If non nil smooth scrolling (native-scrolling) is enabled. Smooth
@@ -353,7 +353,10 @@ are currently in."
                   (empty-line . empty-line)
                   (unknown . question-mark)))
 
-  ;; Line behavior
+  ;; Transparent background
+  (spacemacs/toggle-transparent-frame)
+
+  ;; -- Line behavior
   (setq-default default-fill-column 70)
   ;; Stop truncate lines
   (add-hook 'text-mode-hook (lambda ()
