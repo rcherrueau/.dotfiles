@@ -353,9 +353,6 @@ are currently in."
                   (empty-line . empty-line)
                   (unknown . question-mark)))
 
-  ;; Transparent background
-  (spacemacs/toggle-transparent-frame)
-
   ;; -- Line behavior
   (setq-default default-fill-column 70)
   ;; Stop truncate lines
