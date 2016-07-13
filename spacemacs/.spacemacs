@@ -27,9 +27,10 @@ values."
      html
      idris
      javascript
+     python
      racket
      ;; --------------------------------------------------------- others
-     ;; erc
+     erc
      ;; nixos
      org
      ;; ANSI rather than eshell, shell, ...
@@ -415,6 +416,7 @@ are currently in."
   (add-to-list 'page-break-lines-modes 'css-mode)
   (add-to-list 'page-break-lines-modes 'idris-mode)
   (add-to-list 'page-break-lines-modes 'proverif-pv-mode)
+  (add-to-list 'page-break-lines-modes 'sh-mode)
 
   ;; ------------------------------------------------------------- Modes
   ;; -- helm
@@ -602,6 +604,21 @@ are currently in."
               :level     0))))))
 
     (advice-add 'org-export-resolve-id-link :around #'org/drop-unlinked-link))
+
+  ;; -- python
+  (with-eval-after-load 'python
+    (setq python-indent-offset 2)
+    (setq python-fill-column default-fill-column)
+
+    ;; https://github.com/google/yapf/blob/master/yapf/yapflib/style.py#L220
+    ;;   style = CreateGoogleStyle()
+    ;; style['INDENT_DICTIONARY_VALUE'] = True
+    ;; style['INDENT_WIDTH'] = 2
+    ;; style['JOIN_MULTIPLE_LINES'] = False
+    ;; style['SPLIT_BEFORE_BITWISE_OPERATOR'] = True
+    ;; style['SPLIT_PENALTY_FOR_ADDED_LINE_SPLIT'] = 0
+    (setq py-yapf-options (format "--style='{based_on_style:chromium,column-limit:%s}'"
+                                  default-fill-column)))
 
   ;; -- web-mode
   (with-eval-after-load 'web-mode
