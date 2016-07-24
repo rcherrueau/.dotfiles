@@ -1,84 +1,60 @@
 !General config
-Xft*dpi:             96
-Xft*antialias:       true
-Xft*hinting:         true
-Xft*hintstyle:       hintfull
-Xft*rgba:            rgb
+Xft*dpi:                      96
+Xft*antialias:                true
+Xft*hinting:                  true
+Xft*hintstyle:                hintfull
+Xft*rgba:                     rgb
 
-! Zenburn Color
-! COLOR_FG                  #dcdccc
-! COLOR_BG                  #3f3f3f
-!
-! COLOR_TERM_BLACK          COLOR_BG
-! COLOR_TERM_DARK_RED       #705050
-! COLOR_TERM_DARK_GREEN     #60b48a
-! COLOR_TERM_DARK_YELLOW    #dfaf8f
-! COLOR_TERM_DARK_BLUE      #506070
-! COLOR_TERM_DARK_MAGENTA   #dc8cc3
-! COLOR_TERM_DARK_CYAN      #8cd0d3
-! COLOR_TERM_LIGHT_GRAY     COLOR_FG
-!
-! COLOR_TERM_DARK_GRAY      #709080
-! COLOR_TERM_LIGHT_RED      #dca3a3
-! COLOR_TERM_LIGHT_GREEN    #c3bf9f
-! COLOR_TERM_LIGHT_YELLOW   #f0dfaf
-! COLOR_TERM_LIGHT_BLUE     #94bff3
-! COLOR_TERM_LIGHT_MAGENTA  #ec93d3
-! COLOR_TERM_LIGHT_CYAN     #93e0e3
-! COLOR_TERM_WHITE          #ffffff
+! ----------------------------------------------------------------- Zenburn
+! `man urxvt` for the customization
+! source https:               //gist.github.com/cqpx/1436584
+URxvt*depth:                  32
+URxvt*geometry:               90x30
+URxvt*transparent:            false
+URxvt*fading:                 0
+URxvt*font:                   xft: FiraMono: size=9
+URxvts*.letterSpace:          -1
+URxvt*scrollBar:              false
+URxvt*internalBorder:         0
+URxvt*jumpScroll:             true
+URxvt*visualBell:             false
+URxvt*pointerBlank:           true
+URxvt*saveLines:              65535
 
-*foreground:         #dcdccc
-*background:         #3f3f3f
-! Black
-*color0:             #3f3f3f
-! Red
-*color1:             #705050
-! Green
-*color2:             #60b48a
-! Yellow
-*color3:             #dfaf8f
-! Blue
-*color4:             #506070
-! Magenta
-*color5:             #dc8cc3
-! Cyan
-*color6:             #8cd0d3
-! LGray
-*color7:             #cdcdcc
-! Gray
-*color8:             #709080
-! LRed
-*color9:             #dca3a3
-! LGreen
-*color10:            #c3bf9f
-! LYellow
-*color11:            #f0dfaf
-! LBlue
-*color12:            #94bff3
-! LMagenta
-*color13:            #ec93d3
-! LCyan
-*color14:            #93e0e3
-! White
-*color15:            #ffffff
-*cursorColor:        #6b3644
+! Pointer
+URxvt*pointerBlank:           true
+URxvt*pointerColorBackground: #586e75
+URxvt*pointerColorForeground: #93a1a1
 
-URxvt*font:            xft:FiraMono:size=9
-URxvts*.letterSpace:   -1
-URxvt*scrollBar:       false
-URxvt*internalBorder:  0
-URxvt*jumpScroll:      true
-URxvt*visualBell:      false
-URxvt*pointerBlank:    true
-URxvt*saveLines:       4000
-URxvt*cursorColor:     #6b3654
-URxvt*colorUL:         #c3bf9f
-URxvt*underlineColor:  #c3bf9f
+! Cursor
+URxvt*cursorColor:            #dc8cc3
 
-! ----------------------------------------------------------------------
+URxvt.internalBorder:         0
+URxvt*background:             #3f3f3f
+URxvt*foreground:             #dcdccc
+! URxvt*colorUL:                #366060
+URxvt*underlineColor:         #dfaf8f
+
+URxvt*color0:                 #3f3f3f
+URxvt*color1:                 #cc9393
+URxvt*color2:                 #7f9f7f
+URxvt*color3:                 #d0bf8f
+URxvt*color4:                 #6ca0a3
+URxvt*color5:                 #dc8cc3
+URxvt*color6:                 #93e0e3
+URxvt*color7:                 #dcdccc
+URxvt*color8:                 #000000
+URxvt*color9:                 #dca3a3
+URxvt*color10:                #bfebbf
+URxvt*color11:                #f0dfaf
+URxvt*color12:                #8cd0d3
+URxvt*color13:                #dc8cc3
+URxvt*color14:                #93e0e3
+URxvt*color15:                #ffffff
+
+! -------------------------------------------------------------------- Rofi
 ! $ man rofi
 ! $ rofi -dump-xresources
-! ----------------------------------------------------------------------
 rofi.kb-row-up: Control+k,Control+p,Up
 rofi.kb-row-down: Control+j,Control+n,Down
 ! Set selected item as input text
