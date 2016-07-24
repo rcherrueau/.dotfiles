@@ -376,6 +376,10 @@ are currently in."
   (add-hook 'org-mode-hook #'add-watchwords)
 
   ;; -- Powerline
+  ;; Display the name of the function in the powerline
+  (which-function-mode t)
+
+  ;; Powerline with arrow
   (setq powerline-default-separator 'arrow)
   (setq powerline-default-separator-dir '(right . right))
 
@@ -386,28 +390,29 @@ are currently in."
   ;;   ;; Displays in org-mode when window is focused
   ;;   :when (eq major-mode 'org-mode))
 
-  ;; (setq spacemacs-mode-line-left
-  ;;       '(((workspace-number window-number)
-  ;;          :fallback state-tag
-  ;;          :separator "|"
-  ;;          :face state-face)
-  ;;         (buffer-modified buffer-encoding-abbrev line-column
-  ;;          "⚓" buffer-id remote-host)
-  ;;         major-mode
-  ;;         ((flycheck-errors flycheck-warnings flycheck-infos)
-  ;;          :when active)
-  ;;         ((minor-modes process)
-  ;;          :when active)
-  ;;         (erc-track :when active)
-  ;;         (org-pomodoro :when active)
-  ;;         (org-clock :when active)
-  ;;         (org-path :when active)))
+  ;; Custom power line
+  (spaceline-compile "main"
+        '(((workspace-number window-number)
+           :fallback evil-state
+           :separator "|"
+           :face highlight-face)
+          (buffer-modified buffer-encoding-abbrev line-column
+           "⚓" buffer-id remote-host)
+          major-mode
+          ((minor-modes process)
+           :when active)
+          (erc-track :when active)
+          ((flycheck-errors flycheck-warnings flycheck-infos)
+           :when active)
+          (org-pomodoro :when active)
+          (org-clock :when active)
+          which-function)
+          ;; (org-path :when active))
 
-  ;; (setq spacemacs-mode-line-right
-  ;;       '(selection-info
-  ;;        ((global-mode new-version)
-  ;;         :when active)
-  ;;        buffer-position hud))
+        '(selection-info
+          ((global-mode new-version)
+           :when active)
+          buffer-position hud))
 
   ;; -- Dispalye formfeed `C-q C-l' as horizontal line.
   (global-page-break-lines-mode t)
