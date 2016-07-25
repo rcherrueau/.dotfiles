@@ -622,8 +622,13 @@ are currently in."
     ;; style['JOIN_MULTIPLE_LINES'] = False
     ;; style['SPLIT_BEFORE_BITWISE_OPERATOR'] = True
     ;; style['SPLIT_PENALTY_FOR_ADDED_LINE_SPLIT'] = 0
-    (setq py-yapf-options (format "--style='{based_on_style:chromium,column-limit:%s}'"
-                                  default-fill-column)))
+    (setq py-yapf-options
+          (format "--style='{based_on_style:chromium,column-limit:%s}'"
+                  default-fill-column)))
+
+  ;; -- shell
+  (with-eval-after-load 'shell
+    (setq sh-basic-offset 2))
 
   ;; -- web-mode
   (with-eval-after-load 'web-mode
