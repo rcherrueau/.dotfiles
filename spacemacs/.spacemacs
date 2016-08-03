@@ -112,7 +112,8 @@ values."
    ;; `dotspacemacs-startup-lists' doesn't include `recents'. (default 5)
    dotspacemacs-startup-recent-list-size 5
    ;; Default major mode of the scratch buffer (default `text-mode')
-   dotspacemacs-scratch-mode 'emacs-lisp-mode
+   ;; dotspacemacs-scratch-mode 'emacs-lisp-mode
+   dotspacemacs-scratch-mode 'text-mode
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
@@ -424,6 +425,12 @@ are currently in."
   (add-to-list 'page-break-lines-modes 'sh-mode)
 
   ;; ------------------------------------------------------------- Modes
+  ;; -- erc
+  (with-eval-after-load 'erc
+    ;; Flyspell
+    ;; https://www.emacswiki.org/emacs/ErcSpelling
+    (erc-spelling-mode t))
+
   ;; -- helm
   (with-eval-after-load 'helm-files
     ;; Don't show files matching regexp in
