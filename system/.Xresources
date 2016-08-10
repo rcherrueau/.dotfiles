@@ -20,6 +20,7 @@ URxvt*jumpScroll:             true
 URxvt*visualBell:             false
 URxvt*pointerBlank:           true
 URxvt*saveLines:              65535
+URxvt*termName:               rxvt
 
 ! Pointer
 URxvt*pointerBlank:           true
