@@ -391,6 +391,8 @@ are currently in."
   ;;   ;; Displays in org-mode when window is focused
   ;;   :when (eq major-mode 'org-mode))
 
+  (setq ispell-dictionary "en_GB")
+
   ;; Custom power line
   (spaceline-compile "main"
         '(((workspace-number window-number)
