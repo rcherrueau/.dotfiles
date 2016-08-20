@@ -372,7 +372,7 @@ are currently in."
   ;; Highlight the following words in comments
   (defun add-watchwords ()
     (font-lock-add-keywords
-     nil '(("\\<\\(TODO\\|FIXME\\|HACK\\|XXX\\|BUG\\|Note\\):"
+     nil '(("\\<\\(TODO\\|FIXME\\|HACK\\|XXX\\|BUG\\|Note\\)"
             1 font-lock-warning-face t))))
 
   (add-hook 'prog-mode-hook #'add-watchwords)
@@ -385,15 +385,6 @@ are currently in."
   ;; Powerline with arrow
   (setq powerline-default-separator 'arrow)
   (setq powerline-default-separator-dir '(right . right))
-
-  ;; FIXME: https://github.com/TheBB/spaceline
-  ;; Powerline segment for orgmode
-  ;; (spacemacs|define-mode-line-segment org-path
-  ;;   (fmdkdd/org-full-outline-path)
-  ;;   ;; Displays in org-mode when window is focused
-  ;;   :when (eq major-mode 'org-mode))
-
-  (setq ispell-dictionary "en_GB")
 
   ;; Custom power line
   (spaceline-compile "main"
@@ -412,7 +403,6 @@ are currently in."
           (org-pomodoro :when active)
           (org-clock :when active)
           which-function)
-          ;; (org-path :when active))
 
         '(selection-info
           ((global-mode new-version)
@@ -428,7 +418,12 @@ are currently in."
   (add-to-list 'page-break-lines-modes 'proverif-pv-mode)
   (add-to-list 'page-break-lines-modes 'sh-mode)
 
+  ;; ------------------------------------------------------------- Other
+  (setq ispell-dictionary "en_GB")
+  (spacemacs/toggle-camel-case-motion-globally-on)
+
   ;; ------------------------------------------------------------- Modes
+
   ;; -- erc
   (with-eval-after-load 'erc
     ;; Flyspell
