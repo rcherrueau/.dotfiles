@@ -257,6 +257,13 @@ executes.
  This function is mostly useful for variables that need to be set
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
+
+  ;; -- Customize
+  ;; Set custome variables in a specific file
+  (setq custom-file (locate-user-emacs-file "mine-pref.el"))
+  (unless (file-exists-p custom-file)
+    (write-region "" nil custom-file))
+  (load custom-file)
   )
 
 (defun dotspacemacs/user-config ()
@@ -317,13 +324,6 @@ are currently in."
             (if this-win-2nd (other-window 1))))))
 
   (spacemacs/set-leader-keys "w|" 'toggle-window-split)
-
-  ;; -- Customize
-  ;; Set custome variables in a specific file
-  (setq custom-file (locate-user-emacs-file "mine-pref.el"))
-  (unless (file-exists-p custom-file)
-    (write-region "" nil custom-file))
-  (load custom-file)
 
   ;; -------------------------------------------------------- Appearance
   ;; -- Fringeline
