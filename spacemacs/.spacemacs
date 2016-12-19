@@ -777,13 +777,4 @@ key sent by xdotool."
   (setq vc-follow-symlinks nil)
   ;; Fully disable vc-mode
   (setq vc-handled-backends ())
-
-  ;; -------------------------------------------------------------- Misc
-  ;; Revert gc threshold to the default value after initalization.
-  ;; I've got lag on key-up in big org files such as my timeline
-  ;; https://github.com/syl20bnr/spacemacs/issues/3011
-  (setq gc-cons-threshold 800000)
   )
-
-;; Do not write anything past this comment. This is where Emacs will
-;; auto-generate custom variable definitions.
