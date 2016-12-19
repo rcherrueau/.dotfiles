@@ -257,8 +257,6 @@ executes.
  This function is mostly useful for variables that need to be set
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
-  ;; Are we using a mac-keyboard
-  (setq mac-keyboard t)
   )
 
 (defun dotspacemacs/user-config ()
@@ -291,12 +289,6 @@ are currently in."
                                              ; argument works right
 
   ;; ---------------------------------------------------- Hardware setup
-  ;; -- Key bindings
-  ;; Mac-os key
-  (when mac-keyboard
-   (setq x-meta-keysym 'super)
-   (setq x-super-keysym 'meta))
-
   ;; Toggle axe-window split
   ;; http://emacswiki.org/emacs/ToggleWindowSplit
   (defun toggle-window-split ()
@@ -481,9 +473,8 @@ are currently in."
     ;; (evil-define-key 'normal evil-org-mode-map
     ;;   "J" 'evil-join)
 
-    ;; Set the external pdf application to zathura on my nixos
-    (when (spacemacs/system-is-linux)
-      (setcdr (assoc "\\.pdf\\'" org-file-apps) "zathura %s"))
+    ;; Set the external pdf application to zathura
+    (setcdr (assoc "\\.pdf\\'" org-file-apps) "zathura %s")
 
     ;; Highlight LaTeX related syntax
     (setf org-highlight-latex-and-related '(latex))

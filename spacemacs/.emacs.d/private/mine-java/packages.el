@@ -90,6 +90,4 @@
     :config
     ;; Point to the correct directories for java and pmd-home
     (setq pmd-java-home "/usr/bin/env java")
-    (setq pmd-home (if (spacemacs/system-is-linux)
-                       "~/.nix-profile/"
-                     "/usr/local/pmd/"))))
+    (setq pmd-home "/run/current-system/sw")))
