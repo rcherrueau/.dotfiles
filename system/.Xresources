@@ -1,26 +1,27 @@
 !General config
-Xft*dpi:                      96
-Xft*antialias:                true
-Xft*hinting:                  true
+!Xft*dpi:                      144
+Xft*autohint:                 false
+Xft*lcdfilter:                lcddefault
 Xft*hintstyle:                hintfull
+Xft*hinting:                  true
+Xft*antialias:                true
 Xft*rgba:                     rgb
 
 ! ----------------------------------------------------------------- Zenburn
 ! `man urxvt` for the customization
-! source https:               //gist.github.com/cqpx/1436584
+! source https://gist.github.com/cqpx/1436584
 URxvt*depth:                  32
 URxvt*geometry:               90x30
 URxvt*transparent:            false
 URxvt*fading:                 0
-URxvt*font:                   xft: FiraMono: size=9
-URxvts*.letterSpace:          -1
+URxvt*font:                   xft:FiraCode:size=10
+URxvt*letterSpace:            -1
 URxvt*scrollBar:              false
 URxvt*internalBorder:         0
 URxvt*jumpScroll:             true
 URxvt*visualBell:             false
-URxvt*pointerBlank:           true
 URxvt*saveLines:              65535
-URxvt*termName:               rxvt
+URxvt*termName:               rxvt-unicode
 
 ! Pointer
 URxvt*pointerBlank:           true

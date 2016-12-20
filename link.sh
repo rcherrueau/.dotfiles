@@ -5,6 +5,9 @@
 # https://github.com/NixOS/nixpkgs/issues/5200
 # https://bbs.archlinux.org/viewtopic.php?id=174916
 
-stow --target="$HOME" system
-stow --target="$HOME" git
-stow --target="$HOME" spacemacs
+stow --target="$HOME"       system
+stow --target="$HOME"       git
+stow --target="$HOME"       spacemacs
+stow --target="/etc/nixos/" nixos
+
+# TODO: case home/hp ln -s specific
