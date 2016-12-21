@@ -183,11 +183,23 @@
       historyLimit = 65535;
       keyMode = "vi";
       terminal = "screen-256color";
+      newSession = true;
+
     };
 
     zsh = {
       enable = true;
-      interactiveShellInit = ". /etc/nixos/functions.sh";
+      interactiveShellInit = ''
+        # Some utils functions
+        . /etc/nixos/functions.sh
+
+        # # TMUX
+        # # https://wiki.archlinux.org/index.php/Tmux#Start_tmux_on_every_shell_login
+        # if which tmux >/dev/null 2>&1; then
+        #   #if not inside a tmux session, and if no session is started, start a new session
+        #   test -z "$TMUX" && (tmux attach || tmux new-session)
+        # fi
+      '';
       shellAliases = {
         l = "ls -alh"; ll = "ls -l"; ls = "ls --color=tty";
         pleaze  = "sudo $(history -p !!)";
@@ -252,7 +264,8 @@
       #                              # returned by every module
       # nix-repl> :p config.services.xserver.displayManager.sessionCommands
       sessionCommands = lib.mkBefore ''
-        ${pkgs.xcape}/bin/xcape -e 'Shift_L=Escape;Control_L=Escape'
+        ${pkgs.xcape}/bin/xcape -e 'Shift_L=Escape'
+        ${pkgs.xcape}/bin/xcape -e 'Control_L=Escape'
         # ${pkgs.emacs}/bin/emacs --daemon
       '';
     };
