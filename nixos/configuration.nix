@@ -184,7 +184,6 @@
       keyMode = "vi";
       terminal = "screen-256color";
       newSession = true;
-
     };
 
     zsh = {
@@ -205,7 +204,7 @@
         pleaze  = "sudo $(history -p !!)";
         encrypt = "openssl enc -aes-256-cbc -salt";
         decrypt = "openssl enc -aes-256-cbc -salt -d";
-        p = "xdg-open"; r = "ranger";
+        p = "open_command"; r = "ranger";
       };
     };
   };
