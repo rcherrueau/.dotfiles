@@ -130,6 +130,9 @@
      courier
      # cm-super required by [T1]{fontspec}
      cm-super
+     # dvipng required by org-mode to compute preview images of latex
+     # formulas
+     dvipng
      latexmk;
    })
 
