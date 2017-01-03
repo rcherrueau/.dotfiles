@@ -293,7 +293,9 @@
   # Enable virtualization
   virtualisation.docker.enable = true;
   virtualisation.virtualbox.host.enable = true;
-  nixpkgs.config.virtualbox.enableExtensionPack = true;
+  # Next option requires to compile VirtualBox extension 
+  # and it takes way too long
+  # nixpkgs.config.virtualbox.enableExtensionPack = true;
   users.extraGroups.vboxusers.members = [ "rfish" ];
 
   # Enable CUPS to print documents.
