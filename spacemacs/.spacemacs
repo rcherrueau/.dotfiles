@@ -315,7 +315,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
 
   ;; -- Customize
   ;; Set custome variables in a specific file
-  (setq custom-file (locate-user-emacs-file "mine-pref.el"))
+  (setq custom-file (locate-user-emacs-file "private/mine-pref.el"))
   (unless (file-exists-p custom-file)
     (write-region "" nil custom-file))
   (load custom-file)
