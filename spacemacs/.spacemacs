@@ -681,6 +681,13 @@ are currently in."
   (with-eval-after-load 'shell
     (setq sh-basic-offset 2))
 
+  ;; -- tramp
+  (with-eval-after-load 'tramp
+    ;; Add my G5K bin directory to the list of remote paths TRAMP can
+    ;; search for programs (so TRAMP can call `ag' on for instance).
+    ;; [[info:tramp#Remote%20programs][info:tramp#Remote programs]]
+    (add-to-list 'tramp-remote-path "/home/rcherrueau/bin/usr/bin"))
+
   ;; -- web-mode
   (with-eval-after-load 'web-mode
     (defvar-local fmdkdd/browser-window-list nil
