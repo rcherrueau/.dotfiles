@@ -466,6 +466,8 @@ are currently in."
 
   ;; ------------------------------------------------------------- Other
   (setq ispell-dictionary "en_GB")
+  (setq select-enable-primary t) ;; Selecting text put it in the
+                                 ;; x-buffer for x-copy
   (spacemacs/toggle-camel-case-motion-globally-on)
 
   ;; ------------------------------------------------------------- Modes
