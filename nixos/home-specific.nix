@@ -78,8 +78,10 @@
     videoDrivers = [ "nvidia" ];
 
     # I use a french mac bluetooth keyboard. Pass the following line
-    # if you want to swap alt key and command key
+    # if you want to swap alt key and command key:
     # `echo options hid_apple swap_opt_cmd=1 | sudo tee -a /etc/modprobe.d/hid_apple.conf`
+    # or delete the hid_apple.conf file to remove the swap.
+    # Swapping/unswapping require a restart
     # Maybe you should set it with `boot.extraModprobeConfig`
     # See wiki.archlinux.org/index.php?title=Apple_Keyboard&oldid=387451
     xkbModel = "apple_laptop";
@@ -88,5 +90,4 @@
       ${pkgs.feh}/bin/feh --bg-fill '/home/rfish/Sync/Pictures/c38Xn.jpg'
     '';
   };
-
 }
