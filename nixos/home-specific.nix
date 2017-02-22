@@ -44,6 +44,7 @@
 
   environment.systemPackages = with pkgs; [
     bluez
+    ntfs3g
   ];
 
   # Bluetooth:
