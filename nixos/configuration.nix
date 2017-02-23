@@ -30,13 +30,13 @@
   fonts = {
     enableDefaultFonts = true;
     fonts = with pkgs; [
+      iosevka             # Font for programming
       fira                # Font of Firefox OS
-      fira-mono           # Font of Firefox OS
       fira-code           # Fira Mono + programming ligatures
     ];
 
     fontconfig = {
-      defaultFonts.monospace = [ "FiraCode" ];
+      defaultFonts.monospace = [ "Iosevka" ];
     };
   };
 
