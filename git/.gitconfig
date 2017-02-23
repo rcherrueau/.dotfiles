@@ -1,48 +1,54 @@
 [user]
-        name = RFish ⚓
-        email = RonanCherrueau@gmail.com
+  name = RFish ⚓
+  email = RonanCherrueau@gmail.com
+  signingKey = 5C383D7AC6C937CB
+[gpg]
+	program = gpg2
+[commit]
+	gpgsign = true
 [core]
-        excludesfile = ~/.gitignore_global
-        pager = cat
-        editor = emacs
-        whitespace = -trailing-space
+  excludesfile = ~/.gitignore_global
+  pager = cat
+  editor = emacs
+  whitespace = -trailing-space
 [color]
-        ui = auto
+  ui = auto
 [alias]
-        st = status
-        ci = commit
-        lg = log --graph --pretty=tformat:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%an %ar)%Creset'
-        # Do ssh-add if no entity is laoded inside ssh-agent
-        purr = !ssh-add -l > /dev/null || ssh-add && git-pull --rebase
+  st = status
+  ci = commit
+	co = checkout
+  lg = log --graph --pretty=tformat:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%an %ar)%Creset'
+  # Do ssh-add if no entity is laoded inside ssh-agent
+  purr = !ssh-add -l > /dev/null || ssh-add && git-pull --rebase
 [diff]
-        tool = vimdiff
-        mnemonicPrefix = true
-        wordRegex = .
+  tool = vimdiff
+  mnemonicPrefix = true
+  wordRegex = .
 [fetch]
-        recurseSubmodules = on-demand
+  recurseSubmodules = on-demand
 [grep]
-        extendedRegexp = true
+  extendedRegexp = true
 [log]
-        abbrevCommit = true
+  abbrevCommit = true
 [merge]
-        conflictStyle = diff3
+  conflictStyle = diff3
 [mergetool]
-        # keepBackup = false
-        # keepTemporaries = false
-        # prompt = false
+  # keepBackup = false
+  # keepTemporaries = false
+  # prompt = false
 [pull]
-        # This is GREAT… when you know what you're doing and are careful
-        # not to pull --no-rebase over a local line containing a true merge.
-        # rebase = true
-        # WARNING! This option, which does away with the one gotcha of
-        # auto-rebasing on pulls, is only available from 1.8.5 onwards.
-        # rebase = preserve
+  # This is GREAT… when you know what you're doing and are careful
+  # not to pull --no-rebase over a local line containing a true merge.
+  # rebase = true
+  # WARNING! This option, which does away with the one gotcha of
+  # auto-rebasing on pulls, is only available from 1.8.5 onwards.
+  # rebase = preserve
 [push]
-        default = upstream
+  default = upstream
 [rerere]
-        # If, like me, you like rerere, decomment these
-        # autoupdate = true
-        # enabled = true
+  # If, like me, you like rerere, decomment these
+  # autoupdate = true
+  # enabled = true
 [status]
   submoduleSummary = true
 [gitreview]
