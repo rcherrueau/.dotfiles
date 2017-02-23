@@ -7,8 +7,8 @@
 {
   imports = [./specific.nix];
 
-  # Linux kernel 4.8
-  boot.kernelPackages = pkgs.linuxPackages_4_8;
+  # Linux kernel 4.9
+  boot.kernelPackages = pkgs.linuxPackages_4_9;
 
   # Tmp on tmpfs
   boot.tmpOnTmpfs = true;
@@ -44,6 +44,7 @@
   users.extraUsers.rfish = {
     createHome = true;
     home = "/home/rfish";
+    # TODO: remove networkmanager group
     extraGroups = [ "wheel" "networkmanager" ];
     useDefaultShell = true;
     uid = 1000;
@@ -296,14 +297,12 @@
   # Enable virtualization
   virtualisation.docker.enable = true;
   virtualisation.virtualbox.host.enable = true;
-  # Next option requires to compile VirtualBox extension 
+  # Next option requires to compile VirtualBox extension
   # and it takes way too long
   # nixpkgs.config.virtualbox.enableExtensionPack = true;
   users.extraGroups.vboxusers.members = [ "rfish" ];
 
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
-
-  # The NixOS release to be compatible with for stateful data such as databases.
+  # The NixOS release to be compatible with for stateful data such as
+  # databases.
   system.stateVersion = "17.03";
 }

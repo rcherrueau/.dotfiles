@@ -45,8 +45,22 @@
   # -------------------------------------------------- System configuration
 
   # Networking stuff
-  networking.hostName = "hp-rfish";
-  networking.networkmanager.enable = true;
+  networking = {
+    hostName = "hp-rfish";
+    # TODO: Delete the support of network-manager and only relies on
+    # wpa-supplicant.
+    # wireless.enable = true;
+    networkmanager.enable = true;
+  };
+
+  # Enable CUPS to print documents.
+  # Find PPD Drivers on https://www.openprinting.org/printers
+  services.printing = {
+    enable = true;
+    webInterface = true; # Access web interface at
+                         #  `services.printing.listenAddresses`
+                         # localhost:631
+  };
 
   # Xorg settings
   services.xserver = {
@@ -70,7 +84,8 @@
       # xrandr --dpi 144 --output eDP1 --auto --output DP1-1 --auto --scale 1.35x1.35 --right-of eDP1
       xrandr --output DP2 --auto --output DP1-1 --auto --right-of DP2
 
-      ${pkgs.feh}/bin/feh --bg-fill '/home/rfish/Sync/Pictures/1369350629075.jpg'
+      # pexels.com
+      ${pkgs.feh}/bin/feh --bg-fill '/home/rfish/Sync/Pictures/sea-ocean-sailing-ship-boat.jpg'
     '';
   };
 }
