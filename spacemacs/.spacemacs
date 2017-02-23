@@ -57,6 +57,7 @@ values."
      nixos
      org
      spell-checking
+     syntax-checking
      ;; --------------------------------------------------------- perso
      mine-java
      )
@@ -64,7 +65,8 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '(tao-theme page-break-lines rainbow-mode)
+   dotspacemacs-additional-packages '(tao-theme page-break-lines
+     rainbow-mode realgud)
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -140,8 +142,8 @@ values."
    ;; `recents' `bookmarks' `projects' `agenda' `todos'."
    ;; List sizes may be nil, in which case
    ;; `spacemacs-buffer-startup-lists-length' takes effect.
-   dotspacemacs-startup-lists '((recents . 10)
-                                (todo . nil))
+   ;; dotspacemacs-startup-lists '((recents . 10)
+   ;;                              (todo . nil))
    ;; True if the home buffer should respond to resize events.
    dotspacemacs-startup-buffer-responsive nil
    ;; Default major mode of the scratch buffer (default `text-mode')
