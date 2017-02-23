@@ -44,7 +44,6 @@
         # autoupdate = true
         # enabled = true
 [status]
-        submoduleSummary = true
-#[user]
-#	name = pv-sec-sac2016
-#	email = pv-sec-sac2016@users.noreply.github.com
+  submoduleSummary = true
+[gitreview]
+	username = rcherrueau

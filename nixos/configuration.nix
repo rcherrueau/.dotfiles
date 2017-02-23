@@ -85,7 +85,7 @@
     zathura xournal # Pdf viewer + notetaking
 
     # development tools
-    git
+    git git-review # git-review for OpenStack Gerrit
     emacs vim aspell aspellDicts.en aspellDicts.fr
     silver-searcher
     # Put here the list of needed tex packages. scheme-* collection-*
