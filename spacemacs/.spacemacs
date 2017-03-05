@@ -39,7 +39,7 @@ values."
      erc
      ;; ----------------------------------------------------------- lang
      emacs-lisp
-     helm
+     haskell
      html
      idris
      javascript
@@ -47,6 +47,7 @@ values."
      racket
      ;; ----------------------------------------------------------- tool
      ansible
+     helm
      ;; ANSI rather than eshell, shell, ...
      ;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
      (shell :variables
@@ -71,6 +72,10 @@ values."
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
    dotspacemacs-excluded-packages '(
+     ;; FIXME: Remove this so Spacemacs use PATH from nix-shell. This
+     ;; is a workaround since some layer rely on this package
+     ;; (go/rust): https://github.com/syl20bnr/spacemacs/issues/2294
+     exec-path-from-shell
      ;; Do not print a ~ to indicate the end of file
      vi-tilde-fringe
      ;; Do not show symbol as bullet for headers in org
