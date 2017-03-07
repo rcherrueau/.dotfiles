@@ -162,7 +162,7 @@ values."
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
    dotspacemacs-default-font '("Iosevka"
-                               :size 15
+                               :size 16
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
@@ -467,6 +467,7 @@ are currently in."
   (add-to-list 'page-break-lines-modes 'web-mode)
   (add-to-list 'page-break-lines-modes 'js-mode)
   (add-to-list 'page-break-lines-modes 'css-mode)
+  (add-to-list 'page-break-lines-modes 'haskell-mode)
   (add-to-list 'page-break-lines-modes 'idris-mode)
   (add-to-list 'page-break-lines-modes 'proverif-pv-mode)
   (add-to-list 'page-break-lines-modes 'sh-mode)
