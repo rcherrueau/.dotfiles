@@ -26,6 +26,8 @@ bindsym $mod+q kill
 set $rofi_ops  -case-sensitive -fuzzy -lines 5 \
                -terminal urxvt -font "Iosevka 13"
 bindsym $mod+space exec --no-startup-id rofi $rofi_ops -show run
+# Rofi web
+bindsym $mod+w exec --no-startup-id rofi $rofi_ops -show web:~/.i3/web_rofi.sh
 
 # change focus
 bindsym $mod+h focus left

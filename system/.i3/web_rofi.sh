@@ -43,10 +43,6 @@
   (define longest-key
     (foldr max 0 (map (compose string-length web-entry-key) ws)))
 
-  ;; Size of the longest description
-  (define longest-desc
-    (foldr max 0 (map (compose string-length web-entry-description) ws)))
-
   ;; Formats web-entry to print key and description
   ;;
   ;; wentry-key-and-desc: web-entry → string
@@ -54,19 +50,27 @@
     (define padded-key (~a (web-entry-key w)
                            #:min-width longest-key
                            #:right-pad-string " "))
-    (define padded-desc (~a (web-entry-description w)
-                            #:min-width longest-desc
-                            #:right-pad-string " "))
-    (format "~a ~s " padded-key padded-desc))
+
+    (format "~a ~s " padded-key (web-entry-description w)))
 
   (for-each displayln (map wentry-key-and-desc ws)))
 
 ;; List of all web search entries
 (define web-entries
   (list
-   (web-entry "qwant"  "Search Web for {query}"     "https://www.qwant.com/?q={query}")
+   ;; General
+   (web-entry "qwant"  "Search Web for {query}"       "https://www.qwant.com/?q={query}")
+   (web-entry "wpedia" "Search Wikipedia for {query}" "https://wikipedia.org/w/index.php?search={query}")
+   ;; Language Helper
    (web-entry "cnrtl"  "French {query} definition"  "http://cnrtl.fr/definition/{query}")
-   (web-entry "conjug" "French {query} conjugaison" "http://cnrtl.fr/morphologie/{query}")))
+   (web-entry "conjug" "French {query} conjugaison" "http://cnrtl.fr/morphologie/{query}")
+   (web-entry "mw"     "English {query} definition" "https://www.merriam-webster.com/dictionary/{query}")
+   (web-entry "en2fr"  "Search Wordref for {query}"  "http://www.wordreference.com/enfr/{query}")
+   ;; Science
+   (web-entry "dblp"    "CS Bib for {query}"         "http://dblp.uni-trier.de/search?q={query}")
+   (web-entry "scholar" "Google Scholar for {query}" "https://scholar.google.fr/scholar?q={query}")
+   (web-entry "scihub"  "Sci-Hub for {doi}"          "https://sci-hub.ac/{query}")
+   ))
 
 (cond
   ;; Display the list of web search entries when no arguments

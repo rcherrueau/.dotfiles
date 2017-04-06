@@ -57,11 +57,12 @@ URxvt*color15:                #ffffff
 ! -------------------------------------------------------------------- Rofi
 ! $ man rofi
 ! $ rofi -dump-xresources
-rofi.kb-row-up: Control+k,Control+p,Up
-rofi.kb-row-down: Control+j,Control+n,Down
-! Set selected item as input text
-rofi.kb-row-select: Tab
-rofi.kb-row-tab:
+! rofi.kb-row-up: Control+k,Control+p,Up
+! rofi.kb-row-down: Control+j,Control+n,Down
+! ! Set selected item as input text
+! rofi.kb-row-select: Tab
+! rofi.kb-row-tab:
+
 ! Use extended color scheme
 rofi.color-enabled: true
 ! bg Background color row
