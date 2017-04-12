@@ -296,7 +296,7 @@
 
   # Enable virtualization
   virtualisation.docker.enable = true;
-  virtualisation.virtualbox.host.enable = true;
+  # virtualisation.virtualbox.host.enable = true;
   # Next option requires to compile VirtualBox extension
   # and it takes way too long
   # nixpkgs.config.virtualbox.enableExtensionPack = true;
