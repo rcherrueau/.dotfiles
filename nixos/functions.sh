@@ -59,3 +59,17 @@ function ppp() {
   # find ~/Sync/Papers/ -iname $KEY -printf "'%p'\n"
   find /home/rfish/Sync/Papers/ -iname ${KEY} | sed "s/'/'\\\''/g" | sed "s/.*/'&'/g"
 }
+
+# Toggle the dpi settings in the `.Xresource`
+function toggle-dpi() {
+  grep -q '^!Xft\*dpi:' /home/rfish/.Xresources
+  if [ $? -eq 0 ]; then
+    sed -i 's/^!Xft\*dpi:/Xft*dpi:/' /home/rfish/.Xresources
+    echo 'dpi activated'
+  else
+    sed -i 's/^Xft\*dpi:/!&/' /home/rfish/.Xresources
+    echo 'dpi deactivated'
+  fi
+
+  xrdb /home/rfish/.Xresources
+}
