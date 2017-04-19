@@ -70,6 +70,7 @@
     # windowing
     xlibs.libXft
     i3status rofi
+    dunst # The lightweight notification-daemon
 
     # soft
     firefox chromium
@@ -295,8 +296,8 @@
   services.openssh.enable = true;
 
   # Enable virtualization
-  virtualisation.docker.enable = true;
-  # virtualisation.virtualbox.host.enable = true;
+  # virtualisation.docker.enable = true;
+  virtualisation.virtualbox.host.enable = true;
   # Next option requires to compile VirtualBox extension
   # and it takes way too long
   # nixpkgs.config.virtualbox.enableExtensionPack = true;
