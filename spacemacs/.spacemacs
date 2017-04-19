@@ -39,13 +39,14 @@ values."
      erc
      ;; ----------------------------------------------------------- lang
      emacs-lisp
-     haskell
+     (haskell :variables haskell-completion-backend 'ghc-mod)
      html
      idris
      javascript
      python
      racket
      ;; ----------------------------------------------------------- tool
+     auto-completion
      ansible
      helm
      ;; ANSI rather than eshell, shell, ...
