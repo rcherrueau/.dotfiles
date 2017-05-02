@@ -30,3 +30,6 @@ tramp
 
 # flymake-mode
 *_flymake.*
+
+# nixos
+default.nix
