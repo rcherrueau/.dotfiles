@@ -31,5 +31,9 @@ tramp
 # flymake-mode
 *_flymake.*
 
-# nixos
+#### NixOS
 default.nix
+
+#### Python
+venv/
+ENV/
