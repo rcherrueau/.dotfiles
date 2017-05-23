@@ -500,6 +500,8 @@ are currently in."
     (setq org-src-fontify-natively t)
     ;; Preserve my indentation during source block export
     (setq org-src-preserve-indentation t)
+    ;; Activate smartparens mode
+    (smartparens-mode t)
 
     ;; Todo Keywords
     (setq org-todo-keywords
@@ -525,6 +527,9 @@ are currently in."
     ;; Highlight LaTeX related syntax
     (setf org-highlight-latex-and-related '(latex))
 
+    ;; Easy templates
+    (add-to-list 'org-structure-template-alist
+                 '("M" "#+BEGIN_MAILQUOTE\n?\n#+END_MAILQUOTE"))
 
     ;; -- Agnostic cite hyperlink; support in LaTeX
     ;;
@@ -650,7 +655,38 @@ are currently in."
             ;; `org-export-numbered-headline-p'
               :level     0))))))
 
-    (advice-add 'org-export-resolve-id-link :around #'org/drop-unlinked-link))
+    (advice-add 'org-export-resolve-id-link :around #'org/drop-unlinked-link)
+    )
+
+  (with-eval-after-load 'ox-ascii
+    ;; -- ASCII Special Export for mail
+    ;;
+    ;;
+    ;; See http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/ox-ascii.el;hb=HEAD
+    ;;
+    ;; Offers new kind of blocks with specific formating related
+    ;; - MAILQUOTE: display content as it is prepend with a ">".
+    (defun mail-ascii/special-block (_special-block contents _info)
+      "Transcode a special block element from Org to ACII.
+CONTENTS holds the contents of the block. INFO is a plist holding
+contextual information. This function offers new kind of
+formating depending on the type of _SPECIAL_BLOCK."
+      (let ((blockname (org-element-property :type _special-block)))
+        (cond
+         ;; MAILQUOTE: display CONTENTS with a ">".
+         ;; TODO: Returns contents as it is in the content block
+         ((string= blockname "MAILQUOTE")
+          (replace-regexp-in-string "^" "> " contents))
+         ;; returns the content with no specific formating.
+         (t contents))))
+
+    (org-export-define-derived-backend 'mail-ascii 'ascii
+      :menu-entry '(?t "Export to Plain Text"
+                       ((?M "As ASCII for Mail"
+                           (lambda (a s v b)
+                             (org-export-to-buffer 'mail-ascii "*Org MAIL-ASCII Export*")))))
+      :translate-alist '((special-block . mail-ascii/special-block)))
+    )
 
   ;; -- python
   (with-eval-after-load 'python
