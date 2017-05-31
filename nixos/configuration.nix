@@ -61,6 +61,7 @@
   # $ nix-env -qaP|fgrep wget
   environment.systemPackages = with pkgs; [
     # system
+    dnsutils # dig
     nix-repl ncat
     wget openssh stow htop unzip unrar gnupg tree
     ranger w3m xsel # w3m to print images, xsel to copy file name with `yd`
@@ -294,6 +295,13 @@
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
+
+  # Enable Unbound DNS and set it as DNS in resolv.conf. For
+  # resolv.conf/nameservers see also nix
+  # networking.networkmanager.appendNameservers and
+  # networking.networkmanager.insertNameservers
+  services.unbound.enable = true;
+  networking.nameservers = [ "127.0.0.1" ];
 
   # Enable virtualization
   # virtualisation.docker.enable = true;
