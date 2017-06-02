@@ -16,12 +16,19 @@ URxvt*transparent:            false
 URxvt*fading:                 0
 URxvt*font:                   xft:Iosevka:size=12
 URxvt*letterSpace:            0
-URxvt*scrollBar:              false
 URxvt*internalBorder:         0
-URxvt*jumpScroll:             true
 URxvt*visualBell:             false
 URxvt*saveLines:              65535
 URxvt*termName:               rxvt-unicode
+
+! Scroll management,
+! Stop automatic scrolling when going back in the buffer
+! https://bbs.archlinux.org/viewtopic.php?id=57823
+URxvt*scrollBar:              false
+URxvt*jumpScroll:             true
+URxvt*scrollTtyOutput:        false
+URxvt*scrollWithBuffer:       true
+URxvt*scrollTtyKeypress:      true
 
 ! Pointer
 URxvt*pointerBlank:           true
