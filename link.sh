@@ -24,4 +24,4 @@ stow -v --target="$HOME" system
 stow -v --target="$HOME" git
 stow -v --target="$HOME" spacemacs
 
-sudo stow -v --ignore=".*specific.nix" --target="/etc/nixos" nixos
+sudo stow -v --ignore=".*-specific.nix" --target="/etc/nixos" nixos
