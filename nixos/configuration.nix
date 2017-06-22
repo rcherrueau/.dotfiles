@@ -51,7 +51,7 @@
   };
 
   # Environment variables
-  environment.variables.EDITOR = "emacsclient -c";
+  environment.variables.EDITOR = "emacsclient -c -a \"\"";
 
   #------------------------------------------------------------------- App
   nixpkgs.config.allowUnfree = true;
@@ -211,7 +211,8 @@
         pleaze  = "sudo $(history -p !!)";
         encrypt = "openssl enc -aes-256-cbc -salt";
         decrypt = "openssl enc -aes-256-cbc -salt -d";
-        p = "open_command"; r = "ranger";
+        p = "open_command"; r = "ranger"; ns = "nix-shell";
+        emacs="emacsclient -c -a \"\""; # Start daemon or connect to it
       };
     };
   };
