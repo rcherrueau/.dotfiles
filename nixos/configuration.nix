@@ -59,6 +59,7 @@
 
   # List packages installed in system profile. To search by name, run:
   # $ nix-env -qaP|fgrep wget
+  # See, http://beyermatthias.de/blog/2015/11/27/nixos-on-unstable---how-to-fix-a-broken-nixos-rebuild/
   environment.systemPackages = with pkgs; [
     # system
     dnsutils # dig
@@ -76,7 +77,7 @@
     # soft
     firefox chromium
     imagemagick # import -window root screenshot.jpg
-    inkscape
+    inkscape gimp
     kpcli xclip # xclip is used by kpcli to copy pass to clipboard
     qtox
     rxvt_unicode
@@ -88,7 +89,7 @@
     zathura xournal # Pdf viewer + notetaking
 
     # development tools
-    git git-review # git-review for OpenStack Gerrit
+    git
     emacs vim aspell aspellDicts.en aspellDicts.fr
     silver-searcher
     # Put here the list of needed tex packages. scheme-* collection-*
@@ -310,8 +311,4 @@
   # and it takes way too long
   # nixpkgs.config.virtualbox.enableExtensionPack = true;
   users.extraGroups.vboxusers.members = [ "rfish" ];
-
-  # The NixOS release to be compatible with for stateful data such as
-  # databases.
-  system.stateVersion = "17.03";
 }
