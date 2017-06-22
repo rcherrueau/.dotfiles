@@ -73,6 +73,7 @@
     xlibs.libXft
     i3status rofi
     dunst # The lightweight notification-daemon
+    elementary-icon-theme
 
     # soft
     firefox chromium
