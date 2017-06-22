@@ -47,11 +47,14 @@
   # Networking stuff
   networking = {
     hostName = "hp-rfish";
-    # TODO: Delete the support of network-manager and only relies on
+    # FIXME: Delete the support of network-manager and only relies on
     # wpa-supplicant.
     # wireless.enable = true;
     networkmanager.enable = true;
   };
+  # FIXME: remove networkmanager group and only relies on
+  # wpa-supplicant. Then move this line to
+  users.extraUsers.rfish.extraGroups = [ "networkmanager" ];
 
   # Enable CUPS to print documents.
   # Find PPD Drivers on https://www.openprinting.org/printers
@@ -88,4 +91,14 @@
       ${pkgs.feh}/bin/feh --bg-fill '/home/rfish/Sync/Pictures/sea-ocean-sailing-ship-boat.jpg'
     '';
   };
+
+
+  # Enable virtualization
+  virtualisation.docker.enable = true;
+  users.extraGroups.docker.members = [ "rfish" ];
+  # `enableExtensionPack` requires to compile VirtualBox extension
+  # pack and it takes way too long.
+  virtualisation.virtualbox.host.enable = true;
+  users.extraGroups.vboxusers.members = [ "rfish" ];
+  # nixpkgs.config.virtualbox.enableExtensionPack = true;
 }

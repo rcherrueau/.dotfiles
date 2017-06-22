@@ -44,8 +44,7 @@
   users.extraUsers.rfish = {
     createHome = true;
     home = "/home/rfish";
-    # TODO: remove networkmanager group
-    extraGroups = [ "wheel" "networkmanager" ];
+    extraGroups = [ "wheel" ];
     useDefaultShell = true;
     uid = 1000;
     shell = "/run/current-system/sw/bin/zsh";
@@ -304,12 +303,4 @@
   # networking.networkmanager.insertNameservers
   services.unbound.enable = true;
   networking.nameservers = [ "127.0.0.1" ];
-
-  # Enable virtualization
-  # virtualisation.docker.enable = true;
-  virtualisation.virtualbox.host.enable = true;
-  # Next option requires to compile VirtualBox extension
-  # and it takes way too long
-  # nixpkgs.config.virtualbox.enableExtensionPack = true;
-  users.extraGroups.vboxusers.members = [ "rfish" ];
 }
