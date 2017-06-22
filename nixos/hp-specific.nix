@@ -83,12 +83,19 @@
       tapButtons = false;
     };
 
+    # Wallpaper: Following are options for ${pkgs.feh}/bin/feh
+    # --bg-${destkopManager.wallpaper}
+    # ${desktopManager.combineScreens ? "" : "--no-xinerama"}
+    # $HOME/.background-image
+    #
+    # Find images on pexels.com
+    desktopManager.wallpaper.mode = "fill";
+    desktopManager.wallpaper.combineScreens = false;
+
+    #  Cmds run at start of the session.
     displayManager.sessionCommands = ''
       # xrandr --dpi 144 --output eDP1 --auto --output DP1-1 --auto --scale 1.35x1.35 --right-of eDP1
       xrandr --output DP2 --auto --output DP1-1 --auto --right-of DP2
-
-      # pexels.com
-      ${pkgs.feh}/bin/feh --bg-fill '/home/rfish/Sync/Pictures/sea-ocean-sailing-ship-boat.jpg'
     '';
   };
 
