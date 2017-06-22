@@ -62,14 +62,14 @@ function ppp() {
 
 # Toggle the dpi settings in the `.Xresource`
 function toggle-dpi() {
-  grep -q '^!Xft\*dpi:' /home/rfish/.Xresources
+  grep -q '^!Xft\*dpi:' /home/rfish/.dotfiles/system/.Xresources
   if [ $? -eq 0 ]; then
-    sed -i 's/^!Xft\*dpi:/Xft*dpi:/' /home/rfish/.Xresources
+    sed -i 's/^!Xft\*dpi:/Xft*dpi:/' /home/rfish/.dotfiles/system/.Xresources
     echo 'dpi activated'
   else
-    sed -i 's/^Xft\*dpi:/!&/' /home/rfish/.Xresources
+    sed -i 's/^Xft\*dpi:/!&/' /home/rfish/.dotfiles/system/.Xresources
     echo 'dpi deactivated'
   fi
 
-  xrdb /home/rfish/.Xresources
+  xrdb /home/rfish/.dotfiles/system/.Xresources
 }
