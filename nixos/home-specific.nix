@@ -86,8 +86,7 @@
     # See wiki.archlinux.org/index.php?title=Apple_Keyboard&oldid=387451
     xkbModel = "apple_laptop";
 
-    displayManager.sessionCommands = ''
-      ${pkgs.feh}/bin/feh --bg-fill '/home/rfish/Sync/Pictures/c38Xn.jpg'
-    '';
+    desktopManager.wallpaper.mode = "fill";
+    desktopManager.wallpaper.combineScreens = false;
   };
 }
