@@ -101,8 +101,8 @@
 
 
   # Enable virtualization
-  virtualisation.docker.enable = true;
-  users.extraGroups.docker.members = [ "rfish" ];
+  # virtualisation.docker.enable = true;
+  # users.extraGroups.docker.members = [ "rfish" ];
   # `enableExtensionPack` requires to compile VirtualBox extension
   # pack and it takes way too long.
   virtualisation.virtualbox.host.enable = true;
