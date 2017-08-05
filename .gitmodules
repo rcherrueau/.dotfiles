@@ -1,0 +1,3 @@
+[submodule "nixos/musnix"]
+	path = nixos/musnix
+	url = https://github.com/musnix/musnix.git
