@@ -45,6 +45,7 @@ values."
      javascript
      python
      racket
+     rust
      ;; ----------------------------------------------------------- tool
      auto-completion
      ansible
@@ -76,6 +77,9 @@ values."
      ;; FIXME: Remove this so Spacemacs use PATH from nix-shell. This
      ;; is a workaround since some layer rely on this package
      ;; (go/rust): https://github.com/syl20bnr/spacemacs/issues/2294
+     ;; Also cherry-pick PR #8537 to make rust and go layer behave
+     ;; correctly without `exec-path-from-shell'
+     ;; https://github.com/syl20bnr/spacemacs/issues/8537
      exec-path-from-shell
      ;; Do not print a ~ to indicate the end of file
      vi-tilde-fringe
