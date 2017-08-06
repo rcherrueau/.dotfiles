@@ -63,7 +63,7 @@
     # system
     dnsutils # dig
     nix-repl ncat
-    wget openssh stow htop unzip unrar gnupg tree
+    wget stow htop unzip unrar gnupg tree
     ranger w3m xsel # w3m to print images, xsel to copy file name with `yd`
     usbutils # lsusb
     vagrant
@@ -297,6 +297,7 @@
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
+  programs.ssh.startAgent = true;
 
   # Enable Unbound DNS and set it as DNS in resolv.conf. For
   # resolv.conf/nameservers see also nix

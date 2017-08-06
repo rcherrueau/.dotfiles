@@ -107,5 +107,5 @@
   # pack and it takes way too long.
   virtualisation.virtualbox.host.enable = true;
   users.extraGroups.vboxusers.members = [ "rfish" ];
-  # nixpkgs.config.virtualbox.enableExtensionPack = true;
+  nixpkgs.config.virtualbox.enableExtensionPack = true;
 }
