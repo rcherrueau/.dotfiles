@@ -33,6 +33,7 @@
       iosevka             # Font for programming
       fira                # Font of Firefox OS
       fira-code           # Fira Mono + programming ligatures
+      noto-fonts-emoji    # B&W emoji fonts
     ];
 
     fontconfig = {
