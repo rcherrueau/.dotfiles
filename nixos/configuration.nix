@@ -23,8 +23,11 @@
   time.timeZone = "CET";
 
   # Garbage collection
-  nix.gc.automatic = true;
-  nix.gc.dates = "00:01";
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 30d";
+  };
 
   # Font
   fonts = {
@@ -142,7 +145,6 @@
    })
 
     # language
-    pltScheme
     openjdk sbt pmd
   ];
 

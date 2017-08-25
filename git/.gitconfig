@@ -3,7 +3,7 @@
   email = RonanCherrueau@gmail.com
   signingKey = 5C383D7AC6C937CB
 [gpg]
-	program = gpg2
+	program = gpg
 [commit]
 	gpgsign = true
 [core]
