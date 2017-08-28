@@ -96,6 +96,8 @@
     git
     emacs vim aspell aspellDicts.en aspellDicts.fr
     silver-searcher
+    zeal
+
     # Put here the list of needed tex packages. scheme-* collection-*
     # are predefined sets of tex packages. You can find theme using
     # nix-repl
