@@ -74,11 +74,10 @@ values."
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
    dotspacemacs-excluded-packages '(
-     ;; FIXME: Remove this so Spacemacs use PATH from nix-shell. This
-     ;; is a workaround since some layer rely on this package
-     ;; (go/rust): https://github.com/syl20bnr/spacemacs/issues/2294
-     ;; Also cherry-pick PR #8543 (48c12d4) to make rust and go layer behave
-     ;; correctly without `exec-path-from-shell'
+     ;; Remove this so Spacemacs use PATH from nix-shell, see:
+     ;; https://github.com/syl20bnr/spacemacs/issues/2294 Also
+     ;; cherry-pick PR #8543 (commit: 48c12d4) to make rust and go
+     ;; layer behave correctly without `exec-path-from-shell'
      ;; https://github.com/syl20bnr/spacemacs/issues/8543
      exec-path-from-shell
      ;; Do not print a ~ to indicate the end of file
@@ -93,6 +92,8 @@ values."
      ;; The `font-lock-add-keywords' feature does the job. I don't
      ;; need a minor mode to do the same
      hl-todo
+     ;; YouTube videos thumbnails inside erc doesn't work well
+     erc-yt
      )
    ;; Defines the behaviour of Spacemacs when installing packages.
    ;; Possible values are `used-only', `used-but-keep-unused' and `all'.
@@ -363,40 +364,10 @@ layers configuration. You are free to put any user code."
                        string)
          t))
 
-  ;; Gets the healdlines path of your current position in org-mode
-  ;; https://github.com/fmdkdd/dotfiles/blob/master/spacemacs/.emacs.d/private/fmdkdd/packages.el#L172
-  (defun fmdkdd/org-full-outline-path ()
-    "Concatenate the results of `org-get-outline-path' and
-`org-get-heading' to get the full outline path to the heading we
-are currently in."
-    (unless (org-before-first-heading-p)
-      (let* ((path (append (org-get-outline-path)
-                           (cons (org-get-heading t t) nil))))
-        (org-format-outline-path path 10)))) ; XXX: not sure if the width
-                                             ; argument works right
-
   ;; -------------------------------------------------------- Appearance
   ;; -- Fringeline
-  ;; Display - in the fringe line for EOF
+  ;; Display `-' in the fringe line for EOF
   (setq-default indicate-empty-lines t)
-  ;; Set the fringe bitmaps as emacs default values
-  (setq-default fringe-indicator-alist
-                '((truncation left-arrow right-arrow)
-                  (continuation left-curly-arrow right-curly-arrow)
-                  (overlay-arrow . right-triangle)
-                  (up . up-arrow)
-                  (down . down-arrow)
-                  (top top-left-angle top-right-angle)
-                  (bottom bottom-left-angle
-                          bottom-right-angle
-                          top-right-angle
-                          top-left-angle)
-                  (top-bottom left-bracket
-                              right-bracket
-                              top-right-angle
-                              top-left-angle)
-                  (empty-line . empty-line)
-                  (unknown . question-mark)))
 
   ;; -- Line behavior
   (setq-default default-fill-column 70)
@@ -413,7 +384,7 @@ are currently in."
   ;; Highlight the following words in comments
   (defun add-watchwords ()
     (font-lock-add-keywords
-     nil '(("\\<\\(TODO\\|FIXME\\|HACK\\|XXX\\|BUG\\|Note\\)"
+     nil '(("\\<\\(TODO\\|FIXME\\|HACK\\|XXX\\|BUG\\|Note:\\)"
             1 font-lock-warning-face t))))
 
   (add-hook 'prog-mode-hook #'add-watchwords)
@@ -428,27 +399,27 @@ are currently in."
   (setq powerline-default-separator-dir '(right . right))
 
   ;; Custom power line
-  (spaceline-compile "main"
-        '(((workspace-number window-number)
-           :fallback evil-state
-           :separator "|"
-           :face highlight-face)
-          (buffer-modified buffer-encoding-abbrev line-column
-           "⚓" buffer-id remote-host)
-          major-mode
-          ((minor-modes process)
-           :when active)
-          (erc-track :when active)
-          ((flycheck-errors flycheck-warnings flycheck-infos)
-           :when active)
-          (org-pomodoro :when active)
-          (org-clock :when active)
-          which-function)
+  ;; (spaceline-compile "main"
+  ;;       '(((workspace-number window-number)
+  ;;          :fallback evil-state
+  ;;          :separator "|"
+  ;;          :face highlight-face)
+  ;;         (buffer-modified buffer-encoding-abbrev line-column
+  ;;          "⚓" buffer-id remote-host)
+  ;;         major-mode
+  ;;         ((minor-modes process)
+  ;;          :when active)
+  ;;         (erc-track :when active)
+  ;;         ((flycheck-errors flycheck-warnings flycheck-infos)
+  ;;          :when active)
+  ;;         (org-pomodoro :when active)
+  ;;         (org-clock :when active)
+  ;;         which-function)
 
-        '(selection-info
-          ((global-mode new-version)
-           :when active)
-          buffer-position hud))
+  ;;       '(selection-info
+  ;;         ((global-mode new-version)
+  ;;          :when active)
+  ;;         buffer-position hud))
 
   ;; -- Dispalye formfeed `C-q C-l' as horizontal line.
   (global-page-break-lines-mode t)
