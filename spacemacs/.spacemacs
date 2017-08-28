@@ -452,13 +452,14 @@ are currently in."
 
   ;; -- Dispalye formfeed `C-q C-l' as horizontal line.
   (global-page-break-lines-mode t)
-  (add-to-list 'page-break-lines-modes 'web-mode)
-  (add-to-list 'page-break-lines-modes 'js-mode)
   (add-to-list 'page-break-lines-modes 'css-mode)
+  (add-to-list 'page-break-lines-modes 'js-mode)
   (add-to-list 'page-break-lines-modes 'haskell-mode)
   (add-to-list 'page-break-lines-modes 'idris-mode)
   (add-to-list 'page-break-lines-modes 'proverif-pv-mode)
+  (add-to-list 'page-break-lines-modes 'racket-mode)
   (add-to-list 'page-break-lines-modes 'sh-mode)
+  (add-to-list 'page-break-lines-modes 'web-mode)
 
   ;; ------------------------------------------------------------- Other
   (setq ispell-dictionary "en_GB")
