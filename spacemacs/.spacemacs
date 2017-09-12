@@ -653,11 +653,25 @@ formating depending on the type of _SPECIAL_BLOCK."
       (let ((blockname (org-element-property :type _special-block)))
         (cond
          ;; MAILQUOTE: display CONTENTS with a ">".
-         ;; TODO: Returns contents as it is in the content block
          ((string= blockname "MAILQUOTE")
-          (replace-regexp-in-string "^" "> " contents))
-         ;; returns the content with no specific formating.
-         (t contents))))
+          (let* ((contents-begin (org-element-property :contents-begin _special-block))
+                 (contents-end (org-element-property :contents-end _special-block))
+                 ;; Get content of the block without `fill-paragraph' application.
+                 (orig-contents (s-lines (buffer-substring-no-properties contents-begin contents-end))))
+
+            (defun mail-ascii/quoted-line? (line)
+              "Tests if a line is a mail-quoted one."
+              (s-starts-with? ">" line))
+
+            (defun mail-ascii/quote-line (line)
+              "Quote the current line."
+              (if (not (mail-ascii/quoted-line? line))
+                  (s-prepend "> " line)
+                (s-prepend ">" line)))
+
+            (s-join "\n" (-map 'mail-ascii/quote-line orig-contents))))
+         ;; Fallback on the original org-ascii-special-block
+         (t (org-ascii-special-block (_special-block contents _info))))))
 
     (org-export-define-derived-backend 'mail-ascii 'ascii
       :menu-entry '(?t "Export to Plain Text"
