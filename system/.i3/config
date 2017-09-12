@@ -23,7 +23,7 @@ focus_follows_mouse no
 bindsym $mod+q kill
 
 # Use rofi as app launcher
-set $rofi_ops  -case-sensitive -fuzzy -lines 5 \
+set $rofi_ops  -case-sensitive -fuzzy -lines 15 \
                -terminal urxvt -font "Iosevka 13"
 bindsym $mod+space exec --no-startup-id rofi $rofi_ops -show run
 # Rofi web

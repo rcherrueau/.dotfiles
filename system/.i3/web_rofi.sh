@@ -51,7 +51,7 @@
                            #:min-width longest-key
                            #:right-pad-string " "))
 
-    (format "~a ~s " padded-key (web-entry-description w)))
+    (format "~a → ~a " padded-key (web-entry-description w)))
 
   (for-each displayln (map wentry-key-and-desc ws)))
 
@@ -66,6 +66,7 @@
    (web-entry "conjug" "French {query} conjugaison" "http://cnrtl.fr/morphologie/{query}")
    (web-entry "mw"     "English {query} definition" "https://www.merriam-webster.com/dictionary/{query}")
    (web-entry "en2fr"  "Search Wordref for {query}"  "http://www.wordreference.com/enfr/{query}")
+   (web-entry "fr2en"  "Search Wordref for {query}"  "http://www.wordreference.com/fren/{query}")
    ;; Science
    (web-entry "dblp"    "CS Bib for {query}"         "http://dblp.uni-trier.de/search?q={query}")
    (web-entry "scholar" "Google Scholar for {query}" "https://scholar.google.fr/scholar?q={query}")
