@@ -1,0 +1,29 @@
+* flycheck-tla
+A flycheck checker for TLA+ using the SANY parser.
+
+** Requirements
+You'll need to have the SANY parser in your =CLASSPATH=. Installation
+instructions are available on the [[http://research.microsoft.com/en-us/um/people/lamport/tla/tla.html][TLA Home Page]].
+
+On your Emacs setup, you'll need [[https://github.com/flycheck/flycheck][flycheck]], of course.
+
+** Installation
+Download the source and make Emacs load it on startup or (so much easier!) use
+[[https://github.com/quelpa/quelpa][quelpa]]. Then you can simply add this to your init file:
+
+#+BEGIN_SRC emacs-lisp
+(quelpa '(tla-mode :fetcher github :repo "iamarcel/flycheck-tla"))
+#+END_SRC
+
+The package will add the checker to Flycheck's list automatically, so all you
+need to do is make sure =flycheck-mode= is enabled. If you have [[https://github.com/ratish-punnoose/tla-mode][tla-mode]]
+installed, you can do this to load flycheck automatically:
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'tla-mode-hook 'flycheck-mode)
+#+END_SRC
+
+** Current status
+- Shows syntax errors and their backtrace as info
+- Does *not* show semantic errors. SANY seems to get confused with the file
+  names and Exceptions out (yes, I just made up a verb) on my computer.
