@@ -50,6 +50,7 @@ values."
      auto-completion
      ansible
      helm
+     vagrant
      ;; ANSI rather than eshell, shell, ...
      ;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
      (shell :variables
