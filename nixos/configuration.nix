@@ -96,7 +96,7 @@
     git
     emacs vim aspell aspellDicts.en aspellDicts.fr
     silver-searcher
-    zeal
+    zeal sqlite
 
     # Put here the list of needed tex packages. scheme-* collection-*
     # are predefined sets of tex packages. You can find theme using

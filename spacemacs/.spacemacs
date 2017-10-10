@@ -49,6 +49,7 @@ values."
      ;; ----------------------------------------------------------- tool
      auto-completion
      ansible
+     dash
      helm
      vagrant
      ;; ANSI rather than eshell, shell, ...
@@ -435,7 +436,7 @@ layers configuration. You are free to put any user code."
   (add-to-list 'page-break-lines-modes 'web-mode)
 
   ;; ------------------------------------------------------------- Other
-  (setq ispell-dictionary "en_GB")
+  (setq ispell-dictionary "en_US")
   (setq select-enable-primary t) ;; Selecting text put it in the
                                  ;; x-buffer for x-copy
   (spacemacs/toggle-camel-case-motion-globally-on)
@@ -465,7 +466,10 @@ layers configuration. You are free to put any user code."
                           (unless
                               (string-match "\\(?:/\\|\\`\\)\\.\\{1,2\\}\\'"
                                             file)
-                            (funcall fcn file)))))
+                            (funcall fcn file))))
+
+    ;; Docsets directory for helm-dash
+    (setq helm-dash-docset-newpath "~/.local/share/Zeal/Zeal/docsets/"))
 
   ;; -- Idris
   (with-eval-after-load 'idris-mode
@@ -566,6 +570,25 @@ layers configuration. You are free to put any user code."
     ;;      :link link
     ;;      :decription description)))
     )
+
+  (with-eval-after-load 'epresent
+    (setq rfish/default-font (assq 'font default-frame-alist))
+    (setq rfish/crimson-font '(font . "-PfEd-Crimson-normal-normal-normal-*-18-*-*-*-*-0-iso10646-1"))
+
+    (defun rfish/toggle-font ()
+      (let ((current-font (assq 'font default-frame-alist)))
+        (if (equal current-font rfish/default-font)
+            ;; Set crimson font
+            (progn
+              (message "Enter presenter mode: use crimson font")
+              (add-to-list 'default-frame-alist rfish/crimson-font))
+          ;; Back to default font
+          (progn
+            (message "Quit presenter mode: go back to default font")
+            (add-to-list 'default-frame-alist rfish/default-font)))))
+
+    (add-hook 'epresent-start-presentation-hook #'rfish/toggle-font)
+    (add-hook 'epresent-stop-presentation-hook #'rfish/toggle-font))
 
   (with-eval-after-load 'ox
     ;; Transforms many following cites into one multiple cite.
