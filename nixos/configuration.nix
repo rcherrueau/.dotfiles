@@ -308,6 +308,12 @@
   # resolv.conf/nameservers see also nix
   # networking.networkmanager.appendNameservers and
   # networking.networkmanager.insertNameservers
-  services.unbound.enable = true;
+  services.unbound = {
+    enable = true;
+    # forward remaining requests to https://dns.watch/
+    forwardAddresses = [ "84.200.69.80" "84.200.70.40" "2001:1608:10:25::1c04:b12f" "2001:1608:10:25::9249:d69b" ];
+
+  };
   networking.nameservers = [ "127.0.0.1" ];
+
 }
