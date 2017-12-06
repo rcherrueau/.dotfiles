@@ -18,6 +18,7 @@
   ci = commit
 	co = checkout
   lg = log --graph --pretty=tformat:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%an %ar)%Creset'
+  lgf = log --graph --pretty=tformat:'%Cred%h%Creset -%C(auto)%d%Creset %s %Cgreen(%an %ar)%Creset' --name-status --oneline
   # Do ssh-add if no entity is laoded inside ssh-agent
   purr = !ssh-add -l > /dev/null || ssh-add && git-pull --rebase
 [diff]
