@@ -61,6 +61,11 @@ URxvt*color13:                #dc8cc3
 URxvt*color14:                #93e0e3
 URxvt*color15:                #ffffff
 
+! Extensions: open url with button 2 of the mouse
+URxvt*perl-ext-common:        default,matcher
+URxvt*url-launcher:           firefox
+URxvt*matcher.button:         2
+
 ! -------------------------------------------------------------------- Rofi
 ! $ man rofi
 ! $ rofi -dump-xresources
