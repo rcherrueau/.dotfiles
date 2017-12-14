@@ -15,7 +15,9 @@
 ;; (web-entry "qwant"  "Search Web for {query}"  "https://www.qwant.com/?q={query}")
 ;;
 ;; In rofi window: first argument should be the key of your web entry.
-;; Last argument should be the query.
+;; If second argument is → then the description should follow. Rest of
+;; the line consists in the query argument. See `query-args' for more
+;; information.
 ;;
 ;; Edit `web-entries` list to add custom web searches.
 
@@ -23,10 +25,14 @@
 
 (require racket/format
          racket/string
+         racket/list
          net/sendurl)
 
 ;; Web Search Entry
 (struct web-entry (key description $url))
+
+;; Separator for the web search entry keyword and its description
+(define sep "→")
 
 ;; Lookup into a list of web-entry `ws' the web-entry with the key `k'
 ;;
@@ -51,9 +57,38 @@
                            #:min-width longest-key
                            #:right-pad-string " "))
 
-    (format "~a → ~a " padded-key (web-entry-description w)))
+    (format "~a ~a ~a " padded-key sep (web-entry-description w)))
 
   (for-each displayln (map wentry-key-and-desc ws)))
+
+;; Finds the {query} arguments in `q' for the web entry `w'. List `q'
+;; could be of two form:
+;;
+;; > '(key → desc query-arg1 ...)
+;; > '(key query-arg1 ...)
+;;
+;; query-args: [string] → web-entry → [string]
+(define (query-args q w)
+  (define desc (web-entry-description w))
+
+  ;; Test if the list `q' contains the `sep' (ie, →). In such a case,
+  ;; remove the web entry description `desc'
+  (if (equal? (cadr q) sep)
+      ;; Removes the "key → desc" from `q' to get the query argument
+      (drop q (+ (length (string-split sep))
+                 (length (string-split desc)) 1))
+      ;; Only remove the "key" from `q' to get the query argument
+      (drop q 1)))
+
+;; Gets command-line arguments. Note: This function splits "normally
+;; single argument" into "normally" "single" "argument"
+(define (get-args)
+  (string-split
+   (apply string-append
+          (add-between
+           (append-map string-split
+                       (vector->list (current-command-line-arguments)))
+           " "))))
 
 ;; List of all web search entries
 (define web-entries
@@ -74,17 +109,25 @@
    (web-entry "scihub"  "Sci-Hub for {doi}"          "https://sci-hub.ac/{query}")
    ))
 
+
 (cond
   ;; Display the list of web search entries when no arguments
-  [(eq? 0 (vector-length (current-command-line-arguments)))
+  [(eq? 0 (length (get-args)))
    (wentry-display-candidates web-entries)]
+
   ;; Get the key and the query value and call the browser
   [else
-   (let* ([args (string-split (vector-ref (current-command-line-arguments) 0))]
-          [key (list-ref args 0)]
-          [query (list-ref args (sub1 (length args)))]
+   (let* ([args (get-args)]
+          [key (car args)]
           [w (wentry-lookup web-entries key)]
           [$url (web-entry-$url w)]
+          [query (apply string-append (add-between (query-args args w) " "))]
           [url (string-replace $url "{query}" query)])
      ;; TODO: Give browser the focus
      (send-url url #:escape? #t))])
+
+;; Test it!
+;; ./web_rofi.sh qwant Rick Astley - Never Gonna
+;; ./web_rofi.sh "qwant Rick Astley - Never Gonna"
+;; ./web_rofi.sh qwant → Search Web for {query} Rick Astley - Never Gonna
+;; ./web_rofi.sh "qwant → Search Web for {query} Rick Astley - Never Gonna"
