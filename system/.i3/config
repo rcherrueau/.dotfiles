@@ -16,6 +16,9 @@ floating_modifier $mod
 bindsym $mod+Return exec i3-sensible-terminal
 bindsym $mod+Shift+Return split h; exec i3-sensible-terminal; layout tabbed
 
+# Change the output screen
+bindsym XF86Display exec ~/.i3/toggle-screen.sh
+
 # focus windows when the mouse hovers them
 focus_follows_mouse no
 

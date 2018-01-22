@@ -60,15 +60,17 @@ function ppp() {
   find /home/rfish/Sync/Papers/ -iname ${KEY} | sed "s/'/'\\\''/g" | sed "s/.*/'&'/g"
 }
 
-# Toggle the dpi settings in the `.Xresource`
-function toggle-dpi() {
+# Toggle the dpi settings in the `.Xresource` and set the xrandr
+function toggle-screen() {
   grep -q '^!Xft\*dpi:' /home/rfish/.dotfiles/system/.Xresources
   if [ $? -eq 0 ]; then
+    xrandr --output eDP1 --auto --output DP1-1 --off
     sed -i 's/^!Xft\*dpi:/Xft*dpi:/' /home/rfish/.dotfiles/system/.Xresources
-    echo 'dpi activated'
+    echo 'hp laptop mode activated'
   else
     sed -i 's/^Xft\*dpi:/!&/' /home/rfish/.dotfiles/system/.Xresources
-    echo 'dpi deactivated'
+    echo 'dell desktop mode deactivated'
+    xrandr --output DP1-1 --auto --output eDP1 --off
   fi
 
   xrdb /home/rfish/.dotfiles/system/.Xresources
