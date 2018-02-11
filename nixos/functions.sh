@@ -52,12 +52,17 @@ termcolors(){
 # gi linux,osx,idris
 function gi() { curl -L -s https://www.gitignore.io/api/$@ ;}
 
-# Open an article based on its key
-function ppp() {
+# Find an article based on its title
+function fp() {
   KEY="*$1*"
   # `p "$(find ~/Sync/Papers/ -name $KEY -print)"`
   # find ~/Sync/Papers/ -iname $KEY -printf "'%p'\n"
   find /home/rfish/Sync/Papers/ -iname ${KEY} | sed "s/'/'\\\''/g" | sed "s/.*/'&'/g"
+}
+
+# Make xdg-open runs in background
+function xdg-open-background() {
+  xdg-open "$*" &
 }
 
 # Toggle the dpi settings in the `.Xresource` and set the xrandr
