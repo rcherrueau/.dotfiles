@@ -67,8 +67,8 @@
     # system
     dnsutils # dig
     nix-repl ncat
-    wget stow htop unzip unrar gnupg tree
-    ranger w3m xsel # w3m to print images, xsel to copy file name with `yd`
+    aria stow htop unzip unrar gnupg tree
+    ranger w3m xsel # w3m to display images, xsel to copy file name with `yd`
     usbutils # lsusb
     vagrant
 
@@ -216,8 +216,8 @@
         pleaze  = "sudo $(history -p !!)";
         encrypt = "openssl enc -aes-256-cbc -salt";
         decrypt = "openssl enc -aes-256-cbc -salt -d";
-        p = "open_command"; r = "ranger"; ns = "nix-shell";
-        emacs="emacsclient -c -a \"\""; # Start daemon or connect to it
+        p = "xdg-open-background"; r = "ranger"; ns = "nix-shell";
+        # emacs="emacsclient -c -a \"\""; # Start daemon or connect to it
       };
     };
   };
@@ -315,5 +315,4 @@
 
   };
   networking.nameservers = [ "127.0.0.1" ];
-
 }

@@ -69,6 +69,22 @@
   # wpa-supplicant. Then move this line to
   users.extraUsers.rfish.extraGroups = [ "networkmanager" ];
 
+  # OpenVPN client:
+  services.openvpn.servers = {
+    # Access to home freebox. Activate it with `sudo systemctl start
+    # openvpn-freebox`
+    freebox = {
+      autoStart = false;
+      config = '' config /home/rfish/openvpn/freeboxVPN.ovpn '';
+    };
+    # Access to Grid5000. Activate it with `sudo systemctl start
+    # openvpn-g5k`
+    g5k = {
+      autoStart = false;
+      config = '' config /home/rfish/openvpn/g5k/Grid5000_VPN.ovpn '';
+    };
+  };
+
   # Enable CUPS to print documents.
   # Find PPD Drivers on https://www.openprinting.org/printers
   services.printing = {
@@ -108,17 +124,19 @@
     #  Cmds run at start of the session.
     displayManager.sessionCommands = ''
       # xrandr --dpi 144 --output eDP1 --auto --output DP1-1 --auto --scale 1.35x1.35 --right-of eDP1
-      xrandr --output DP2 --auto --output DP1-1 --auto --right-of DP2
+      xrandr --output DP1-2 --auto --output DP1-1 --auto --right-of DP1-2
     '';
   };
 
+  # Use pusleaudio to easily switch between hdmi/display port/analog audio output
+  # hardware.pulseaudio.enable = true;
 
   # Enable virtualization
-  # virtualisation.docker.enable = true;
-  # users.extraGroups.docker.members = [ "rfish" ];
+  virtualisation.docker.enable = true;
+  users.extraGroups.docker.members = [ "rfish" ];
   # `enableExtensionPack` requires to compile VirtualBox extension
   # pack and it takes way too long.
   virtualisation.virtualbox.host.enable = true;
   users.extraGroups.vboxusers.members = [ "rfish" ];
-  nixpkgs.config.virtualbox.enableExtensionPack = true;
+  # nixpkgs.config.virtualbox.enableExtensionPack = true;
 }
