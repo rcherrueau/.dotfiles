@@ -82,6 +82,8 @@
     g5k = {
       autoStart = false;
       config = '' config /home/rfish/openvpn/g5k/Grid5000_VPN.ovpn '';
+      # Update /etc/resolv.conf with g5k DNS
+      updateResolvConf = true;
     };
   };
 
