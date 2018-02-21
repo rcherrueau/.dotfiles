@@ -9,7 +9,6 @@
 [core]
   excludesfile = ~/.gitignore_global
   pager = cat
-  editor = emacs
   whitespace = -trailing-space
 [color]
   ui = auto

@@ -55,7 +55,8 @@
   };
 
   # Environment variables
-  environment.variables.EDITOR = "emacsclient -c -a \"\"";
+  # environment.variables.EDITOR = "emacsclient -c -a \"\"";
+  environment.variables.EDITOR = "${pkgs.vim}/bin/vim -n -u /home/rfish/.vimrc --noplugin";
 
   #------------------------------------------------------------------- App
   nixpkgs.config.allowUnfree = true;
