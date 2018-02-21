@@ -214,7 +214,8 @@
       '';
       shellAliases = {
         l = "ls -alh"; ll = "ls -l"; ls = "ls --color=tty";
-        pleaze  = "sudo $(history -p !!)";
+        # pleaze  = "sudo $(history -p !!)";
+        fu  = "sudo $(fc -ln -1 -1)";
         encrypt = "openssl enc -aes-256-cbc -salt";
         decrypt = "openssl enc -aes-256-cbc -salt -d";
         p = "xdg-open-background"; r = "ranger"; ns = "nix-shell";
