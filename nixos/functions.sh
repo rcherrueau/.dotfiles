@@ -64,19 +64,3 @@ function fp() {
 function xdg-open-background() {
   xdg-open "$*" &
 }
-
-# Toggle the dpi settings in the `.Xresource` and set the xrandr
-function toggle-screen() {
-  grep -q '^!Xft\*dpi:' /home/rfish/.dotfiles/system/.Xresources
-  if [ $? -eq 0 ]; then
-    xrandr --output eDP1 --auto --output DP1-1 --off
-    sed -i 's/^!Xft\*dpi:/Xft*dpi:/' /home/rfish/.dotfiles/system/.Xresources
-    echo 'hp laptop mode activated'
-  else
-    sed -i 's/^Xft\*dpi:/!&/' /home/rfish/.dotfiles/system/.Xresources
-    echo 'dell desktop mode deactivated'
-    xrandr --output DP1-1 --auto --output eDP1 --off
-  fi
-
-  xrdb /home/rfish/.dotfiles/system/.Xresources
-}

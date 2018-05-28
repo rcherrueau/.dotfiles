@@ -16,8 +16,8 @@ floating_modifier $mod
 bindsym $mod+Return exec i3-sensible-terminal
 bindsym $mod+Shift+Return split h; exec i3-sensible-terminal; layout tabbed
 
-# Change the output screen
-bindsym XF86Display exec ~/.i3/toggle-screen.sh
+# Change between laptop and dell-desktop mode
+bindsym XF86Display exec ~/.i3/toggle-mode.sh
 
 # focus windows when the mouse hovers them
 focus_follows_mouse no
@@ -29,7 +29,11 @@ bindsym $mod+q kill
 set $rofi_ops  -case-sensitive -fuzzy -lines 15 \
                -terminal urxvt -font "Iosevka 13"
 bindsym $mod+space exec --no-startup-id rofi $rofi_ops -show run
-# Rofi web
+
+# Rofi personal mode
+## laptop mode
+bindsym $mod+m exec --no-startup-id rofi $rofi_ops -show lmode:~/.i3/set-laptop-mode.sh
+## web
 bindsym $mod+w exec --no-startup-id rofi $rofi_ops -show web:~/.i3/web_rofi.sh
 
 # change focus
@@ -114,8 +118,8 @@ bindsym XF86AudioRaiseVolume exec "amixer set Master 5%+"
 bindsym XF86AudioMute exec "amixer set Master toggle"
 
 # Media keys to control brightness
-bindsym XF86MonBrightnessUp exec "xbacklight -inc 10"
-bindsym XF86MonBrightnessDown exec "xbacklight -dec 10"
+bindsym XF86MonBrightnessUp exec "xbacklight -inc 5"
+bindsym XF86MonBrightnessDown exec "xbacklight -dec 5"
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
