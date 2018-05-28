@@ -66,8 +66,8 @@
   # See, http://beyermatthias.de/blog/2015/11/27/nixos-on-unstable---how-to-fix-a-broken-nixos-rebuild/
   environment.systemPackages = with pkgs; [
     # system
-    dnsutils # dig
-    nix-repl ncat
+    dnsutils ncat # dig
+    nixUnstable # nix repl, nix run, ...
     aria stow htop unzip unrar gnupg tree
     ranger w3m xsel # w3m to display images, xsel to copy file name with `yd`
     usbutils # lsusb
@@ -214,7 +214,6 @@
       '';
       shellAliases = {
         l = "ls -alh"; ll = "ls -l"; ls = "ls --color=tty";
-        # pleaze  = "sudo $(history -p !!)";
         fu  = "sudo $(fc -ln -1 -1)";
         encrypt = "openssl enc -aes-256-cbc -salt";
         decrypt = "openssl enc -aes-256-cbc -salt -d";
