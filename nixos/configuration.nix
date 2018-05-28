@@ -301,6 +301,13 @@
     ];
   };
 
+  # Audio settings (alsa)
+  # hardware.pulseaudio.enable = true;
+  sound = {
+    enable = true;
+    mediaKeys.enable = false; # Managed by i3
+  };
+
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
   programs.ssh.startAgent = true;
