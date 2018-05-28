@@ -36,7 +36,7 @@
 ;;;###autoload
 (flycheck-define-checker tla
                          "A syntax checker for the TLA+ language."
-                         :command ("java" "tla2sany.SANY" source-inplace)
+                         :command ("sany" source)
                          :error-patterns
                          ((info line-start (message) "starting at line " line ", column " column)
                           (error line-start (message) " at line " line ", column " column))
