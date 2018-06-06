@@ -1,4 +1,3 @@
-
 (require 'cl-lib)
 (require 's)
 (require 'dash)
@@ -16,15 +15,15 @@
 (defun slugify (str)
   "Slugify STR.
 
-Jekyll slugify headers to attach them an id. This function
-compute the slug value of STR.
+Jekyll slugifies headers to attach them an unique id. This
+function computes the slug value of STR.
 
 See https://gist.github.com/mathewbyrne/1280286"
   (replace-regexp-in-string "\-\-+" "-"
-   (replace-regexp-in-string "[^[:ascii:]]+" ""
-   (replace-regexp-in-string "\\." ""
+   (replace-regexp-in-string "[^[:alnum:]_-]" ""
    (replace-regexp-in-string "&" "and"
    (replace-regexp-in-string "\s+" "-"
+   (replace-regexp-in-string "<.+?>" " "
    (s-downcase (s-trim str))))))))
 
 (defun update-last-seebling-at-depth (depth fun tree &optional nodep)
@@ -68,20 +67,6 @@ Example usage, `-snoc' adds an element in the subtree:
      (t
       (error "The depth could not be smaller than 0"))))
 
-;; Predicate for a leaf in the `toc-tree'
-(defun leafp (item)
-  (pcase item
-    (`(,title . ,slug)
-     (and (stringp title) (stringp slug)))
-    (item nil)))
-
-;; Pushes `element' in the last seebling of `tree' at depth `depth'.
-(defun push-in-last-seebling (depth element tree)
-  (update-last-seebling-at-depth depth
-                                 (lambda (sibling) (-snoc sibling element))
-                                 tree
-                                 (lambda (item) (not (leafp item)))))
-
 
 ;;; Define Back-end
 
@@ -98,7 +83,10 @@ Example usage, `-snoc' adds an element in the subtree:
   :translate-alist '(
                      (code . org-html-code)
                      (src-block . org-html-src-block)
-                     (link . org-html-link)
+                     ;; Use html link except for internal link to headline
+                     (link . org-jekyll-link)
+                     ;; Render markdown into abstract block
+                     (special-block . org-jekyll-special-block)
                      ;; Handle standalone images as in ox-html, handle
                      ;; the rest as in ox-md.
                      (paragraph . org-jekyll-paragraph)
@@ -112,6 +100,27 @@ Example usage, `-snoc' adds an element in the subtree:
     (:jekyll-categories "JEKYLL_CATEGORIES" nil "" space))
   )
 
+;;;; Link
+
+(defun org-jekyll-link (link desc info)
+  "Transcode a LINK object from Org to Jekyyl.
+DESC is the description part of the link, or the empty string.
+INFO is a plist holding contextual information.  See
+`org-export-data'."
+  (let ((type (org-element-property :type link))
+        (raw-path (org-element-property :path link)))
+    (cond
+     ;; This is an internal link to a headline: slugifies it!
+     ((and (string= type "fuzzy") (s-starts-with? "*" raw-path))
+      (let ((slugified-path (slugify raw-path)))
+        (message "%s" slugified-path)
+        (s-lex-format "[${desc}](#${slugified-path})")))
+     ;; Fallback on html
+     (t
+      (org-export-with-backend 'html link desc info)))))
+
+;;;; Keyword
+
 (defun org-jekyll-render-toc (toc-tree)
   (pcase toc-tree
     ;; The tree is empty
@@ -119,7 +128,7 @@ Example usage, `-snoc' adds an element in the subtree:
     ;; The current node is a subtree
     ((and `(,tree . ,trees) (guard (not (leafp tree))))
      (s-join "\n" (list
-       "<li><ul>" (s-concat (org-jekyll-render-toc tree) "</ul></li>")
+       "<ul>" (s-concat (org-jekyll-render-toc tree) "</ul>")
        (org-jekyll-render-toc trees))))
     ;; The current node is a leaf
     ((and `(,tree . ,trees) (guard (leafp tree)))
@@ -136,20 +145,58 @@ DEPTH is an integer specifying the depth of the table.  INFO is
 a plist used as a communication channel.  Optional argument SCOPE
 is an element defining the scope of the table.  Return the table
 of contents as a string, or nil if it is empty."
-  (let* ((headlines (org-export-collect-headlines info depth scope))
-         (toc-titles (-map (lambda (hd) (org-element-property :raw-value hd))
-                           headlines))
-         (toc-slugs  (->>
+
+  ;; Predicate for a leaf in the `toc-tree'
+  (defun leafp (item)
+    (pcase item
+      (`(,title . ,slug)
+       (and (stringp title) (stringp slug)))
+      (item nil)))
+
+  ;; Pushes `element' in the last seebling of `tree' at depth `depth'.
+  (defun push-in-last-seebling (depth element tree)
+    (update-last-seebling-at-depth depth
+                                   (lambda (sibling) (-snoc sibling element))
+                                   tree
+                                   (lambda (item) (not (leafp item)))))
+
+  ;; Main
+  (let* ((slug-hash (make-hash-table :test 'equal)) ;; Stores slugs of the toc
+         (headlines (org-export-collect-headlines info depth scope))
+         (toc-titles (->>
                       headlines
-                      (-map (lambda (hd) (org-element-property :raw-value hd)))
-                      ;; TODO: clean tags, TODO ....
+                      (-map (lambda (hd) (org-export-get-alt-title hd info)))
+                      (-map (lambda (hd) (org-export-data-with-backend
+                                          hd
+                                          ;; Create an anonymous back-end that will ignore any
+                                          ;; footnote-reference, link, radio-target and target
+                                          ;; in table of contents.
+                                          (org-export-create-backend
+                                           :parent 'html
+                                           :transcoders '((footnote-reference . ignore)
+                                                          (link . (lambda (object c i) c))
+                                                          (radio-target . (lambda (object c i) c))
+                                                          (target . ignore)))
+                                          info)))))
+         (toc-slugs  (->>
+                      toc-titles
                       (-map (lambda (hd) (slugify hd)))
-                      (-map (lambda (hd) (s-concat "#" hd)))))
+                      (-map (lambda (hd) (s-concat "#" hd)))
+                      (-map (lambda (slug-base)
+                              ;; Append -1, -2, -3, ... until unique
+                              ;; slug if found.
+                              (let ((slug slug-base)
+                                    (idx 0))
+                                (while (gethash slug slug-hash)
+                                  (setq slug
+                                        (s-concat slug-base "-" (number-to-string (setq idx (1+ idx))))))
+                                (puthash slug t slug-hash)
+                                slug)))))
          (toc-depths (->>
                       headlines
                       (-map (lambda (h) (org-export-get-relative-level h info)))
                       (-map '1-)))
-         ;; A tree like representation of the toc:
+         ;; `toc-tree' is a tree like representation of the toc:
          ;; '((sec-1 . #sec-1)
          ;;   ((sec-2 . #sec-2) ((subsec-21 . #subsec-21) (subsec-22 . #subsec-22)))
          ;;   (sec-3 . #sec-3))
@@ -182,6 +229,23 @@ channel."
         (org-jekyll-toc depth info (and localp keyword))))
      (t
       (org-export-with-backend 'md keyword contents info)))))
+
+;;;; Special Block
+
+(defun org-jekyll-special-block (special-block contents info)
+  "Transcode a SPECIAL-BLOCK element from Org to HTML.
+CONTENTS holds the contents of the block.  INFO is a plist
+holding contextual information."
+  (let* ((block-type (org-element-property :type special-block))
+         (transcoded-content
+          (org-export-with-backend 'md special-block contents info)))
+    (cond
+      ((string= block-type "abstract")
+       (s-join "\n" (list
+         "{::options parse_block_html=\"true\" /}"
+         transcoded-content
+         "{::options parse_block_html=\"false\" /}")))
+      (t transcoded-content))))
 
 (defun org-jekyll-template (contents info)
   "Return complete document string after Markdown conversion.
@@ -308,7 +372,10 @@ contents of hidden elements.
 
 Return output file's name."
   (interactive)
-  (let ((outfile (org-export-output-file-name ".md" subtreep)))
+  (let* ((env (org-export-get-environment 'jekyll))
+         (title (org-element-interpret-data (plist-get env :title)))
+         (date (org-element-interpret-data  (org-export-get-date env "%Y-%m-%d")))
+         (outfile (s-concat date "-" (slugify title) ".markdown")))
     (org-export-to-file 'jekyll outfile async subtreep visible-only)))
 
 ;;;###autoload
@@ -320,7 +387,7 @@ is the property list for the given project.  PUB-DIR is the
 publishing directory.
 
 Return output file name."
-  (org-publish-org-to 'jekyll filename ".md" plist pub-dir))
+  (org-publish-org-to 'jekyll filename ".markdown" plist pub-dir))
 
 
 (provide 'ox-jekyll)
