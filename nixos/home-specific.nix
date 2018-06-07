@@ -59,7 +59,7 @@
   networking.firewall.allowedTCPPorts = [ 22000 ];
 
   environment.systemPackages = with pkgs; [
-    bluez
+    # bluez
     ntfs3g
   ];
 
@@ -70,25 +70,27 @@
   # See wiki.archlinux.org/index.php?title=Bluetooth&oldid=390632
   # See nixos.org/w/index.php?title=FAQ&oldid=24648#How_to_add_a_custom_udev_rule_in_nixos.3F
   hardware.bluetooth.enable = true;
-  services.udev.extraRules = ''
-      # Set bluetooth power up
-      ACTION=="add", KERNEL=="hci0", RUN+="${config.system.path}/bin/hciconfig hci0 up"
-    '';
-  systemd.services."bluetooth-auto-power@" = {
-    # description = "Automatically power on bluetooth device after suspend/resume-cycle";
+  # Note: Deprecated, see
+  # https://wiki.archlinux.org/index.php?title=Bluetooth&oldid=490938#Auto_power-on_after_boot
+  # services.udev.extraRules = ''
+  #     # Set bluetooth power up
+  #     ACTION=="add", KERNEL=="hci0", RUN+="${config.system.path}/bin/hciconfig hci0 up"
+  #   '';
+  # systemd.services."bluetooth-auto-power@" = {
+  #   # description = "Automatically power on bluetooth device after suspend/resume-cycle";
 
-    unitConfig = {
-      Description = "Bluetooth auto power on";
-      After = "bluetooth.service sys-subsystem-bluetooth-devices-%i.device suspend.target";
-    };
+  #   unitConfig = {
+  #     Description = "Bluetooth auto power on";
+  #     After = "bluetooth.service sys-subsystem-bluetooth-devices-%i.device suspend.target";
+  #   };
 
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${config.system.path}/bin/hciconfig %i up";
-    };
+  #   serviceConfig = {
+  #     Type = "oneshot";
+  #     ExecStart = "${config.system.path}/bin/hciconfig %i up";
+  #   };
 
-    wantedBy = [ "suspend.target" ];
-  };
+  #   wantedBy = [ "suspend.target" ];
+  # };
 
   services.xserver = {
     videoDrivers = [ "nvidia" ];
