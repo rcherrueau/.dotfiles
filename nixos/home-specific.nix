@@ -6,7 +6,6 @@
 
   imports =
     [ <nixpkgs/nixos/modules/installer/scan/not-detected.nix>
-      ./musnix
     ];
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "ehci_pci" "ahci" "usbhid" "sd_mod" ];
@@ -39,9 +38,6 @@
   boot.loader.grub.device = "/dev/sda";
 
   # -------------------------------------------------- System configuration
-
-  musnix.enable = true;
-  users.extraUsers.rfish.extraGroups = [ "audio" ];
 
   # Define your hostname.
   networking.hostName = "home-rfish";
