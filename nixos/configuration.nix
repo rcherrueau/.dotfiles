@@ -148,7 +148,9 @@
    })
 
     # language
-    openjdk sbt pmd
+    # openjdk sbt pmd
+    racket
+    # haskellPackages.stack
   ];
 
   #---------------------------------------------------------------- Daemon
