@@ -374,11 +374,16 @@ layers configuration. You are free to put any user code."
 
   ;; -- Line behavior
   (setq-default default-fill-column 70)
+  (setq-default fill-column default-fill-column)
+
   ;; Stop truncate lines
   (add-hook 'text-mode-hook (lambda ()
                               (setq truncate-lines nil)))
   ;; Never insert tabs
   (set-default 'indent-tabs-mode nil)
+
+  ;; Add a new line at the end of file
+  (set-default 'require-final-newline t)
 
   ;; Highlight current line
   (set-face-attribute 'hl-line nil :background "#4A2F59")
@@ -483,6 +488,9 @@ layers configuration. You are free to put any user code."
     (setq org-startup-indented nil)
     ;; Syntax highlighting of source block
     (setq org-src-fontify-natively t)
+    ;; Set TAB of source block as if it were used in the appropriate
+    ;; major mode
+    (setq org-src-tab-acts-natively t)
     ;; Preserve my indentation during source block export
     (setq org-src-preserve-indentation t)
     ;; Activate smartparens mode
