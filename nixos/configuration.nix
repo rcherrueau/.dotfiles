@@ -192,6 +192,8 @@
   programs = {
     bash.enableCompletion = true;
 
+    mtr.enable = true; # traceroute + ping
+
     tmux = {
       enable = true;
       clock24 = true;
