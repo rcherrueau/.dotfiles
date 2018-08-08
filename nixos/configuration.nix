@@ -327,4 +327,15 @@
 
   };
   networking.nameservers = [ "127.0.0.1" ];
+
+  # Enable virtualization
+  virtualisation.docker = {
+    enable = true;
+    # Only load docker service, but make it inactive. A command on the
+    # docker cli (e.g., `docker ps` or `docker run`) will activate it.
+    enableOnBoot = false;
+    # Do `docker system prune -f` periodically.
+    autoPrune.enable = true;
+  };
+  users.extraGroups.docker.members = [ "rfish" ];
 }
