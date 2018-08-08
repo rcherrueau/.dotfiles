@@ -144,9 +144,13 @@
   # hardware.pulseaudio.enable = true;
 
   # Enable virtualization
-  # `enableExtensionPack` requires to compile VirtualBox extension
-  # pack and it takes way too long.
-  virtualisation.virtualbox.host.enable = true;
+  virtualisation.virtualbox.host = {
+    enable = true;
+    # Remove GUI and Qt dependency. I use VirtualBox through vagrant.
+    headless = true;
+    # `enableExtensionPack` requires to compile VirtualBox extension
+    # pack and it takes way too long.
+    # enableExtensionPack = true;
+  };
   users.extraGroups.vboxusers.members = [ "rfish" ];
-  # nixpkgs.config.virtualbox.enableExtensionPack = true;
 }
