@@ -7,9 +7,6 @@
 {
   imports = [./specific.nix];
 
-  # Linux kernel 4.9
-  boot.kernelPackages = pkgs.linuxPackages_4_9;
-
   # Tmp on tmpfs
   boot.tmpOnTmpfs = true;
 
