@@ -72,11 +72,17 @@
   # Customize sudo:
   # see, nixos-option security.sudo.extraRules
   # https://github.com/NixOS/nixpkgs/blob/b94e1f1fbfb5fe00503b7a9b0e5b1f56b9388b08/nixos/modules/security/sudo.nix#L76
-  security.sudo.extraRules = [
+  #
+  # The `mkAfter` ensures that this extra rule appears after rules
+  # already defined in configuration.nix (especially the %wheel rule
+  # that states that all users from the group wheel have to provide a
+  # password with sudo).
+  security.sudo.extraRules = lib.mkAfter [
     # Let rfish do `sudo rfkill ...` without being prompted for a
     # password.
-   { users = [ "rfish" ];
-     commands = [ { command = "${pkgs.utillinux}/bin/rfkill"; options = [ "NOPASSWD" ]; } ]; }
+    { users = [ "rfish" ];
+      commands = [ { command = "${pkgs.utillinux}/bin/rfkill";
+                     options = [ "NOPASSWD" ]; } ]; }
   ];
 
   # OpenVPN client:
