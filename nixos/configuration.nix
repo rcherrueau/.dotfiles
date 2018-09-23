@@ -7,6 +7,11 @@
 {
   imports = [./specific.nix];
 
+  # Minimum swappiness without disabling it entirely (preserve ssd)
+  boot.kernel.sysctl = {
+    "vm.swappiness" = lib.mkDefault 1;
+  };
+
   # Tmp on tmpfs
   boot.tmpOnTmpfs = true;
 

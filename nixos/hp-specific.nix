@@ -112,6 +112,13 @@
                          # localhost:631
   };
 
+  # Advanced power management for Linux.
+  # See, https://github.com/NixOS/nixos-hardware/tree/b7185cd232c7b9d9e8872ecd4a10e86bac65c0ea/common/pc/laptop 
+  services.tlp.enable = true;
+  powerManagement.cpuFreqGovernor =
+    lib.mkIf config.services.tlp.enable (lib.mkForce null);
+
+
   # Xorg settings
   services.xserver = {
     videoDrivers = [ "intel" ];
