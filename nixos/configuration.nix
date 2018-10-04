@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, lib, pkgs, ... }:
+{ config, options, lib, pkgs, ... }:
 
 {
   imports = [./specific.nix];
@@ -59,6 +59,13 @@
   # Environment variables
   # environment.variables.EDITOR = "emacsclient -c -a \"\"";
   environment.variables.EDITOR = "${pkgs.vim}/bin/vim -n -u /home/rfish/.vimrc --noplugin";
+
+  # Overlays path for package overriding. See,
+  # - https://nixos.wiki/wiki/Overlays
+  # - https://blog.flyingcircus.io/2017/11/07/nixos-the-dos-and-donts-of-nixpkgs-overlays/
+  nix.nixPath = lib.mkDefault (options.nix.nixPath.default ++ [
+    "nixpkgs-overlays=/etc/nixos/overlays"
+  ]);
 
   #------------------------------------------------------------------- App
   nixpkgs.config.allowUnfree = true;
