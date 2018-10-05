@@ -60,18 +60,27 @@
   # environment.variables.EDITOR = "emacsclient -c -a \"\"";
   environment.variables.EDITOR = "${pkgs.vim}/bin/vim -n -u /home/rfish/.vimrc --noplugin";
 
-  # Overlays path for package overriding. See,
-  # - https://nixos.wiki/wiki/Overlays
-  # - https://blog.flyingcircus.io/2017/11/07/nixos-the-dos-and-donts-of-nixpkgs-overlays/
-  nix.nixPath = lib.mkDefault (options.nix.nixPath.default ++ [
-    "nixpkgs-overlays=/etc/nixos/overlays"
-  ]);
-
   #------------------------------------------------------------------- App
   nixpkgs.config.allowUnfree = true;
 
+  # Overlays for package overriding. See,
+  # - https://nixos.wiki/wiki/Overlays
+  # - https://blog.flyingcircus.io/2017/11/07/nixos-the-dos-and-donts-of-nixpkgs-overlays/
+  nixpkgs.overlays = [
+    (self: super: {
+      # Compile emacs with imagemagick so org will support the
+      # property `#+ATTR_ORG: :width` that sets the size of an image.
+      emacs = super.emacs.override {
+        imagemagick = super.imagemagick;
+      };
+    })
+  ];
+
   # List packages installed in system profile. To search by name, run:
-  # $ nix-env -qaP|fgrep wget
+  # ~$ nix search -u <<name>>
+  # To test it:
+  # ~$ nix run nixpkgs.<<name>> -c <<name>>
+  #
   # See, http://beyermatthias.de/blog/2015/11/27/nixos-on-unstable---how-to-fix-a-broken-nixos-rebuild/
   environment.systemPackages = with pkgs; [
     # system
