@@ -38,6 +38,15 @@ values."
      ;; ----------------------------------------------------------- chat
      erc
      ;; ----------------------------------------------------------- lang
+     (elm :variables
+          elm-interactive-command '("elm" "repl")
+          elm-reactor-command '("elm" "reactor")
+          elm-reactor-arguments '("--port" "8000")
+          elm-compile-command '("elm" "make")
+          elm-compile-arguments '("--output=elm.js" "--debug")
+          elm-compile-arguments '("--output=elm.js")
+          elm-package-command '("elm" "package")
+          elm-package-json "elm.json")
      emacs-lisp
      (haskell :variables haskell-completion-backend 'ghc-mod)
      html
@@ -51,6 +60,7 @@ values."
      auto-completion
      dash
      helm
+     restclient
      vagrant
      ;; ANSI rather than eshell, shell, ...
      ;; https://www.masteringemacs.org/article/running-shells-in-emacs-overview
@@ -71,8 +81,12 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '(tao-theme page-break-lines
-     rainbow-mode realgud)
+   dotspacemacs-additional-packages '(tao-theme
+                                      zenburn-theme
+                                      page-break-lines
+                                      rainbow-mode realgud
+                                      epresent
+                                      )
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
@@ -436,10 +450,11 @@ layers configuration. You are free to put any user code."
   (add-to-list 'page-break-lines-modes 'haskell-mode)
   (add-to-list 'page-break-lines-modes 'idris-mode)
   (add-to-list 'page-break-lines-modes 'proverif-pv-mode)
+  (add-to-list 'page-break-lines-modes 'python-mode)
   (add-to-list 'page-break-lines-modes 'racket-mode)
   (add-to-list 'page-break-lines-modes 'sh-mode)
+  (add-to-list 'page-break-lines-modes 'text-mode)
   (add-to-list 'page-break-lines-modes 'web-mode)
-  (add-to-list 'page-break-lines-modes 'python-mode)
 
   ;; ------------------------------------------------------------- Other
   (setq ispell-dictionary "en_US")
@@ -675,7 +690,7 @@ layers configuration. You are free to put any user code."
     ;; -- ASCII Special Export for mail
     ;;
     ;;
-    ;; See http://orgmode.org/w/?p=org-mode.git;a=blob_plain;f=lisp/ox-ascii.el;hb=HEAD
+    ;; See file:~/.emacs.d/elpa/org-plus-contrib-20180716/ox-ascii.el::(org-export-define-backend%20'ascii]
     ;;
     ;; Offers new kind of blocks with specific formating related
     ;; - MAILQUOTE: display content as it is prepend with a ">".
