@@ -113,7 +113,8 @@
 
     # development tools
     git
-    emacs vim aspell aspellDicts.en aspellDicts.fr
+    (emacsWithPackages (epkgs: [epkgs.pdf-tools]))
+    vim aspell aspellDicts.en aspellDicts.fr
     silver-searcher
     zeal sqlite
 

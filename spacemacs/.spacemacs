@@ -71,6 +71,7 @@ values."
      ;; --------------------------------------------------------- others
      nixos
      org
+     pdf-tools
      spell-checking
      syntax-checking
      ;; --------------------------------------------------------- perso
