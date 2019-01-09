@@ -5,7 +5,7 @@
 { config, options, lib, pkgs, ... }:
 
 {
-  imports = [./specific.nix];
+  imports = [./cachix.nix ./specific.nix];
 
   # Minimum swappiness without disabling it entirely (preserve ssd)
   boot.kernel.sysctl = {
