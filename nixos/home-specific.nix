@@ -6,6 +6,7 @@
 
   imports =
     [ <nixpkgs/nixos/modules/installer/scan/not-detected.nix>
+      ./musnix
     ];
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "ehci_pci" "ahci" "usbhid" "sd_mod" ];
@@ -103,4 +104,23 @@
     desktopManager.wallpaper.mode = "fill";
     desktopManager.wallpaper.combineScreens = false;
   };
+
+  # -- Musnix
+  # https://github.com/musnix/musnix
+  musnix.enable = true;
+  users.users.rfish.extraGroups = [ "audio" ];
+  # Diff with actual musnix, 
+  # diff --git i/modules/base.nix w/modules/base.nix
+  # index 50ee870..6edf252 100644
+  # --- i/modules/base.nix
+  # +++ w/modules/base.nix
+  # @@ -51,6 +51,7 @@ in {
+  #          if cfg.alsaSeq.enable
+  #            then [ "snd-seq"
+  #                   "snd-rawmidi"
+  # +                 "snd-seq-midi"
+  #                 ]
+  #            else [];
+  # kernelParams = [ "threadirq" ]
+  musnix.alsaSeq.enable = true;
 }
