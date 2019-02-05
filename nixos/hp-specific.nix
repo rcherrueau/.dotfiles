@@ -47,10 +47,8 @@
   # Networking stuff
   networking = {
     hostName = "hp-rfish";
-    # FIXME: Delete the support of network-manager and only relies on
     # wpa-supplicant.
-    # wireless.enable = true;
-    networkmanager.enable = true;
+    wireless.enable = true;
 
     # Make the firewall unblock packet for syncthing (22000). Blocked
     # packets in dmesg/journalctl look like this:
@@ -65,9 +63,6 @@
     # https://nixos.org/nixos/manual/index.html#sec-firewall
     firewall.allowedTCPPorts = [ 22000 ];
   };
-  # FIXME: remove networkmanager group and only relies on
-  # wpa-supplicant. Then move this line to
-  users.extraUsers.rfish.extraGroups = [ "networkmanager" ];
 
   # Customize sudo:
   # see, nixos-option security.sudo.extraRules
