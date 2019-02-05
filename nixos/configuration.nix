@@ -102,10 +102,10 @@
     imagemagick # import -window root screenshot.jpg
     inkscape gimp
     kpcli xclip # xclip is used by kpcli to copy pass to clipboard
+    mpv # replacement of mplayer 
     qtox
     rxvt_unicode
     syncthing
-    vlc
     xorg.xbacklight # Decrease screen brightness
     xcape # Escape and Control on a single key
     xdotool # Script your mouse
