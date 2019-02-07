@@ -44,6 +44,11 @@
 
   # -------------------------------------------------- System configuration
 
+  # Specific packages for my laptop
+  environment.systemPackages = with pkgs; [
+    rfkill # manage wifi device
+  ];
+
   # Networking stuff
   networking = {
     hostName = "hp-rfish";
@@ -76,7 +81,7 @@
     # Let rfish do `sudo rfkill ...` without being prompted for a
     # password.
     { users = [ "rfish" ];
-      commands = [ { command = "${pkgs.utillinux}/bin/rfkill";
+      commands = [ { command = "${pkgs.rfkill}/bin/rfkill";
                      options = [ "NOPASSWD" ]; } ]; }
   ];
 
@@ -108,11 +113,10 @@
   };
 
   # Advanced power management for Linux.
-  # See, https://github.com/NixOS/nixos-hardware/tree/b7185cd232c7b9d9e8872ecd4a10e86bac65c0ea/common/pc/laptop 
+  # See, https://github.com/NixOS/nixos-hardware/tree/b7185cd232c7b9d9e8872ecd4a10e86bac65c0ea/common/pc/laptop
   services.tlp.enable = true;
   powerManagement.cpuFreqGovernor =
     lib.mkIf config.services.tlp.enable (lib.mkForce null);
-
 
   # Xorg settings
   services.xserver = {
@@ -157,7 +161,7 @@
     # Remove GUI and Qt dependency. I use VirtualBox through vagrant.
     headless = true;
     # `enableExtensionPack` requires to compile VirtualBox extension
-    # pack and it takes way too long.
+    # pack, but it takes way too long.
     # enableExtensionPack = true;
   };
   users.extraGroups.vboxusers.members = [ "rfish" ];
