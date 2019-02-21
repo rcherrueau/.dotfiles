@@ -93,7 +93,7 @@
 
     # windowing
     xlibs.libXft
-    i3status rofi
+    i3status-rust rofi
     dunst # The lightweight notification-daemon
     elementary-icon-theme
 

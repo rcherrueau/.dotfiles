@@ -1,0 +1,86 @@
+# https://github.com/greshake/i3status-rust/blob/2dc958995834b529a245c22c510b57d5c928c747/src/themes.rs
+[theme]
+name = "gruvbox-dark"
+[theme.overrides]
+separator = "|"
+separator_bg = "#282828"
+separator_fg = "#ebdbb2"
+
+# https://github.com/greshake/i3status-rust/blob/2dc958995834b529a245c22c510b57d5c928c747/src/icons.rs#L4
+[icons]
+name = "none"
+[icons.overrides]
+bat = " ⚡ "
+bat_full = "" # Collapse when fully charged
+bat_charging = " ⚡ "
+bat_discharging = " ⚡ "
+volume_full = " ♪ "
+volume_half = " ♪ "
+volume_empty = " ♪ "
+volume_muted = " --"
+
+[[block]]
+block = "disk_space"
+path = "/"
+alias = "/"
+info_type = "available"
+unit = "GB"
+interval = 20
+warning = 20.0
+alert = 10.0
+
+[[block]]
+block = "disk_space"
+path = "/home"
+alias = "/home"
+info_type = "available"
+unit = "GB"
+interval = 20
+warning = 20.0
+alert = 10.0
+
+[[block]]
+block = "sound"
+
+[[block]]
+block = "net"
+device = "wlp2s0"
+ssid = true
+bitrate = true
+ip = true
+speed_up = false
+speed_down = false
+interval = 5
+
+[[block]]
+block = "net"
+device = "enp0s31f6"
+ip = true
+speed_up = false
+speed_down = false
+interval = 5
+
+[[block]]
+block = "battery"
+interval = 20
+format = "{time} {percentage}% "
+
+# [[block]]
+# block = "memory"
+# display_type = "memory"
+# format_mem = "{Mup}%"
+# format_swap = "{SUp}%"
+
+# [[block]]
+# block = "cpu"
+# interval = 1
+
+[[block]]
+block = "load"
+interval = 1
+format = "{1m}"
+
+[[block]]
+block = "time"
+interval = 60
+format = "%Y-%m-%d %H:%M"
