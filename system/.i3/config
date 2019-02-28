@@ -34,7 +34,7 @@ bindsym $mod+space exec --no-startup-id rofi $rofi_ops -show run
 ## laptop mode
 bindsym $mod+m exec --no-startup-id rofi $rofi_ops -show lmode:~/.i3/set-laptop-mode.sh
 ## web
-bindsym $mod+w exec --no-startup-id rofi $rofi_ops -show web:~/.i3/web_rofi.sh
+bindsym $mod+w exec --no-startup-id rofi $rofi_ops -show web:~/.i3/web-rofi.sh
 
 # change focus
 bindsym $mod+h focus left
@@ -50,7 +50,7 @@ bindsym $mod+Shift+l move right
 
 # split in horizontal orientation
 # bindsym $mod+Shift+colon split h
-bindsym $mod+Shift+slash split h
+bindsym $mod+slash split h
 
 # split in vertical orientation
 bindsym $mod+minus split v

@@ -4,7 +4,7 @@
 ;;
 ;; Lets you quickly launch web searches from rofi. Call it with
 ;;
-;; $ rofi -show web:./web_rofi.sh
+;; $ rofi -show web:./web-rofi.sh
 ;;
 ;; A `web-entry` defines a web search. It is made of a
 ;; - key: The keyboard shortcut to use in rofi.
@@ -103,6 +103,7 @@
    (web-entry "en2fr"  "Search Wordref for {query}" "http://www.wordreference.com/enfr/{query}")
    (web-entry "fr2en"  "Search Wordref for {query}" "http://www.wordreference.com/fren/{query}")
    (web-entry "lin"    "Search Linguee for {query}" "https://www.linguee.com/english-french/search?source=auto&query={query}")
+   (web-entry "ox"     "Search Oxford dict for {query}" "https://www.oxfordlearnersdictionaries.com/definition/english/{query}")
    ;; Science
    (web-entry "dblp"    "CS Bib for {query}"         "http://dblp.uni-trier.de/search?q={query}")
    (web-entry "scholar" "Google Scholar for {query}" "https://scholar.google.fr/scholar?q={query}")
@@ -127,7 +128,7 @@
      (send-url url #:escape? #t))])
 
 ;; Test it!
-;; ./web_rofi.sh qwant Rick Astley - Never Gonna
-;; ./web_rofi.sh "qwant Rick Astley - Never Gonna"
-;; ./web_rofi.sh qwant → Search Web for {query} Rick Astley - Never Gonna
-;; ./web_rofi.sh "qwant → Search Web for {query} Rick Astley - Never Gonna"
+;; ./web-rofi.sh qwant Rick Astley - Never Gonna
+;; ./web-rofi.sh "qwant Rick Astley - Never Gonna"
+;; ./web-rofi.sh qwant → Search Web for {query} Rick Astley - Never Gonna
+;; ./web-rofi.sh "qwant → Search Web for {query} Rick Astley - Never Gonna"
