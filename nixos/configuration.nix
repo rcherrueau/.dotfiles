@@ -347,6 +347,7 @@
     ];
 
   };
+  # networking.nameservers = [ "84.200.69.80" "84.200.70.40" ];
   networking.nameservers = [ "127.0.0.1" ];
 
   # Enable virtualization
