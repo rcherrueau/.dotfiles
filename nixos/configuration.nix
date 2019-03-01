@@ -95,14 +95,14 @@
     xlibs.libXft
     i3status-rust rofi
     dunst # The lightweight notification-daemon
-    elementary-icon-theme
+    # XXX 2019-03-01: elementary-icon-theme
 
     # soft
     firefox chromium
     imagemagick # import -window root screenshot.jpg
     inkscape gimp
     kpcli xclip # xclip is used by kpcli to copy pass to clipboard
-    mpv # replacement of mplayer 
+    mpv # replacement of mplayer
     qtox
     rxvt_unicode
     syncthing
@@ -342,9 +342,11 @@
   services.unbound = {
     enable = true;
     # forward remaining requests to https://dns.watch/
-    forwardAddresses = [ "84.200.69.80" "84.200.70.40" "2001:1608:10:25::1c04:b12f" "2001:1608:10:25::9249:d69b" ];
+    forwardAddresses = [ "84.200.69.80" "84.200.70.40"
+    "2001:1608:10:25::1c04:b12f" "2001:1608:10:25::9249:d69b" ];
 
   };
+  # networking.nameservers = [ "84.200.69.80" "84.200.70.40" ];
   networking.nameservers = [ "127.0.0.1" ];
 
   # Enable virtualization
