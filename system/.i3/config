@@ -81,7 +81,7 @@ set $ws4 4
 set $ws5 5
 set $ws6 6
 set $ws7 7
-set $ws8 8
+set $ws8 8:♪
 
 # switch to workspace
 bindsym $mod+1 workspace $ws1
@@ -121,6 +121,9 @@ bindsym XF86AudioMute exec "amixer set Master toggle"
 # Media keys to control brightness
 bindsym XF86MonBrightnessUp exec "xbacklight -inc 5"
 bindsym XF86MonBrightnessDown exec "xbacklight -dec 5"
+
+# Lock the screen
+bindsym XF86Sleep exec i3lock --color "$CBG"; exec systemctl suspend
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
