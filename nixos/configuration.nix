@@ -66,20 +66,7 @@
   # Overlays for package overriding. See,
   # - https://nixos.wiki/wiki/Overlays
   # - https://blog.flyingcircus.io/2017/11/07/nixos-the-dos-and-donts-of-nixpkgs-overlays/
-  nixpkgs.overlays = [
-    (self: super: {
-      emacs = super.emacs.override {
-        # Compile emacs with imagemagick so org will support the
-        # property `#+ATTR_ORG: :width` that sets the size of an image.
-        imagemagick = super.imagemagick;
-        # Support Xwidgets for better lsp-ui.
-        withXwidgets = true;
-      };
-    })
-  ];
-  # nix.nixPath = lib.mkDefault (options.nix.nixPath.default ++ [
-  #   "nixpkgs-overlays=/etc/nixos/overlays"
-  # ]);
+  nixpkgs.overlays = [ (import ./overlays.nix) ];
 
   # List packages installed in system profile. To search by name, run:
   # ~$ nix search -u <<name>>
@@ -118,7 +105,7 @@
 
     # development tools
     git
-    (emacsWithPackages (epkgs: [epkgs.pdf-tools]))
+    emacs # (emacsWithPackages (epkgs: [epkgs.pdf-tools]))
     vim aspell aspellDicts.en aspellDicts.fr
     silver-searcher
     zeal sqlite
