@@ -1,1 +1,2 @@
 nixos/specific.nix
+system/.i3/i3status-rs.toml
