@@ -335,6 +335,14 @@
     mediaKeys.enable = false; # Managed by i3
   };
 
+  # Enable redshift daemon.
+  services.redshift = {
+    enable = true;
+    provider = "manual"; # Don't send geoloc with geoclue2
+    latitude = "47.216542"; longitude = "1.553005"; # Nantes
+
+  };
+
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
   programs.ssh.startAgent = true;
