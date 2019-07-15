@@ -50,7 +50,7 @@
   users.extraUsers.rfish = {
     createHome = true;
     home = "/home/rfish";
-    extraGroups = [ "wheel" ];
+    extraGroups = [ "wheel" "video" ];
     useDefaultShell = true;
     uid = 1000;
     shell = "${pkgs.zsh}/bin/zsh";
@@ -68,13 +68,18 @@
   # - https://blog.flyingcircus.io/2017/11/07/nixos-the-dos-and-donts-of-nixpkgs-overlays/
   nixpkgs.overlays = [
     (self: super: {
-      # Compile emacs with imagemagick so org will support the
-      # property `#+ATTR_ORG: :width` that sets the size of an image.
       emacs = super.emacs.override {
+        # Compile emacs with imagemagick so org will support the
+        # property `#+ATTR_ORG: :width` that sets the size of an image.
         imagemagick = super.imagemagick;
+        # Support Xwidgets for better lsp-ui.
+        withXwidgets = true;
       };
     })
   ];
+  # nix.nixPath = lib.mkDefault (options.nix.nixPath.default ++ [
+  #   "nixpkgs-overlays=/etc/nixos/overlays"
+  # ]);
 
   # List packages installed in system profile. To search by name, run:
   # ~$ nix search -u <<name>>
@@ -167,9 +172,7 @@
    })
 
     # language
-    # openjdk sbt pmd
     racket
-    # haskellPackages.stack
   ];
 
   #---------------------------------------------------------------- Daemon
@@ -209,6 +212,8 @@
   #-------------------------------------------------- App/Service Settings
   # Programs settings
   programs = {
+    # Fix for emacs ssh https://github.com/NixOS/nix/issues/644
+    # bash.promptInit = "PS1=\"# \"";
     bash.enableCompletion = true;
 
     mtr.enable = true; # traceroute + ping
@@ -325,7 +330,6 @@
   };
 
   # Audio settings (alsa)
-  # hardware.pulseaudio.enable = true;
   sound = {
     enable = true;
     mediaKeys.enable = false; # Managed by i3
@@ -342,11 +346,12 @@
   services.unbound = {
     enable = true;
     # forward remaining requests to https://dns.watch/
-    forwardAddresses = [ "84.200.69.80" "84.200.70.40"
-    "2001:1608:10:25::1c04:b12f" "2001:1608:10:25::9249:d69b" ];
+    forwardAddresses = [
+      "84.200.69.80" "84.200.70.40" # dns.watch
+      "9.9.9.9" "149.112.112.112"   # quad9.net
+    ];
 
   };
-  # networking.nameservers = [ "84.200.69.80" "84.200.70.40" ];
   networking.nameservers = [ "127.0.0.1" ];
 
   # Enable virtualization
