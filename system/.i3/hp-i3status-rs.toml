@@ -74,4 +74,4 @@ format = "{1m}"
 [[block]]
 block = "time"
 interval = 60
-format = "%Y-%m-%d %H:%M"
+format = "%Y-%m-%d (%a) %H:%M"

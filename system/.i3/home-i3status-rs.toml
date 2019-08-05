@@ -45,7 +45,7 @@ block = "sound"
 
 [[block]]
 block = "net"
-device = "enp0s31f6"
+device = "enp3s0"
 ip = true
 speed_up = false
 speed_down = false
@@ -69,4 +69,4 @@ format = "{1m}"
 [[block]]
 block = "time"
 interval = 60
-format = "%Y-%m-%d %H:%M"
+format = "%Y-%m-%d (%a) %H:%M"
