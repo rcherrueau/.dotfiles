@@ -57,8 +57,8 @@ This function should only modify configuration layer settings."
      org
      ;; FIXME: lsp use lsp-python-ms that required to be installed
      ;; manually on my machine.
-     ;; https://github.com/emacs-lsp/lsp-python-ms (python :variables
-     ;; python-backend 'lsp)
+     ;; https://github.com/emacs-lsp/lsp-python-ms
+     ;; (python :variables python-backend 'lsp)
      racket
      (rust :variables
            rust-rls-cmd '("rustup" "run" "stable" "rls"))
@@ -74,7 +74,7 @@ This function should only modify configuration layer settings."
      erc
      lsp
      nixos
-     ;; pdf
+     pdf
      ranger
      restclient
      ;; TODO:
@@ -97,8 +97,8 @@ This function should only modify configuration layer settings."
    dotspacemacs-additional-packages
    '(
      rainbow-mode
-     gruvbox-theme
      zenburn-theme
+     gruvbox-theme
      (lsp-haskell :location (recipe :fetcher github :repo "emacs-lsp/lsp-haskell"))
      )
 
@@ -642,7 +642,7 @@ before packages are loaded."
                                             file)
                             (funcall fcn file)))))
 
-  ;; ;; -- todo: idris
+  ;; -- Idris
   (with-eval-after-load 'idris-mode
     ;; Fix spacemacs integration
     (setq idris-stay-in-current-window-on-compiler-error t)
@@ -702,13 +702,6 @@ before packages are loaded."
     (add-to-list 'org-modules 'org-tempo)
     (add-to-list 'org-structure-template-alist
                  '("M" . "MAILQUOTE"))
-
-    ;; Dita
-    (add-to-list 'org-babel-load-languages '(ditaa . t))
-    (setq org-ditaa-jar-path "/run/current-system/sw/lib/ditaa.jar")
-    ;; (org-babel-do-load-languages
-    ;;  'org-babel-load-languages
-    ;;  '((ditaa . t))) ; this line activates ditaa
     )
 
   (with-eval-after-load 'toc-org
@@ -756,10 +749,6 @@ formating depending on the type of _SPECIAL_BLOCK."
                            (lambda (a s v b)
                              (org-export-to-buffer 'mail-ascii "*Org MAIL-ASCII Export*")))))
       :translate-alist '((special-block . mail-ascii/special-block))))
-
-  ;; -- Rust
-  (with-eval-after-load 'rust
-    )
 
   ;; -- tramp
   (with-eval-after-load 'tramp
