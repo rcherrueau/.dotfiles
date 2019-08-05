@@ -343,7 +343,9 @@
     # forward remaining requests to https://dns.watch/
     forwardAddresses = [
       "84.200.69.80" "84.200.70.40" # dns.watch
+      "2001:1608:10:25::1c04:b12f" "2001:1608:10:25::9249:d69b"
       "9.9.9.9" "149.112.112.112"   # quad9.net
+      "2620:fe::fe" "2620:fe::9"
     ];
 
   };
