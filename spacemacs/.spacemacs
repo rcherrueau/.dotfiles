@@ -98,8 +98,8 @@ This function should only modify configuration layer settings."
    '(
      rainbow-mode
      zenburn-theme
-     gruvbox-theme
      (lsp-haskell :location (recipe :fetcher github :repo "emacs-lsp/lsp-haskell"))
+     (ob-racket :location (recipe :fetcher github :repo "DEADB17/ob-racket"))
      )
 
    ;; A list of packages that cannot be updated.
@@ -702,6 +702,9 @@ before packages are loaded."
     (add-to-list 'org-modules 'org-tempo)
     (add-to-list 'org-structure-template-alist
                  '("M" . "MAILQUOTE"))
+
+    ;; Racket support inside babel
+    (add-to-list 'org-babel-load-languages '(racket . t))
     )
 
   (with-eval-after-load 'toc-org
