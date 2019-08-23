@@ -574,6 +574,54 @@ before packages are loaded."
                        string)
          t))
 
+  ;; Try (macroexpand '(rcherr/inoremap "jk" company-complete-common))
+  (defmacro rcherr/inoremap (key-seq fun)
+    "Mimic vim 'inoremap KEY-SEQ FUN' in insert mode.
+
+Trigger FUN if KEY-SEQ is pressed rapidly in evil insert mode.
+For instance, \(rcherr/inoremap \"jk\" company-complete-common)
+calls the completion function `company-complete-common' when
+rapidly pressing 'jk'.
+
+Note: Do not quote FUN with macro, (see URL
+https://stackoverflow.com/a/14001190)."
+    (let ((defun-name (intern (format "recherr/inoremap-%s" key-seq)))
+          ;; FIXME: Generalize to more than a seq of 2 chars
+          (fst-key (aref key-seq 0))
+          (snd-key (aref key-seq 1))
+          (timeout 0.1) ;; Delay between fst-and snd-key to trigger
+                        ;; FUN
+          )
+      ;; If the name of the defun exists, then KEY-SEQ is already in
+      ;; use somewhere else.
+      (when (fboundp defun-name)
+        (error "The key sequence '%s' is already used" key-seq))
+
+      ;; The macro
+      `(progn
+         ;; The function that insert in the buffer `fst-key', then
+         ;; waits for `snd-key' to trigger FUN. See,
+         ;; https://emacs.stackexchange.com/a/20024
+         (defun ,defun-name ()
+           (interactive)
+           (let ((modified (buffer-modified-p)))
+             (insert ,fst-key)
+             (let ((evt (read-event nil nil ,timeout)))
+               (cond
+                ;; `snd-key' match ⇒ remove `fst-key' and exec FUN.
+                ((and (characterp evt) (= evt ,snd-key))
+                 (delete-char -1)
+                 (set-buffer-modified-p modified)
+                 (,fun))
+                ;; timeout or not `snd-key' ⇒ `evt' should be
+                ;; considered as normal char.
+                (t (push evt unread-command-events))))))
+
+         ;; The maping into evil-insert-state-map
+         (define-key evil-insert-state-map
+                     [,fst-key]
+                     (quote ,defun-name)))))
+
   ;; -------------------------------------------------------- Appearance
   ;; -- Fringeline
   ;; Display `-' in the fringe line for EOF
@@ -630,7 +678,7 @@ before packages are loaded."
     ;; `auto-completion-complete-with-key-sequence' complete the
     ;; selected candidate once completion is already initiated. It is
     ;; not what I am looking for.
-    (define-key evil-insert-state-map "jk" 'company-complete-common))
+    (rcherr/inoremap "jk" company-complete-common))
 
   ;; -- Coq
   (with-eval-after-load 'coq-mode
