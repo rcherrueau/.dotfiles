@@ -65,7 +65,15 @@ This function should only modify configuration layer settings."
      scala
      yaml
      ;; ----------------------------------------------------------- conf
-     ;; TODO: auto-completion
+     (auto-completion :variables
+                      auto-completion-return-key-behavior nil
+                      auto-completion-tab-key-behavior nil
+                      auto-completion-idle-delay nil ;; no automatic suggestion
+                      ;; auto-completion-private-snippets-directory nil
+                      ;; auto-completion-enable-snippets-in-popup nil
+                      ;; auto-completion-enable-help-tooltip nil
+                      ;; auto-completion-enable-sort-by-usage nil
+                      )
      helm
      spell-checking
      syntax-checking
@@ -123,6 +131,8 @@ This function should only modify configuration layer settings."
      lsp-ui
      ;; Do not print a ~ to indicate the end of file
      vi-tilde-fringe
+     ;; Do not mix company with auto-complete
+     auto-complete
      )
 
    ;; Defines the behaviour of Spacemacs when installing packages.
@@ -613,7 +623,16 @@ before packages are loaded."
         org-ref-bibliography-notes "~/Sync/Papers/notes.org")
 
   ;; ------------------------------------------------------------- Modes
-  ;; Coq
+
+  ;; -- company
+  (with-eval-after-load 'company
+    ;; Start completion candidate on "jk". Note:
+    ;; `auto-completion-complete-with-key-sequence' complete the
+    ;; selected candidate once completion is already initiated. It is
+    ;; not what I am looking for.
+    (define-key evil-insert-state-map "jk" 'company-complete-common))
+
+  ;; -- Coq
   (with-eval-after-load 'coq-mode
     ;; Fix pressing <ESC> to enter normal mode triggers Proof General
     ;; autocomplete.
