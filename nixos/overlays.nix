@@ -14,4 +14,10 @@ self: super:
     # Support Xwidgets for better lsp-ui.
     withXwidgets = true;
   };
+
+  redshift = super.redshift.override {
+    # Get location with manual conf. Don't send geoloc with geoclue2
+    # > pkgs.redshift.configureFlags should output "--enable-geoclue2=no"
+    withGeolocation = false;
+  };
 }
