@@ -55,7 +55,7 @@
     # wpa-supplicant.
     wireless.enable = true;
 
-    # Make the firewall unblock packet for syncthing (22000). Blocked
+    # Make the firewall unblocks packets for syncthing (22000). Blocked
     # packets in dmesg/journalctl look like this:
     #
     # `rejected connection: IN=wlp2s0 OUT=
@@ -145,11 +145,18 @@
     desktopManager.wallpaper.mode = "fill";
     desktopManager.wallpaper.combineScreens = false;
 
-    #  Cmds run at start of the session.
-    displayManager.sessionCommands = ''
-      # xrandr --dpi 144 --output eDP1 --auto --output DP1-1 --auto --scale 1.35x1.35 --right-of eDP1
-      xrandr --output DP1-2 --auto --output DP1-1 --auto --right-of DP1-2
+    displayManager = {
+      slim = {
+        # LUKS secures My HP boot, so I can safely enable `autoLogin`.
+        autoLogin = true;
+      };
+
+      #  Cmds run at start of the session.
+      sessionCommands = ''
+        # xrandr --dpi 144 --output eDP1 --auto --output DP1-1 --auto --scale 1.35x1.35 --right-of eDP1
+        xrandr --output DP1-2 --auto --output DP1-1 --auto --right-of DP1-2
     '';
+    };
   };
 
   # Use pusleaudio to easily switch between hdmi/display port/analog audio output
