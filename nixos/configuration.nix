@@ -361,4 +361,6 @@
     autoPrune.enable = true;
   };
   users.extraGroups.docker.members = [ "rfish" ];
+
+  system.stateVersion = "19.03";
 }
