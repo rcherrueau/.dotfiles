@@ -110,53 +110,59 @@
     silver-searcher
     zeal sqlite
 
-    # Put here the list of needed tex packages. scheme-* collection-*
-    # are predefined sets of tex packages. You can find theme using
-    # nix-repl
-    # nix-repl> :l <nixpkgs>
-    # nix-repl> pkgs.texlive.coll<tab>
-    # You can also put the name of a package directly, e.g.,
-    # `moderncv`, find them with `nix-repl>
-    # pkgs.textlive.<the-package>`.
-    # see https://nixos.org/wiki/TexLive_HOWTO#New_TexLive_Infrastructure
-    # Use parentheses to force the evaluation of the `combine`
-    # function and compute the new texlive derivation
-   (texlive.combine {
-     inherit (texlive)
-     # some tests: collection-basic ⊂ scheme-basic
-     # nix-repl> :a lib
-     # let scheme-basic = pkgs.texlive.scheme-basic.pkgs; in
-     # let coll-basic = pkgs.texlive.collection-basic.pkgs; in
-     # lib.filter (c: !lib.elem c scheme-basic) coll-basic
-     # > [ ]
-     #
-     # This function test if a certain pakcage is contains inside a
-     # collection, based on it's name. Find the doc of lib under
-     # https://github.com/NixOS/nixpkgs/tree/master/lib
-     #
-     # let hasPackage = pkgName: pkgDerivation:
-     #     let pkgNames = map (v: if (pkgs.lib.hasAttr "name" v)
-     #                            then (pkgs.lib.getAttr "name" v)
-     #                            else "") pkgDerivation;
-     #     in pkgs.lib.lists.elem pkgName pkgNames;
-     # in (hasPackage "texlive-ulem-2015" pkgs.texlive.ulem.pkgs)
-     # > true
-     # and to find the name
-     # > pkgs.lib.getAttr "name" (pkgs.lib.head pkgs.texlive.bera.pkgs)
-     scheme-small
-     collection-latex collection-latexextra collection-langfrench
-     # bera is for my thesis only, see if I cannot remove
-     # it and put-it inside an nix-shell
-     luatex collection-luatex bera
-     # courier font is required by IEEETran (pcrr8t)
-     courier
-     # cm-super required by [T1]{fontspec}
-     cm-super
-     # dvipng required by org-mode to compute preview images of latex
-     # formulas
-     dvipng
-     latexmk;
-   })
+   # # Put here the list of needed tex packages. scheme-* collection-*
+   # # are predefined sets of tex packages. You can find theme using
+   # # nix-repl
+   # # nix-repl> :l <nixpkgs>
+   # # nix-repl> pkgs.texlive.coll<tab>
+   # # You can also put the name of a package directly, e.g.,
+   # # `moderncv`, find them with `nix-repl>
+   # # pkgs.textlive.<the-package>`.
+   # # see https://nixos.org/wiki/TexLive_HOWTO#New_TexLive_Infrastructure
+   # # Use parentheses to force the evaluation of the `combine`
+   # # function and compute the new texlive derivation
+   # (texlive.combine {
+   #   inherit (texlive)
+   #   # some tests: collection-basic ⊂ scheme-basic
+   #   # nix-repl> :a lib
+   #   # let scheme-basic = pkgs.texlive.scheme-basic.pkgs; in
+   #   # let coll-basic = pkgs.texlive.collection-basic.pkgs; in
+   #   # lib.filter (c: !lib.elem c scheme-basic) coll-basic
+   #   # > [ ]
+   #   #
+   #   # This function test if a certain pakcage is contains inside a
+   #   # collection, based on it's name. Find the doc of lib under
+   #   # https://github.com/NixOS/nixpkgs/tree/master/lib
+   #   #
+   #   # let hasPackage = pkgName: pkgDerivation:
+   #   #     let pkgNames = map (v: if (pkgs.lib.hasAttr "name" v)
+   #   #                            then (pkgs.lib.getAttr "name" v)
+   #   #                            else "") pkgDerivation;
+   #   #     in pkgs.lib.lists.elem pkgName pkgNames;
+   #   # in (hasPackage "texlive-ulem-2015" pkgs.texlive.ulem.pkgs)
+   #   # > true
+   #   # and to find the name
+   #   # > pkgs.lib.getAttr "name" (pkgs.lib.head pkgs.texlive.bera.pkgs)
+   #   scheme-small
+   #   collection-latex collection-latexextra collection-langfrench
+   #   # bera is for my thesis only, see if I cannot remove
+   #   # it and put-it inside an nix-shell
+   #   luatex collection-luatex bera
+   #   # courier font is required by IEEETran (pcrr8t)
+   #   courier
+   #   # cm-super required by [T1]{fontspec}
+   #   cm-super
+   #   # dvipng required by org-mode to compute preview images of latex
+   #   # formulas
+   #   dvipng
+   #   # provides \includesvg
+   #   svg
+   #   # Required by IEEEtran.cls
+   #   # collection-fontsrecommended
+   #   # Required by adt-inria-hub
+   #   rsfs
+   #   latexmk ;
+   # }) bibtex2html
 
     # language
     racket
