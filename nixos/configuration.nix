@@ -31,18 +31,30 @@
     options = "--delete-older-than 30d";
   };
 
-  # Font
+  # Font: find local font with `fc-list|grep <font>`
   fonts = {
+    # Basic set of font w/ reasonable coverage of Unicode (this
+    # includes deja vu and noto-font-emoji)
     enableDefaultFonts = true;
+    # Extra font
     fonts = with pkgs; [
+      crimson             # Oldstyle typefaces (pair it with cochineal
+                          # in LaTex)
       iosevka             # Font for programming
       fira                # Font of Firefox OS
       fira-code           # Fira Mono + programming ligatures
-      noto-fonts-emoji    # B&W emoji fonts
+      # -- Bitmap fonts
+      dina-font
+      siji                # Iconic font
+      # -- Misc
+      font-awesome        # Social logo
     ];
 
-    fontconfig = {
-      defaultFonts.monospace = [ "Iosevka" ];
+    fontconfig.defaultFonts = {
+      monospace = [ "Iosevka" "Fira Code" "Dina" "DejaVu Sans Mono" ];
+      sansSerif = [ "Fira Sans" "DejaVu Sans" ];
+      serif = [ "Crimson" "DejaVu Serif" ];
+      emoji = [ "Noto Emoji" "Siji" ];
     };
   };
 

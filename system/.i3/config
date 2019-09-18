@@ -7,7 +7,7 @@ set $mod Mod4
 
 # Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below.
-font pango:FiraCode 8
+font pango: Dina 8
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -29,13 +29,14 @@ bindsym $mod+q kill
 # Use rofi as app launcher
 set $rofi_ops  -case-sensitive -fuzzy -lines 15 \
                -terminal urxvt -font "Iosevka 13"
-bindsym $mod+space exec --no-startup-id rofi $rofi_ops -show run
+set $exec-rofi exec --no-startup-id rofi $rofi_ops
 
-# Rofi personal mode
+## Normal mode
+bindsym $mod+space $exec-rofi -show run
 ## laptop mode
-bindsym $mod+m exec --no-startup-id rofi $rofi_ops -show lmode:~/.i3/set-laptop-mode.sh
+bindsym $mod+m $exec-rofi -show lmode:~/.i3/set-laptop-mode.sh
 ## web
-bindsym $mod+w exec --no-startup-id rofi $rofi_ops -show web:~/.i3/web-rofi.sh
+bindsym $mod+w $exec-rofi -show web:~/.i3/web-rofi.sh
 
 # change focus
 bindsym $mod+h focus left
@@ -74,7 +75,7 @@ bindsym $mod+Shift+q focus parent
 # to display names or symbols instead of plain workspace numbers you can use
 # something like: set $ws1 1:mail
 #                 set $ws2 2:⚓
-set $ws1 1:⚓
+set $ws1 1
 set $ws2 2
 set $ws3 3
 set $ws4 4
@@ -179,8 +180,8 @@ set $CLUL       #4a2f59
 
 # class                 border  backgr. text
 client.focused          $CUL    $CUL    $CLYELLOW
-client.focused_inactive $CBLACK $CBLACK $CYELLOW
-client.unfocused        $CBLACK $CBLACK $CYELLOW
+client.focused_inactive $CBLACK $CBLACK $CLYELLOW
+client.unfocused        $CBLACK $CBLACK $CLYELLOW
 client.urgent           $CLRED  $CLRED  $CLYELLOW
 client.background       $CBLACK
 

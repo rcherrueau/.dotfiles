@@ -1,24 +1,28 @@
 # https://github.com/greshake/i3status-rust/blob/2dc958995834b529a245c22c510b57d5c928c747/src/themes.rs
 [theme]
-name = "gruvbox-dark"
+name = "plain"
+# Zenburn, except the idle_bg/fg which are dark-black and yellow,
+# according to my i3 conf
 [theme.overrides]
-idle_bg = "#0f0f0f"
-separator = "|"
+idle_bg = "#0f0f0f"        # Dark black
+idle_fg = "#f0dfaf"        # Yellow
+info_bg = "#6b3654"        # Purple
+info_fg = "#f0dfaf"
+good_bg = "#7f9f7f"        # Green
+good_fg = "#f0dfaf"
+warning_bg = "#f0dfaf"     # Yellow
+warning_fg = "#0f0f0f"
+critical_bg = "#cc9393"    # Red
+critical_fg = "#f0dfaf"
+alternating_tint_bg = "#000000"
+alternating_tint_fg = "#000000"
+separator = "  "
 separator_bg = "#0f0f0f"
-separator_fg = "#ebdbb2"
+separator_fg = "#f0dfaf"
 
 # https://github.com/greshake/i3status-rust/blob/2dc958995834b529a245c22c510b57d5c928c747/src/icons.rs#L4
 [icons]
-name = "none"
-[icons.overrides]
-bat = " ⚡ "
-bat_full = "" # Collapse when fully charged
-bat_charging = " ⚡ "
-bat_discharging = " ⚡ "
-volume_full = " ♪ "
-volume_half = " ♪ "
-volume_empty = " ♪ "
-volume_muted = " --"
+name = "awesome"
 
 [[block]]
 block = "disk_space"
