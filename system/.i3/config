@@ -33,6 +33,7 @@ set $exec-rofi exec --no-startup-id rofi $rofi_ops
 
 ## Normal mode
 bindsym $mod+space $exec-rofi -show run
+bindsym $mod+Shift+space split v; $exec-rofi -show run
 ## laptop mode
 bindsym $mod+m $exec-rofi -show lmode:~/.i3/set-laptop-mode.sh
 ## web
