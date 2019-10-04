@@ -8,7 +8,15 @@
     ];
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "usb_storage" "sd_mod" "rtsx_pci_sdmmc" ];
+  # Module `kvm-intel` for virtualization with libvirtd/kvm. Load it
+  # with the `nested=1` option to enable nested kvm (i.e., kvm VM in a
+  # kvm VM). As a result, the following command should output Y:
+  # > cat /sys/module/kvm_intel/parameters/nested
+  # > Y
+  # Add pci-stub and iommu for GPU passthrough, see
+  # https://github.com/domenkozar/snabb-openstack-testing/tree/6310879eeb2b3b417dbe0e3b0ea5cd9f84aaa311
   boot.kernelModules = [ "kvm-intel" ];
+  boot.extraModprobeConfig = "options kvm_intel nested=1";
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
@@ -163,13 +171,10 @@
   # hardware.pulseaudio.enable = true;
 
   # Enable virtualization
-  virtualisation.virtualbox.host = {
+  virtualisation.libvirtd = {
     enable = true;
-    # Remove GUI and Qt dependency. I use VirtualBox through vagrant.
-    headless = true;
-    # `enableExtensionPack` requires to compile VirtualBox extension
-    # pack, but it takes way too long.
-    # enableExtensionPack = true;
+    onBoot = "ignore"; # Do not automatically start vms on boot
   };
-  users.extraGroups.vboxusers.members = [ "rfish" ];
+  users.extraGroups.libvirtd.members = [ "rfish" ];
+
 }
