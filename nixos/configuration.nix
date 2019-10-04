@@ -88,7 +88,7 @@
   # See, http://beyermatthias.de/blog/2015/11/27/nixos-on-unstable---how-to-fix-a-broken-nixos-rebuild/
   environment.systemPackages = with pkgs; [
     # system
-    dnsutils ncat # dig
+    dnsutils mtr ncat traceroute # dig
     nixUnstable # nix repl, nix run, ...
     aria stow htop unzip unrar gnupg tree
     ranger w3m xsel # w3m to display images, xsel to copy file name with `yd`
@@ -221,8 +221,6 @@
     # bash.promptInit = "PS1=\"# \"";
     bash.enableCompletion = true;
 
-    mtr.enable = true; # traceroute + ping
-
     tmux = {
       enable = true;
       clock24 = true;
@@ -340,16 +338,16 @@
     mediaKeys.enable = false; # Managed by i3
   };
 
+  # Enable the OpenSSH daemon.
+  services.openssh.enable = true;
+  programs.ssh.startAgent = true;
+
   # Enable redshift daemon.
   # $ systemctl --user status redshift.service
   services.redshift = {
     enable = true;
     latitude = "47.216542"; longitude = "1.553005"; # Nantes
   };
-
-  # Enable the OpenSSH daemon.
-  services.openssh.enable = true;
-  programs.ssh.startAgent = true;
 
   # Enable Unbound DNS and set it as DNS in resolv.conf. For
   # resolv.conf/nameservers see also nix
