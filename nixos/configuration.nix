@@ -88,9 +88,9 @@
   # See, http://beyermatthias.de/blog/2015/11/27/nixos-on-unstable---how-to-fix-a-broken-nixos-rebuild/
   environment.systemPackages = with pkgs; [
     # system
-    dnsutils mtr ncat traceroute # dig
+    dnsutils mtr ncat traceroute tcpdump # dig
     nixUnstable # nix repl, nix run, ...
-    aria stow htop unzip unrar gnupg tree
+    aria stow htop unzip unrar tree
     ranger w3m xsel # w3m to display images, xsel to copy file name with `yd`
     usbutils # lsusb
     vagrant
@@ -220,6 +220,11 @@
     # Fix for emacs ssh https://github.com/NixOS/nix/issues/644
     # bash.promptInit = "PS1=\"# \"";
     bash.enableCompletion = true;
+
+    gnupg.agent = {
+      enable = true;
+      pinentryFlavor = "curses"; 
+    };
 
     tmux = {
       enable = true;
