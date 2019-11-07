@@ -177,4 +177,13 @@
   };
   users.extraGroups.libvirtd.members = [ "rfish" ];
 
+  # virtualisation.virtualbox.host = {
+  #   enable = true;
+  #   # Remove GUI and Qt dependency. I use VirtualBox through vagrant.
+  #   headless = true;
+  #   # `enableExtensionPack` requires to compile VirtualBox extension
+  #   # pack, but it takes way too long.
+  #   # enableExtensionPack = true;
+  # };
+  # users.extraGroups.vboxusers.members = [ "rfish" ];
 }
