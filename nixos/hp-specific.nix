@@ -154,10 +154,8 @@
     desktopManager.wallpaper.combineScreens = false;
 
     displayManager = {
-      slim = {
-        # LUKS secures My HP boot, so I can safely enable `autoLogin`.
-        autoLogin = true;
-      };
+      # LUKS secures My HP boot, so I can safely enable `autoLogin`.
+      lightdm.autoLogin.enable = true;
 
       #  Cmds run at start of the session.
       sessionCommands = ''
