@@ -223,7 +223,7 @@
 
     gnupg.agent = {
       enable = true;
-      pinentryFlavor = "curses"; 
+      pinentryFlavor = "curses";
     };
 
     tmux = {
@@ -355,6 +355,8 @@
   # networking.networkmanager.appendNameservers and
   # networking.networkmanager.insertNameservers
   services.unbound = {
+    # Enabling ubound automatically set:
+    # networking.nameservers to [ "127.0.0.1" ];
     enable = true;
     # forward remaining requests to https://dns.watch/
     forwardAddresses = [
@@ -365,8 +367,12 @@
     ];
 
   };
-  # networking.nameservers = [ "84.200.69.80" "84.200.70.40" ];
-  networking.nameservers = [ "127.0.0.1" ];
+  # This is not take into account if `unbound.enable = true;`
+  networking.nameservers = [ 
+      "84.200.69.80" "84.200.70.40" # dns.watch
+      "2001:1608:10:25::1c04:b12f" "2001:1608:10:25::9249:d69b"
+      "9.9.9.9" "149.112.112.112"   # quad9.net
+      "2620:fe::fe" "2620:fe::9" ];
 
   # Enable virtualization
   virtualisation.docker = {
