@@ -47,11 +47,6 @@ termcolors(){
   echo
 }
 
-# gitignore.io
-# Create useful .gitignore files for your project
-# gi linux,osx,idris
-function gi() { curl -L -s https://www.gitignore.io/api/$@ ;}
-
 # Find an article based on its title
 function fp() {
   KEY="*$1*"

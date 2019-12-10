@@ -59,14 +59,14 @@
   };
 
   # My account. Don't forget to set a password with ‘passwd’.
-  users.extraUsers.rfish = {
+  users.users.rfish = {
     createHome = true;
     home = "/home/rfish";
     extraGroups = [ "wheel" "video" ];
     useDefaultShell = true;
     uid = 1000;
-    shell = "${pkgs.zsh}/bin/zsh";
   };
+  users.defaultUserShell = pkgs.zsh;
 
   # Environment variables
   # environment.variables.EDITOR = "emacsclient -c -a \"\"";
@@ -235,6 +235,7 @@
       newSession = true;
     };
 
+    # Find the generated zshrc in /etc/static/zshrc
     zsh = {
       enable = true;
       interactiveShellInit = ''
@@ -264,7 +265,7 @@
       ohMyZsh = {
         enable = true;
         theme = "norm";
-        plugins = [ "git" ];
+        plugins = [ "git" "gitignore" ];
       };
     };
   };
@@ -378,7 +379,7 @@
 
   };
   # This is not take into account if `unbound.enable = true;`
-  networking.nameservers = [ 
+  networking.nameservers = [
       "84.200.69.80" "84.200.70.40" # dns.watch
       "2001:1608:10:25::1c04:b12f" "2001:1608:10:25::9249:d69b"
       "9.9.9.9" "149.112.112.112"   # quad9.net
