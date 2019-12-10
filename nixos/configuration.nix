@@ -256,6 +256,16 @@
         p = "xdg-open-background"; r = "ranger"; ns = "nix-shell";
         # emacs="emacsclient -c -a \"\""; # Start daemon or connect to it
       };
+
+      autosuggestions = {
+        enable = true;
+      };
+
+      ohMyZsh = {
+        enable = true;
+        theme = "norm";
+        plugins = [ "git" ];
+      };
     };
   };
 
