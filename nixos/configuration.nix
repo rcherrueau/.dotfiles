@@ -235,24 +235,27 @@
       newSession = true;
     };
 
-    # Find the generated zshrc in /etc/static/zshrc
     zsh = {
       enable = true;
-      loginShellInit = ''
-        # ctrl-p/n to move up/down a line in the buffer, or if already at
-        # the top/bottom line, search back/forward in the history for a line
-        # beginning with the first word in the buffer.
-        # http://zsh.sourceforge.net/Doc/Release/Zsh-Line-Editor.html#Zsh-Line-Editor
-        #
-        # Do a `cat -v` and press the key (e.g., ctrl-p) to find the
-        # key value (e.g., ^P).
-        bindkey '^P' up-line-or-search
-        bindkey '^N' down-line-or-search
-      '';
+      # # Find the generated zprofile in /etc/static/zprofile
+      # loginShellInit = ''
+      # '';
 
+      # Find the generated zshrc in /etc/static/zshrc
       interactiveShellInit = ''
         # Some utils functions
         . /etc/nixos/functions.sh
+
+        # ctrl-p/n to move up/down a line in the buffer, or if already at
+        # the top/bottom line, search back/forward in the history for a line
+        # beginning with the first word in the buffer.
+        #
+        # > man zshzle  # seek for `up-line`
+        #
+        # Do a `cat -v` and press the key (e.g., ctrl-p) to find the
+        # key value (e.g., ^P).
+        bindkey -e '^P' up-line-or-search
+        bindkey -e '^N' down-line-or-search
 
         # # TMUX
         # # https://wiki.archlinux.org/index.php/Tmux#Start_tmux_on_every_shell_login
@@ -261,6 +264,7 @@
         #   test -z "$TMUX" && (tmux attach || tmux new-session)
         # fi
       '';
+
       shellAliases = {
         l = "ls -alh"; ll = "ls -l"; ls = "ls --color=tty";
         fu  = "sudo $(fc -ln -1 -1)";
