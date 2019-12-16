@@ -88,6 +88,7 @@
   #   wantedBy = [ "suspend.target" ];
   # };
 
+  hardware.opengl.extraPackages = with pkgs; [ vaapiIntel vaapiVdpau ];
   services.xserver = {
     videoDrivers = [ "nvidia" ];
 
