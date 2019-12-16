@@ -61,6 +61,9 @@ bindsym $mod+minus split v
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
 
+# Disable standby (DPMS) and screensaver when a widow is fullscreen.
+exec_always --no-startup-id i3-disable-dpms
+
 # change container layout (stacked, tabbed, toggle split)
 bindsym $mod+s layout stacking
 bindsym $mod+z layout tabbed

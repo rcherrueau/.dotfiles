@@ -97,9 +97,9 @@
 
     # windowing
     xlibs.libXft
-    i3status-rust rofi
+    # i3status-rust rofi
+
     dunst # The lightweight notification-daemon
-    # XXX 2019-03-01: elementary-icon-theme
 
     # soft
     firefox chromium
@@ -294,8 +294,53 @@
     enable = true;
     desktopManager.xterm.enable = false;
     desktopManager.default = "none";
-    windowManager.i3.enable = true;
-    windowManager.default = "i3";
+    windowManager = {
+      i3.enable = true;
+      i3.extraPackages = with pkgs; [
+        i3lock i3status-rust rofi
+        # Disable standby (DPMS) and screensaver when a window is
+        # fullscreen.
+        # https://faq.i3wm.org/question/4217/how-to-disable-screensavermonitor-standby-when-fullscreen.1.html
+        # https://github.com/altdesktop/i3ipc-python/blob/master/examples/disable-standby-fs.py
+        # https://github.com/NixOS/nixpkgs/blob/c34ba30888a60065f3de99037625019a5a7d1227/pkgs/applications/window-managers/i3/wk-switch.nix
+        (let i3-disable-dpms = {stdenv, fetchFromGitHub, python3Packages, xset}:
+               # with pkgs.stdenv.lib;
+               python3Packages.buildPythonApplication rec {
+                 pname = "i3-disable-dpms";
+                 version = "2019-12-16";
+
+                 src = fetchFromGitHub {
+                   owner = "altdesktop";
+                   repo = "i3ipc-python";
+                   rev = "13d6e3c8f190381cce5ed38545ac0fd4c365f00c";
+                   sha256 = "1g56faigwhmx00v3wya0npg53b6pcivl7cfyijmwzlx55arikqk7";
+                 };
+
+                 propagatedBuildInputs = with python3Packages; [ i3ipc ];
+                 dontBuild = true;
+                 doCheck = false;
+
+                 installPhase = ''
+                   mkdir -p "$out/bin"
+                   cp examples/disable-standby-fs.py "$out/bin/${pname}"
+                   chmod a+x "$out/bin/${pname}"
+                 '';
+
+                 meta = with stdenv.lib; {
+                   homepage = https://github.com/altdesktop/i3ipc-python;
+                   description = "Script to disable DPMS from the i3ipc-python library";
+                   license = licenses.bsd3;
+                 };
+               };
+         in i3-disable-dpms {
+           stdenv = pkgs.stdenv;
+           fetchFromGitHub = pkgs.fetchFromGitHub;
+           python3Packages = pkgs.python3Packages;
+           xset = pkgs.xset;
+         })
+      ];
+      default = "i3";
+    };
     displayManager = {
       lightdm = {
         enable = true;
