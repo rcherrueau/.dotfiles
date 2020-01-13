@@ -43,18 +43,15 @@
       iosevka             # Font for programming
       fira                # Font of Firefox OS
       fira-code           # Fira Mono + programming ligatures
-      # -- Bitmap fonts
-      dina-font
-      siji                # Iconic font
       # -- Misc
       font-awesome        # Social logo
     ];
 
     fontconfig.defaultFonts = {
-      monospace = [ "Iosevka" "Fira Code" "Dina" "DejaVu Sans Mono" ];
+      monospace = [ "Iosevka" "Fira Code" "DejaVu Sans Mono" ];
       sansSerif = [ "Fira Sans" "DejaVu Sans" ];
       serif = [ "Crimson" "DejaVu Serif" ];
-      emoji = [ "Noto Emoji" "Siji" ];
+      emoji = [ "Noto Emoji" ];
     };
   };
 
