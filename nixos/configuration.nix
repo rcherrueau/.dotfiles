@@ -17,11 +17,16 @@
 
   # Select internationalisation properties.
   i18n = {
-    consoleUseXkbConfig = true;
     defaultLocale = "en_US.UTF-8";
   };
 
-  # Set your time zone.
+  # Virtual console options
+  console = {
+    font = "";            # Use font of the system
+    useXkbConfig = true;  # Configure KeyMap from the xserver keyboard settings
+  };
+
+  # Set time zone and location
   time.timeZone = "CET";
 
   # Garbage collection
@@ -289,56 +294,14 @@
     # Enable the X11 windowing system.
     autorun = true;
     enable = true;
-    desktopManager.xterm.enable = false;
-    desktopManager.default = "none";
-    windowManager = {
-      i3.enable = true;
-      i3.extraPackages = with pkgs; [
-        i3lock i3status-rust rofi
-        # Disable standby (DPMS) and screensaver when a window is
-        # fullscreen.
-        # https://faq.i3wm.org/question/4217/how-to-disable-screensavermonitor-standby-when-fullscreen.1.html
-        # https://github.com/altdesktop/i3ipc-python/blob/master/examples/disable-standby-fs.py
-        # https://github.com/NixOS/nixpkgs/blob/c34ba30888a60065f3de99037625019a5a7d1227/pkgs/applications/window-managers/i3/wk-switch.nix
-        (let i3-disable-dpms = {stdenv, fetchFromGitHub, python3Packages, xset}:
-               # with pkgs.stdenv.lib;
-               python3Packages.buildPythonApplication rec {
-                 pname = "i3-disable-dpms";
-                 version = "2019-12-16";
 
-                 src = fetchFromGitHub {
-                   owner = "altdesktop";
-                   repo = "i3ipc-python";
-                   rev = "13d6e3c8f190381cce5ed38545ac0fd4c365f00c";
-                   sha256 = "1g56faigwhmx00v3wya0npg53b6pcivl7cfyijmwzlx55arikqk7";
-                 };
-
-                 propagatedBuildInputs = with python3Packages; [ i3ipc ];
-                 dontBuild = true;
-                 doCheck = false;
-
-                 installPhase = ''
-                   mkdir -p "$out/bin"
-                   cp examples/disable-standby-fs.py "$out/bin/${pname}"
-                   chmod a+x "$out/bin/${pname}"
-                 '';
-
-                 meta = with stdenv.lib; {
-                   homepage = https://github.com/altdesktop/i3ipc-python;
-                   description = "Script to disable DPMS from the i3ipc-python library";
-                   license = licenses.bsd3;
-                 };
-               };
-         in i3-disable-dpms {
-           stdenv = pkgs.stdenv;
-           fetchFromGitHub = pkgs.fetchFromGitHub;
-           python3Packages = pkgs.python3Packages;
-           xset = pkgs.xset;
-         })
-      ];
-      default = "i3";
-    };
     displayManager = {
+      # Session to pre-select in the session chooser (`none`
+      # desktopManager + `i3` windowManger)
+      defaultSession = "none+i3";
+
+
+      # LightDM as login manager
       lightdm = {
         enable = true;
         autoLogin.user = "rfish";
@@ -380,9 +343,59 @@
       sessionCommands = lib.mkBefore ''
         ${pkgs.xcape}/bin/xcape -e 'Shift_L=Escape'
         ${pkgs.xcape}/bin/xcape -e 'Control_L=Escape'
-        # ${pkgs.emacs}/bin/emacs --daemon
       '';
     };
+
+    desktopManager.xterm.enable = false;
+
+    windowManager = {
+      i3.enable = true;
+      i3.extraPackages = with pkgs; [
+        i3lock i3status-rust rofi
+        # Disable standby (DPMS) and screensaver when a window is
+        # fullscreen.
+        # https://faq.i3wm.org/question/4217/how-to-disable-screensavermonitor-standby-when-fullscreen.1.html
+        # https://github.com/altdesktop/i3ipc-python/blob/master/examples/disable-standby-fs.py
+        # https://github.com/NixOS/nixpkgs/blob/c34ba30888a60065f3de99037625019a5a7d1227/pkgs/applications/window-managers/i3/wk-switch.nix
+        (let i3-disable-dpms = {stdenv, fetchFromGitHub, python3Packages, xset}:
+               python3Packages.buildPythonApplication rec {
+                 pname = "i3-disable-dpms";
+                 version = "2019-12-16";
+
+                 src = fetchFromGitHub {
+                   owner = "altdesktop";
+                   repo = "i3ipc-python";
+                   rev = "13d6e3c8f190381cce5ed38545ac0fd4c365f00c";
+                   sha256 = "1g56faigwhmx00v3wya0npg53b6pcivl7cfyijmwzlx55arikqk7";
+                 };
+
+                 propagatedBuildInputs = with python3Packages; [ i3ipc ];
+                 dontBuild = true;
+                 doCheck = false;
+
+                 installPhase = ''
+                   mkdir -p "$out/bin"
+                   cp examples/disable-standby-fs.py "$out/bin/${pname}"
+                   chmod a+x "$out/bin/${pname}"
+                 '';
+
+                 meta = with stdenv.lib; {
+                   homepage = https://github.com/altdesktop/i3ipc-python;
+                   description = "Script to disable DPMS from the i3ipc-python library";
+                   license = licenses.bsd3;
+                 };
+               };
+         in i3-disable-dpms {
+           stdenv = pkgs.stdenv;
+           fetchFromGitHub = pkgs.fetchFromGitHub;
+           python3Packages = pkgs.python3Packages;
+           xset = pkgs.xset;
+         })
+      ];
+    };
+
+    # Symlink the X server configuration under /etx/X11/xorg.conf
+    exportConfiguration = true;
 
     # US international so that I can easily type accented letter with a qwerty keyboard
     layout = "us";

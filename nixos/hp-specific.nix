@@ -39,12 +39,19 @@
 
   # Localization of my encrypted partition
   # https://gist.github.com/martijnvermaat/76f2e24d0239470dd71050358b4d5134#file-nixos-md
-  boot.initrd.luks.devices = [{
-    name = "root";
-    device = "/dev/sda2";
+  #
+  # See https://github.com/NixOS/nixpkgs/pull/63103
+  # boot.initrd.luks.devices = [{
+  #   name = "root";
+  #   device = "/dev/disk/by-uuid/5da61310-74d9-4ff5-b8e6-7eb9150b20f0";
+  #   preLVM = true;
+  #   allowDiscards = true;
+  # }];
+  boot.initrd.luks.devices.root = {
+    device = "/dev/disk/by-uuid/5da61310-74d9-4ff5-b8e6-7eb9150b20f0";
     preLVM = true;
     allowDiscards = true;
-  }];
+  };
 
   # Use the systemd-boot EFI boot loader.
   boot.loader.systemd-boot.enable = true;
