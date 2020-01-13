@@ -29,6 +29,11 @@
   # Set time zone and location
   time.timeZone = "CET";
 
+  location = {
+    provider = "manual";
+    latitude = 47.216542; longitude = 1.553005; # Nantes
+  };
+
   # Garbage collection
   nix.gc = {
     automatic = true;
@@ -427,10 +432,7 @@
 
   # Enable redshift daemon.
   # $ systemctl --user status redshift.service
-  services.redshift = {
-    enable = true;
-    latitude = "47.216542"; longitude = "1.553005"; # Nantes
-  };
+  services.redshift.enable = true;
 
   # Enable Unbound DNS and set it as DNS in resolv.conf. For
   # resolv.conf/nameservers see also nix

@@ -15,9 +15,10 @@ self: super:
     withXwidgets = true;
   };
 
-  redshift = super.redshift.override {
-    # Get location with manual conf. Don't send geoloc with geoclue2
-    # > pkgs.redshift.configureFlags should output "--enable-geoclue2=no"
-    withGeolocation = false;
-  };
+  # # Fix by the `location` attribute in `configuration.nix`
+  # redshift = super.redshift.override {
+  #   # Get location with manual conf. Don't send geoloc with geoclue2
+  #   # > pkgs.redshift.configureFlags should output "--enable-geoclue2=no"
+  #   withGeolocation = false;
+  # };
 }
