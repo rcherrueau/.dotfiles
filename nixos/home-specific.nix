@@ -41,6 +41,7 @@
 
   # Define your hostname.
   networking.hostName = "home-rfish";
+
   # Make the firewall unblock packet for syncthing (22000). Blocked
   # packets in dmesg/journalctl look like this:
   #
@@ -53,6 +54,16 @@
   #
   # https://nixos.org/nixos/manual/index.html#sec-firewall
   networking.firewall.allowedTCPPorts = [ 22000 ];
+
+  # Connect to my pi-hole
+  #
+  # A merge is not possible between `unbound.enable = true` from
+  # configuration.nix and the following `unbound.enable = false`. The
+  # `mkForce` ensures that the disabling of `unbound` takes precedence
+  # over the definition in configuration.nix.
+  # https://nixos.org/nixos/manual/#sec-modularity
+  services.unbound.enable = lib.mkForce false;
+  networking.nameservers = [ "192.168.1.253" ];
 
   environment.systemPackages = with pkgs; [
     # bluez
