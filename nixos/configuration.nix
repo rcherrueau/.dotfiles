@@ -87,7 +87,9 @@
   # - https://blog.flyingcircus.io/2017/11/07/nixos-the-dos-and-donts-of-nixpkgs-overlays/
   nixpkgs.overlays = [ (import ./overlays.nix) ];
 
-  # List packages installed in system profile. To search by name, run:
+  # My tools of the trade.
+  #
+  # Packages installed in system profile. To search by name, run:
   # ~$ nix search -u <<name>>
   # To test it:
   # ~$ nix run nixpkgs.<<name>> -c <<name>>
@@ -104,7 +106,6 @@
 
     # windowing
     xlibs.libXft
-    # i3status-rust rofi
 
     dunst # The lightweight notification-daemon
 
@@ -120,7 +121,7 @@
     xorg.xbacklight # Decrease screen brightness
     xcape # Escape and Control on a single key
     xdotool # Script your mouse
-    zathura xournal # Pdf viewer + notetaking
+    zathura xournal pdfgrep # Pdf viewer + notetaking
 
     # development tools
     git
