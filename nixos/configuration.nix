@@ -127,7 +127,7 @@
     git
     emacs # (emacsWithPackages (epkgs: [epkgs.pdf-tools]))
     vim aspell aspellDicts.en aspellDicts.fr
-    silver-searcher
+    ripgrep
     zeal sqlite
 
    # # Put here the list of needed tex packages. scheme-* collection-*
