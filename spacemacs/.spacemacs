@@ -106,6 +106,11 @@ This function should only modify configuration layer settings."
    '(
      rainbow-mode
      zenburn-theme
+     ;; `:location' documentation
+     ;; https://github.com/syl20bnr/spacemacs/blob/f94fea920019feb18900b8f0aa4807d8da145a75/doc/LAYERS.org#packagesel
+     (ospl :location "~/.emacs.d/private/local/")
+     ;; `recipe' documentation
+     ;; https://github.com/melpa/melpa/tree/5f197baa4452e0bd3bac3fa6dc033a2c8a1ae228#recipe-format
      (lsp-haskell :location (recipe :fetcher github :repo "emacs-lsp/lsp-haskell"))
      (ob-racket :location (recipe :fetcher github :repo "DEADB17/ob-racket"))
      )
@@ -727,6 +732,11 @@ https://stackoverflow.com/a/14001190)."
     ;; Go with the Elab Monad
     (setq idris-enable-elab-prover t)
     (setq idris-simple-indent-mode nil))
+
+  ;; -- LaTeX
+  (with-eval-after-load 'tex-mode
+    (require 'ospl)
+    (add-hook 'latex-mode-hook #'turn-on-ospl))
 
   ;; -- Org
   (with-eval-after-load 'org
