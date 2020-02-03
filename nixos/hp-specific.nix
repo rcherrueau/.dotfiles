@@ -108,14 +108,6 @@
       autoStart = false;
       config = '' config /home/rfish/openvpn/freeboxVPN.ovpn '';
     };
-    # Access to Grid5000. Activate it with `sudo systemctl start
-    # openvpn-g5k`
-    g5k = {
-      autoStart = false;
-      config = '' config /home/rfish/openvpn/g5k/Grid5000_VPN.ovpn '';
-      # Update /etc/resolv.conf with g5k DNS
-      updateResolvConf = true;
-    };
   };
 
   # Enable CUPS to print documents.
