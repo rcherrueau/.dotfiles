@@ -55,10 +55,7 @@ This function should only modify configuration layer settings."
      javascript
      lua
      org
-     ;; FIXME: lsp use lsp-python-ms that required to be installed
-     ;; manually on my machine.
-     ;; https://github.com/emacs-lsp/lsp-python-ms
-     ;; (python :variables python-backend 'lsp)
+     (python :variables python-pipenv-activate t)
      racket
      (rust :variables
            rust-rls-cmd '("rustup" "run" "stable" "rls"))
