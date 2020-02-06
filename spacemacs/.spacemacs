@@ -731,9 +731,15 @@ https://stackoverflow.com/a/14001190)."
     (setq idris-simple-indent-mode nil))
 
   ;; -- LaTeX
+  ;;
+  ;; emacs automatically detects the mode of a ".tex" file from the
+  ;; macro into it. Sometimes it guesses the TeX-mode and other times
+  ;; LaTeX-mode. So, It's safer to put stuff in TeX-mode since
+  ;; LateX-mode inherits form it, and everything here will be loaded
+  ;; by both mode.
   (with-eval-after-load 'tex-mode
     (require 'ospl)
-    (add-hook 'latex-mode-hook #'turn-on-ospl))
+    (add-hook 'tex-mode-hook #'turn-on-ospl))
 
   ;; -- Org
   (with-eval-after-load 'org
