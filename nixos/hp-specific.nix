@@ -61,7 +61,8 @@
 
   # Specific packages for my laptop
   environment.systemPackages = with pkgs; [
-    rfkill # manage wifi device
+    rfkill  # Manage wifi device
+    feh     # For desktop wallpaper
   ];
 
   # Networking stuff
@@ -143,10 +144,13 @@
       tapButtons = false;
     };
 
-    # Wallpaper: Following are options for ${pkgs.feh}/bin/feh
-    # --bg-${destkopManager.wallpaper}
-    # ${desktopManager.combineScreens ? "" : "--no-xinerama"}
-    # $HOME/.background-image
+    # Wallpaper: Following are options for the commande
+    #
+    # > ${pkgs.feh}/bin/feh # --bg-${destkopManager.wallpaper} \
+    # >     ${desktopManager.combineScreens ? "" : "--no-xinerama"} \
+    # >     $HOME/.background-image
+    #
+    # https://github.com/NixOS/nixpkgs/blob/766b78841f2342e325e0d801c01ab9d652150a67/nixos/modules/services/x11/desktop-managers/default.nix#L76
     #
     # Find images on pexels.com
     desktopManager.wallpaper.mode = "fill";
