@@ -217,7 +217,8 @@ It should only modify the values of Spacemacs settings."
    ;; with `:variables' keyword (similar to layers). Check the editing styles
    ;; section of the documentation for details on available variables.
    ;; (default 'vim)
-   dotspacemacs-editing-style 'vim
+   dotspacemacs-editing-style '(vim :variables
+                                    vim-style-remap-Y-to-y$ t)
 
    ;; Specify the startup banner. Default value is `official', it displays
    ;; the official spacemacs logo. An integer value is the index of text
@@ -630,6 +631,9 @@ https://stackoverflow.com/a/14001190)."
   (setq-default default-fill-column 70)
   (setq-default fill-column default-fill-column)
 
+  ;; Set sentence delimiter to two spaces
+  (setq-default sentence-end-double-space t)
+
   ;; Stop truncate lines
   (add-hook 'text-mode-hook (lambda () (setq truncate-lines nil)))
 
@@ -652,7 +656,7 @@ https://stackoverflow.com/a/14001190)."
   (add-hook 'prog-mode-hook #'add-watchwords)
   (add-hook 'org-mode-hook #'add-watchwords)
 
-  ;; -- Dispalye formfeed `C-q C-l' as horizontal line.
+  ;; -- Display formfeed `C-q C-l' as horizontal line.
   (global-page-break-lines-mode t)
   (add-to-list 'page-break-lines-modes 'prog-mode)
   (add-to-list 'page-break-lines-modes 'text-mode)
