@@ -643,9 +643,15 @@ https://stackoverflow.com/a/14001190)."
   ;; Add a new line at the end of file
   (setq-default require-final-newline t)
 
-  ;; Highlight current line
-  (set-face-attribute 'hl-line nil :background "#4A2F59")
-  (set-face-attribute 'region nil :background "#6B3654")
+  ;; Change zenburn color a bit
+  (custom-theme-set-faces
+   'zenburn
+   ;; Highlight current line
+   '(hl-line ((t (:background "#4A2F59" :extend t)) (t :weight bold)) t)
+   '(region ((t (:background "#6B3654" :extend t)) (t :inverse-video t)) t)
+
+   ;; Change background color of block in org
+   '(org-block ((t (:background "zenburn-bg" :extend t))) t))
 
   ;; Highlight the following words in comments
   (defun add-watchwords ()
@@ -770,13 +776,6 @@ https://stackoverflow.com/a/14001190)."
     (setq org-todo-keyword-faces
           '(("FEEDBACK" . "orange")
             ("FAIR" . "orange")))
-
-    ;; Change the face of ~code~ that are too dark by default.
-    (when (eq spacemacs--cur-theme 'gruvbox-dark-soft)
-      (let ((code-color "#d5c4a1"))
-        (set-face-attribute 'org-block nil :foreground code-color)
-        (set-face-attribute 'org-verbatim nil :foreground code-color)
-        (set-face-attribute 'org-code nil :foreground code-color)))
 
     ;; Set the external pdf application to zathura
     (setcdr (assoc "\\.pdf\\'" org-file-apps) "zathura %s")
