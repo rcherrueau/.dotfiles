@@ -1,0 +1,3 @@
+# Compiled racket bytecode
+compiled/
+*.zo
