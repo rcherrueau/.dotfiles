@@ -130,6 +130,38 @@
     ripgrep
     zeal sqlite
 
+    # mattermost client + mattermost-ffox to get the token
+    matterhorn
+    (let mattermost-ffox = {pkgs}:
+        pkgs.stdenv.mkDerivation rec {
+          pname = "mattermost-session-cookie-firefox";
+          version = "2020-04-18";
+
+           src = pkgs.fetchFromGitHub {
+             owner = "ftilde";
+             repo = "mattermost-session-cookie-firefox";
+             rev = "84275f3725f2d4821d409243ca30b72b9e6c43a2";
+             sha256 = "1albqx9zrqffcnz4796cnjdc7yirn70xgfzicikahwblxw905bff";
+           };
+
+           buildInputs = with pkgs; [ curl firefox sqlite ];
+           dontBuild = true;
+
+           installPhase = ''
+                   mkdir -p "$out/bin"
+                   cp mattermost-session-cookie-firefox "$out/bin/${pname}"
+                   chmod a+x "$out/bin/${pname}"
+                 '';
+
+           meta = with pkgs.stdenv.lib; {
+             homepage = https://github.com/ftilde/mattermost-session-cookie-firefox;
+             description = "Obtain the session cookie from a mattermost webclient";
+             license = licenses.mit;  # See stdenv.lib.licenses
+           };
+         };
+   in mattermost-ffox {
+     pkgs = pkgs;
+   })
    # # Put here the list of needed tex packages. scheme-* collection-*
    # # are predefined sets of tex packages. You can find theme using
    # # nix-repl
