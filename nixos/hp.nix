@@ -161,16 +161,8 @@
     desktopManager.wallpaper.mode = "fill";
     desktopManager.wallpaper.combineScreens = false;
 
-    displayManager = {
-      # LUKS secures My HP boot, so I can safely enable `autoLogin`.
-      lightdm.autoLogin.enable = true;
-
-      #  Cmds run at start of the session.
-      sessionCommands = ''
-        # xrandr --dpi 144 --output eDP1 --auto --output DP1-1 --auto --scale 1.35x1.35 --right-of eDP1
-        xrandr --output DP1-2 --auto --output DP1-1 --auto --right-of DP1-2
-    '';
-    };
+    # LUKS secures My HP boot, so I can safely enable `autoLogin`.
+    displayManager.lightdm.autoLogin.enable = true;
   };
 
   # Use pusleaudio to easily switch between hdmi/display port/analog audio output
