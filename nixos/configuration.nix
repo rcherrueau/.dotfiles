@@ -122,98 +122,84 @@
     xdotool # Script your mouse
     zathura xournal pdfgrep # Pdf viewer + notetaking
 
+    # mattermost CLI
+    matterhorn
+    # Notification and token fetcher for authentication
+    #
+    # I could handle the notification in an overlay, as following, but
+    # this would rebuild matterhorn which takes forever. So, I prefer
+    # the next solution
+    #
+    # > matterhorn = self.haskell.lib.overrideCabal super.matterhorn (old:
+    # >   {
+    # >     # buildInput = old.matterhorn.buildInput ++ [ self.libnotify];
+    # >     postInstall = (old.postInstall or "") + ''
+    # >       cp notification-scripts/notify $out/matterhorn-notify
+    # >     '';
+    # >   });
+    #
+    # See,
+    # https://nixos.org/nixpkgs/manual/#chap-trivial-builders
+    # https://nixos.org/nixpkgs/manual/#ssec-stdenv-functions
+    (let
+      matterhorn-notify-src = fetchurl {
+        url = "${pkgs.matterhorn.meta.homepage}-${pkgs.matterhorn.version}/src/notification-scripts/notify";
+        sha256 = "1ich5vrpn8lzzqykabqds181rhl5mnnjphbvj92yb0b38yd9qzr3";
+      };
+      mattermost-ffox-token = pkgs.fetchFromGitHub {
+        owner = "ftilde";
+        repo = "mattermost-session-cookie-firefox";
+        rev = "606c3d8728bb532bedab03e648151beec52b98f8";
+        sha256 = "10bcia9ghxlhcan0f77gr8gzq83b5ix9hgyjb0wz3ylmlds99lrb";
+      };
+    in (runCommand "matterhorn-extra" {
+      buildInputs = with pkgs; [
+        libnotify            # Deps for notification script
+        curl firefox sqlite  # Deps for token handling
+      ];
+    } ''
+      OUTPUT="$out/share/matterhorn"
+      mkdir -p "$OUTPUT"
+
+      substitute ${matterhorn-notify-src} "$OUTPUT/matterhorn-notify" \
+           --replace 'notify-send' '${libnotify}/bin/notify-send'
+      substitute ${mattermost-ffox-token}/mattermost-session-cookie-firefox \
+           "$OUTPUT/matterhorn-token" \
+           --replace 'sqlite3' '${sqlite}/bin/sqlite3' \
+           --replace 'curl' '${curl}/bin/curl'
+
+      chmod +x "$OUTPUT/matterhorn-notify"
+      chmod +x "$OUTPUT/matterhorn-token"
+    ''))
+
     # development tools
     git
     emacs # (emacsWithPackages (epkgs: [epkgs.pdf-tools]))
+    # See https://nixos.wiki/wiki/Vim
+    (vim_configurable.customize{
+		  name = "vim";
+		  vimrcConfig.packages.myplugins = with pkgs.vimPlugins; {
+        # Loaded on launch
+		    start = [ vim-nix nord-vim ];
+        # Manually loadable by calling `:packadd $plugin-name`
+		    opt = [];
+		  };
+		  vimrcConfig.customRC = ''
+                    colorscheme nord
+                    function! FoldPageFeed()
+                      setl foldmethod=expr
+                      setl foldexpr=getline(v:lnum)[0]==\"\\<c-l>\"
+                      setl foldminlines=0
+                      setl foldtext='---\ new\ page\ '
+                      setl foldlevel=0
+                      set foldclose=all
+                  endfunction
+		  '';
+		  }
+		)
     vim aspell aspellDicts.en aspellDicts.fr
     ripgrep
     zeal sqlite
-
-    # mattermost CLI
-    matterhorn
-    (let mattermost-ffox = {pkgs}:
-        pkgs.stdenv.mkDerivation rec {
-          pname = "mattermost-session-cookie-firefox";
-          version = "2020-04-18";
-
-           src = pkgs.fetchFromGitHub {
-             owner = "ftilde";
-             repo = "mattermost-session-cookie-firefox";
-             rev = "84275f3725f2d4821d409243ca30b72b9e6c43a2";
-             sha256 = "1albqx9zrqffcnz4796cnjdc7yirn70xgfzicikahwblxw905bff";
-           };
-
-           buildInputs = with pkgs; [ curl firefox sqlite ];
-           dontBuild = true;
-
-           installPhase = ''
-                   mkdir -p "$out/bin"
-                   cp mattermost-session-cookie-firefox "$out/bin/${pname}"
-                   chmod a+x "$out/bin/${pname}"
-                 '';
-
-           meta = with pkgs.stdenv.lib; {
-             homepage = https://github.com/ftilde/mattermost-session-cookie-firefox;
-             description = "Obtain the session cookie from a mattermost webclient";
-             license = licenses.mit;  # See stdenv.lib.licenses
-           };
-         };
-   in mattermost-ffox {
-     pkgs = pkgs;
-   })
-   # # Put here the list of needed tex packages. scheme-* collection-*
-   # # are predefined sets of tex packages. You can find theme using
-   # # nix-repl
-   # # nix-repl> :l <nixpkgs>
-   # # nix-repl> pkgs.texlive.coll<tab>
-   # # You can also put the name of a package directly, e.g.,
-   # # `moderncv`, find them with `nix-repl>
-   # # pkgs.textlive.<the-package>`.
-   # # see https://nixos.org/wiki/TexLive_HOWTO#New_TexLive_Infrastructure
-   # # Use parentheses to force the evaluation of the `combine`
-   # # function and compute the new texlive derivation
-   # (texlive.combine {
-   #   inherit (texlive)
-   #   # some tests: collection-basic ⊂ scheme-basic
-   #   # nix-repl> :a lib
-   #   # let scheme-basic = pkgs.texlive.scheme-basic.pkgs; in
-   #   # let coll-basic = pkgs.texlive.collection-basic.pkgs; in
-   #   # lib.filter (c: !lib.elem c scheme-basic) coll-basic
-   #   # > [ ]
-   #   #
-   #   # This function test if a certain pakcage is contains inside a
-   #   # collection, based on it's name. Find the doc of lib under
-   #   # https://github.com/NixOS/nixpkgs/tree/master/lib
-   #   #
-   #   # let hasPackage = pkgName: pkgDerivation:
-   #   #     let pkgNames = map (v: if (pkgs.lib.hasAttr "name" v)
-   #   #                            then (pkgs.lib.getAttr "name" v)
-   #   #                            else "") pkgDerivation;
-   #   #     in pkgs.lib.lists.elem pkgName pkgNames;
-   #   # in (hasPackage "texlive-ulem-2015" pkgs.texlive.ulem.pkgs)
-   #   # > true
-   #   # and to find the name
-   #   # > pkgs.lib.getAttr "name" (pkgs.lib.head pkgs.texlive.bera.pkgs)
-   #   scheme-small
-   #   collection-latex collection-latexextra collection-langfrench
-   #   # bera is for my thesis only, see if I cannot remove
-   #   # it and put-it inside an nix-shell
-   #   luatex collection-luatex bera
-   #   # courier font is required by IEEETran (pcrr8t)
-   #   courier
-   #   # cm-super required by [T1]{fontspec}
-   #   cm-super
-   #   # dvipng required by org-mode to compute preview images of latex
-   #   # formulas
-   #   dvipng
-   #   # provides \includesvg
-   #   svg
-   #   # Required by IEEEtran.cls
-   #   # collection-fontsrecommended
-   #   # Required by adt-inria-hub
-   #   rsfs
-   #   latexmk ;
-   # }) bibtex2html
 
     # language
     racket
