@@ -56,19 +56,6 @@
   # Define your hostname.
   networking.hostName = "home-rfish";
 
-  # Make the firewall unblock packet for syncthing (22000). Blocked
-  # packets in dmesg/journalctl look like this:
-  #
-  # `rejected connection: IN=wlp2s0 OUT=
-  # MAC=b8:8a:60:a6:bc:dd:d4:3d:7e:19:40:c4:86:dd
-  # SRC=2a01:0e35:8a34:fa80:d63d:7eff:fe19:40c4
-  # DST=2a01:0e35:8a34:fa80:bd34:49c2:56c9:3972 LEN=80 TC=0
-  # HOPLIMIT=64 FLOWLBL=750773 PROTO=TCP SPT=42252 DPT=8888
-  # WINDOW=28400 RES=0x00 SYN URGP=0`
-  #
-  # https://nixos.org/nixos/manual/index.html#sec-firewall
-  networking.firewall.allowedTCPPorts = [ 22000 ];
-
   # Connect to my pi-hole
   #
   # A merge is not possible between `unbound.enable = true` from

@@ -4,11 +4,9 @@
   services.syncthing = {
 
     enable = true;
-
-    openDefaultPorts = true;
-
     user = "rfish";
     configDir = "${config.users.users.rfish.home}/.config/syncthing";
+    openDefaultPorts = true;
 
     declarative.devices = {
       home = { id = "6IWZNUJ-S3TO23F-SHT6UGV-MFX3U5O-S5DNPT2-MEEWFVN-ZUPFIPG-YMAKFAI"; };
@@ -22,11 +20,10 @@
         id = "secret";
         devices = [ "home" "hp" "jolla" "donatello" ];
       };
-      # "${config.users.users.rfish.home}/Sync" = {
-      #   enable = false;
-      #   id = "default";
-      #   devices = [ "home" "hp" "jolla" ];
-      # };
+      "${config.users.users.rfish.home}/Sync" = {
+        id = "default";
+        devices = [ "home" "hp" "donatello" ];
+      };
     };
   };
 }

@@ -6,6 +6,7 @@
 {
   imports = [
     ./cachix.nix
+    ./modules/syncthing.nix
   ];
 
   # Minimum swappiness without disabling it entirely (preserve ssd)
