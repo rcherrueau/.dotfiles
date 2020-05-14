@@ -1,5 +1,5 @@
 !General config
-!Xft*dpi:                      144
+! Xft*dpi:                      144
 Xft*autohint:                 false
 Xft*lcdfilter:                lcddefault
 Xft*hintstyle:                hintfull
@@ -70,7 +70,7 @@ Xft*rgba:                     rgb
 ! override colors
 i3wm*foreground:  nord0320
 
-! 000----------------------------------------------------------------- urxvt
+! -------------------------------------------------------------------- urxvt
 ! `man urxvt` for the customization
 ! source https://gist.github.com/cqpx/1436584
 URxvt*depth:                  32
@@ -99,10 +99,11 @@ URxvt*cursorColor:            nord08
 ! URxvt*colorUL:                nord08
 URxvt*underlineColor:         nord13
 
-! Extensions:
+! Extensions: `matcher` for url matching
 URxvt*perl-ext-common:        default,matcher
 URxvt*url-launcher:           firefox
-URxvt*matcher.button:         2 ! open url with button 2 of the mouse
+! open url with button 2 of the mouse
+URxvt*matcher.button:         2  
 
 ! -------------------------------------------------------------------- Rofi
 ! $ man rofi
