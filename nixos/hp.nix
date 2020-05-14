@@ -7,10 +7,10 @@
 
 {
   # -------------------------------------------------- Hardware configuration
-  imports =
-    [ <nixpkgs/nixos/modules/installer/scan/not-detected.nix>
-      ./desktop-configuration.nix
-    ];
+  imports = [ 
+    <nixpkgs/nixos/modules/installer/scan/not-detected.nix>
+    ./desktop-configuration.nix
+  ];
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "usb_storage" "sd_mod" "rtsx_pci_sdmmc" ];
   # Module `kvm-intel` for virtualization with libvirtd/kvm. Load it
@@ -24,21 +24,19 @@
   boot.extraModprobeConfig = "options kvm_intel nested=1";
   boot.extraModulePackages = [ ];
 
-  fileSystems."/" =
-    { device = "/dev/disk/by-uuid/8a50958b-bff3-421a-968e-42903b15a28a";
-      fsType = "ext4";
-      # Supposedly better for SSD
-      options = [ "noatime" "nodiratime" "discard" ];
-    };
+  fileSystems."/" = { 
+    device = "/dev/disk/by-uuid/8a50958b-bff3-421a-968e-42903b15a28a";
+    fsType = "ext4";
+    # Supposedly better for SSD
+    options = [ "noatime" "nodiratime" "discard" ];
+  };
 
-  fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/0E92-DE8F";
-      fsType = "vfat";
-    };
+  fileSystems."/boot" = { 
+    device = "/dev/disk/by-uuid/0E92-DE8F";
+    fsType = "vfat";
+  };
 
-  swapDevices =
-    [ { device = "/dev/disk/by-uuid/f1315023-2d2c-4e08-964c-46731da945ba"; }
-    ];
+  swapDevices = [ { device = "/dev/disk/by-uuid/f1315023-2d2c-4e08-964c-46731da945ba"; } ];
 
   nix.maxJobs = lib.mkDefault 16;
 
