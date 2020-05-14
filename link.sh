@@ -9,11 +9,11 @@
 # Link `specific.nix` file
 case "$1" in
   home)
-    ln -v -frs nixos/home-specific.nix nixos/specific.nix
+    ln -v -frs nixos/home.nix nixos/configuration.nix
     ln -v -frs system/.i3/home-i3status-rs.toml system/.i3/i3status-rs.toml
     ;;
   hp)
-    ln -v -frs nixos/hp-specific.nix nixos/specific.nix
+    ln -v -frs nixos/hp.nix nixos/configuration.nix
     ln -v -frs system/.i3/hp-i3status-rs.toml system/.i3/i3status-rs.toml
     ;;
   *)
@@ -26,4 +26,4 @@ stow -v --target="$HOME" system
 stow -v --target="$HOME" git
 stow -v --target="$HOME" spacemacs
 
-sudo stow -v --ignore=".*-specific.nix" --target="/etc/nixos" nixos
+sudo stow -v --target="/etc/nixos" nixos

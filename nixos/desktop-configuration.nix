@@ -1,11 +1,12 @@
 # Edit this configuration file to define what should be installed on
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
-
 { config, options, lib, pkgs, ... }:
 
 {
-  imports = [./cachix.nix ./specific.nix];
+  imports = [
+    ./cachix.nix
+  ];
 
   # Minimum swappiness without disabling it entirely (preserve ssd)
   boot.kernel.sysctl = {
@@ -197,7 +198,7 @@
 		  '';
 		  }
 		)
-    vim aspell aspellDicts.en aspellDicts.fr
+    aspell aspellDicts.en aspellDicts.fr
     ripgrep
     zeal sqlite
 
@@ -350,21 +351,7 @@
       #     commands are run with user-interaction from keyboard. E.g. the
       #     shell can prompt the user to enter input.
       # - `~/.bashrc` :: The individual per-interactive-shell startup file
-      #
-      # The `mkBefore` ensures that this sessionCommands is read
-      # before the one redefined in specific.nix.
-      # https://nixos.org/nixos/manual/index.html#sec-modularity
-      #
-      # I can checks this by loading and reading the `config` argument
-      # that contains the complete, merged, system configuration.
-      #
-      # nix-repl> :l <nixpkgs/nixos> # this (1) loads the specific.nix
-      #                              # and current configuration.nix,
-      #                              # (2) merges value to form the
-      #                              # result of combining configuration
-      #                              # returned by every module
-      # nix-repl> :p config.services.xserver.displayManager.sessionCommands
-      sessionCommands = lib.mkBefore ''
+      sessionCommands = ''
         ${pkgs.xcape}/bin/xcape -e 'Shift_L=Escape'
         ${pkgs.xcape}/bin/xcape -e 'Control_L=Escape'
       '';

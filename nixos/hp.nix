@@ -1,10 +1,15 @@
-# On my hp laptop, symbolic link this file with `specific.nix`.
+# Edit this configuration file to define what should be installed on
+# your system.  Help is available in the configuration.nix(5) man page
+# and in the NixOS manual (accessible by running ‘nixos-help’).
+#
+# Symbolic link this file with `configuration.nix`.
 { config, lib, pkgs, ... }:
 
 {
   # -------------------------------------------------- Hardware configuration
   imports =
     [ <nixpkgs/nixos/modules/installer/scan/not-detected.nix>
+      ./desktop-configuration.nix
     ];
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "usb_storage" "sd_mod" "rtsx_pci_sdmmc" ];
