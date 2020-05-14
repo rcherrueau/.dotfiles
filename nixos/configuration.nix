@@ -106,7 +106,6 @@
 
     # windowing
     xlibs.libXft
-
     dunst # The lightweight notification-daemon
 
     # soft
@@ -116,7 +115,7 @@
     kpcli xclip # xclip is used by kpcli to copy pass to clipboard
     mpv # replacement of mplayer
     qtox
-    rxvt_unicode
+    rxvt-unicode-unwrapped
     syncthing
     xorg.xbacklight # Decrease screen brightness
     xcape # Escape and Control on a single key
@@ -130,7 +129,7 @@
     ripgrep
     zeal sqlite
 
-    # mattermost client + mattermost-ffox to get the token
+    # mattermost CLI
     matterhorn
     (let mattermost-ffox = {pkgs}:
         pkgs.stdenv.mkDerivation rec {
@@ -219,6 +218,7 @@
     # language
     racket
   ];
+  environment.pathsToLink = [ "/share/matterhorn" ];
 
   #---------------------------------------------------------------- Daemon
   # I have to investigate this a little bit more latter. I've got few
