@@ -103,6 +103,7 @@ This function should only modify configuration layer settings."
    '(
      rainbow-mode
      zenburn-theme
+     nord-theme
      ;; `:location' documentation
      ;; https://github.com/syl20bnr/spacemacs/blob/f94fea920019feb18900b8f0aa4807d8da145a75/doc/LAYERS.org#packagesel
      (ospl :location "~/.emacs.d/private/local/")
@@ -250,7 +251,8 @@ It should only modify the values of Spacemacs settings."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press `SPC T n' to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(zenburn
+   dotspacemacs-themes '(nord
+                         ;; zenburn
                          spacemacs-light)
 
    ;; TODO: Set the theme for the Spaceline. Supported themes are `spacemacs',
@@ -644,14 +646,14 @@ https://stackoverflow.com/a/14001190)."
   (setq-default require-final-newline t)
 
   ;; Change zenburn color a bit
-  (custom-theme-set-faces
-   'zenburn
-   ;; Highlight current line
-   '(hl-line ((t (:background "#4A2F59" :extend t)) (t :weight bold)) t)
-   '(region ((t (:background "#6B3654" :extend t)) (t :inverse-video t)) t)
-
-   ;; Change background color of block in org
-   '(org-block ((t (:background "zenburn-bg" :extend t))) t))
+  (when (custom-theme-p 'zenburn)
+    (custom-theme-set-faces
+     'zenburn
+     ;; Highlight current line
+     '(hl-line ((t (:background "#4A2F59" :extend t)) (t :weight bold)) t)
+     '(region ((t (:background "#6B3654" :extend t)) (t :inverse-video t)) t)
+     ;; Change background color of block in org
+     '(org-block ((t (:background "zenburn-bg" :extend t))) t)))
 
   ;; Highlight the following words in comments
   (defun add-watchwords ()

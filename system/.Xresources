@@ -7,7 +7,70 @@ Xft*hinting:                  true
 Xft*antialias:                true
 Xft*rgba:                     rgb
 
-! ----------------------------------------------------------------- Zenburn
+! ------------------------------------------------------------------ Colors
+
+! Nord colors
+! https://www.nordtheme.com/docs/colors-and-palettes
+#define nord00   #2e3440
+#define nord01   #3b4252
+#define nord02   #434c5e
+#define nord03   #4c566a
+#define nord04   #d8dee9
+#define nord05   #e5e9f0
+#define nord06   #eceff4
+#define nord07   #8fbcbb
+#define nord08   #88c0d0
+#define nord09   #81a1c1
+#define nord10   #5e81ac
+#define nord11   #bf616a
+#define nord12   #d08770
+#define nord13   #ebcb8b
+#define nord14   #a3be8c
+#define nord15   #b48ead
+
+! nord03 with 20% brightness
+#define nord0320 #7b88a1
+
+! Nord mapping to 16 ANSI colors
+!
+! Labels for the 16 ANSI colors are
+! 0: Black, 1: Red, 2: Green, 3: Yellow
+! 4: Blue, 5: Purple, 6: Cyan, 7: White
+! And then light variant from 8 to 15
+! 8: LBlack, 9: LRed, 10: LGreen, 11: LYellow,
+! 12: LBlue, 13: LPurple, 14: LCyan, 15: LWhite
+!
+! https://github.com/arcticicestudio/nord-xresources/blob/5a409ca2b4070d08e764a878ddccd7e1584f0096/src/nord
+*color0:       nord01
+*color1:       nord11
+*color2:       nord14
+*color3:       nord13
+*color4:       nord09
+*color5:       nord15
+*color6:       nord08
+*color7:       nord05
+
+*color8:       nord03
+*color9:       nord11
+*color10:      nord14
+*color11:      nord13
+*color12:      nord09
+*color13:      nord15
+*color14:      nord07
+*color15:      nord06
+
+! Specific class of colors
+*foreground:   nord04
+*background:   nord00
+*lighterbg:    nord03
+*fading:       35
+*selection:    nord08
+
+! -------------------------------------------------------------------- i3wm
+! override colors
+i3wm*foreground:  nord0320
+
+! 000----------------------------------------------------------------- urxvt
 ! `man urxvt` for the customization
 ! source https://gist.github.com/cqpx/1436584
 URxvt*depth:                  32
@@ -19,7 +82,8 @@ URxvt*letterSpace:            0
 URxvt*internalBorder:         0
 URxvt*visualBell:             false
 URxvt*saveLines:              65535
-URxvt*termName:               rxvt-unicode
+!URxvt*termName:               rxvt-unicode
+URxvt*termName:               xterm-256color
 
 ! Scroll management,
 ! Stop automatic scrolling when going back in the buffer
@@ -30,41 +94,15 @@ URxvt*scrollTtyOutput:        false
 URxvt*scrollWithBuffer:       true
 URxvt*scrollTtyKeypress:      true
 
-! Pointer
 URxvt*pointerBlank:           true
-URxvt*pointerColorBackground: #586e75
-URxvt*pointerColorForeground: #93a1a1
+URxvt*cursorColor:            nord08
+! URxvt*colorUL:                nord08
+URxvt*underlineColor:         nord13
 
-! Cursor
-URxvt*cursorColor:            #dc8cc3
-
-URxvt.internalBorder:         0
-URxvt*background:             #3f3f3f
-URxvt*foreground:             #dcdccc
-! URxvt*colorUL:                #366060
-URxvt*underlineColor:         #dfaf8f
-
-URxvt*color0:                 #3f3f3f
-URxvt*color1:                 #cc9393
-URxvt*color2:                 #7f9f7f
-URxvt*color3:                 #d0bf8f
-URxvt*color4:                 #6ca0a3
-URxvt*color5:                 #dc8cc3
-URxvt*color6:                 #93e0e3
-URxvt*color7:                 #dcdccc
-URxvt*color8:                 #000000
-URxvt*color9:                 #dca3a3
-URxvt*color10:                #bfebbf
-URxvt*color11:                #f0dfaf
-URxvt*color12:                #8cd0d3
-URxvt*color13:                #dc8cc3
-URxvt*color14:                #93e0e3
-URxvt*color15:                #ffffff
-
-! Extensions: open url with button 2 of the mouse
+! Extensions:
 URxvt*perl-ext-common:        default,matcher
 URxvt*url-launcher:           firefox
-URxvt*matcher.button:         2
+URxvt*matcher.button:         2 ! open url with button 2 of the mouse
 
 ! -------------------------------------------------------------------- Rofi
 ! $ man rofi
@@ -77,16 +115,16 @@ rofi.kb-row-tab: Control+space
 
 ! Use extended color scheme
 rofi.color-enabled: true
-! bg Background color row
-! fg Text color
-! bgalt Background color alternating row
-! hlfg Foreground color selected row
-! hlbg Background color selected row
-! State:           'bg',    'fg',    'bgalt', 'hlbg',  'hlfg'
-rofi.color-normal: #2f1e2e, #b4b4b4, #2f1e2e, #4a3255, #ffffff
-rofi.color-urgent: #2f1e2e, #ef6155, #2f1e2e, #4a3255, #ef6155
-rofi.color-active: #2f1e2e, #4a3255, #2f1e2e, #4a3255, #4a3255
-!                  'background', 'border'
-rofi.color-window: #2f1e2e,       #ef6155, #ef6155
+rofi.show-icons:            false
+
+! bg: Background color row
+! fg: Text color
+! bgalt: Background color alternating row
+! hlfg: Foreground color selected row
+! hlbg: Background color selected row
+! State:           'bg',    'fg',    'bgalt',  'hlbg', 'hlfg'
+rofi.color-normal: nord00,  nord04,  nord00,   nord02,  nord08
+!                  'background', 'border', 'separator'
+rofi.color-window: nord00,       nord10,    nord08
 ! Separator style (none, dash, solid)
-rofi.separator-style: dash
+rofi.separator-style: solid
