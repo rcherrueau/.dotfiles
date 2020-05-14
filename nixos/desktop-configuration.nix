@@ -117,7 +117,6 @@
     mpv # replacement of mplayer
     qtox
     rxvt-unicode-unwrapped
-    syncthing
     xorg.xbacklight # Decrease screen brightness
     xcape # Escape and Control on a single key
     xdotool # Script your mouse
