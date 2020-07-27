@@ -44,7 +44,7 @@ self: super:
 
         # Jailbreak Unique for matterhorn (remove version bound).
         #
-        # Note: this jailbreak Unique system-wide (for all haskell
+        # Note: this jailbreaks Unique system-wide (for all haskell
         # packages that use Unique). I guess I could do the same
         # for matterhorn only.
         #

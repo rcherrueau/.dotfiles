@@ -106,7 +106,7 @@
     aria stow htop unzip unrar tree
     ranger w3m xsel # w3m to display images, xsel to copy file name with `yd`
     usbutils # lsusb
-    vagrant
+    # TODO: vagrant
 
     # windowing
     xlibs.libXft
@@ -147,7 +147,7 @@
     (let
       matterhorn-notify-src = fetchurl {
         url = "${pkgs.matterhorn.meta.homepage}-${pkgs.matterhorn.version}/src/notification-scripts/notify";
-        sha256 = "1vivlffsiwl58sl40mc6bzplnr8zib6ci4y5zf2mfz1h8rls3law";
+        sha256 = "1bb52ir0gyw6wxg1i9sjvddxsybrrkvx2l03z37pcm0pfs5qqk3x";
       };
       mattermost-ffox-token = pkgs.fetchFromGitHub {
         owner = "ftilde";
@@ -329,12 +329,9 @@
       # desktopManager + `i3` windowManger)
       defaultSession = "none+i3";
 
-
       # LightDM as login manager
-      lightdm = {
-        enable = true;
-        autoLogin.user = "rfish";
-      };
+      lightdm.enable = true;
+      autoLogin.user = "rfish";
 
       # -- bash_profile for login shell
       # Shell commands executed just before the window or desktop
@@ -498,5 +495,4 @@
   };
   users.extraGroups.docker.members = [ "rfish" ];
 
-  system.stateVersion = "19.03";
 }

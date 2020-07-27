@@ -166,4 +166,6 @@
   #   # enableExtensionPack = true;
   # };
   # users.extraGroups.vboxusers.members = [ "rfish" ];
+
+  system.stateVersion = "19.03";
 }

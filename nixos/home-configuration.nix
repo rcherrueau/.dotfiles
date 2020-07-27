@@ -7,50 +7,14 @@
 
 {
   imports = [
-    <nixpkgs/nixos/modules/installer/scan/not-detected.nix>
+    /etc/nixos/hardware-configuration.nix
     ./desktop-configuration.nix
   ];
-
-  # -------------------------------------------------- Hardware configuration
-  boot.initrd.availableKernelModules = [ "xhci_pci" "ehci_pci" "ahci" "usbhid" "sd_mod" ];
-
-  # Module `kvm-intel` for virtualization with libvirtd/kvm. Load it
-  # with the `nested=1` option to enable nested kvm (i.e., kvm VM in a
-  # kvm VM). As a result, the following command should output Y:
-  # > cat /sys/module/kvm_intel/parameters/nested
-  # > Y
-  # Add pci-stub and iommu for GPU passthrough, see
-  # https://github.com/domenkozar/snabb-openstack-testing/tree/6310879eeb2b3b417dbe0e3b0ea5cd9f84aaa311
-  boot.kernelModules = [ "kvm-intel" ];
-  boot.extraModprobeConfig = "options kvm_intel nested=1";
-  boot.extraModulePackages = [ ];
-
-  fileSystems."/" = {
-    device = "/dev/disk/by-uuid/e851ac1e-62a9-4b42-9f5a-2b1770c8a68d";
-    fsType = "ext4";
-  };
-
-  fileSystems."/tmp" = {
-    device = "tmpfs";
-    fsType = "tmpfs";
-  };
-
-  fileSystems."/home" = {
-    device = "/dev/disk/by-uuid/255ee711-493c-45ff-b30e-62b917043345";
-    fsType = "ext4";
-  };
-
-  swapDevices = [ ];
-
-  nix.maxJobs = lib.mkDefault 16;
 
   # Use the GRUB 2 boot loader.
   boot.loader.grub.enable = true;
   boot.loader.grub.version = 2;
-  # Define on which hard drive you want to install Grub.
   boot.loader.grub.device = "/dev/sda";
-
-  # -------------------------------------------------- System configuration
 
   # Define your hostname.
   networking.hostName = "home";
@@ -94,4 +58,12 @@
     desktopManager.wallpaper.mode = "fill";
     desktopManager.wallpaper.combineScreens = false;
   };
+
+  # This value determines the NixOS release from which the default
+  # settings for stateful data, like file locations and database versions
+  # on your system were taken. It‘s perfectly fine and recommended to leave
+  # this value at the release version of the first install of this system.
+  # Before changing this value read the documentation for this option
+  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
+  system.stateVersion = "20.03"; # Did you read the comment?
 }
