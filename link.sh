@@ -6,24 +6,19 @@
 # https://github.com/NixOS/nixpkgs/issues/5200
 # https://bbs.archlinux.org/viewtopic.php?id=174916
 
-# Link `specific.nix` file
-case "$1" in
-  home)
-    ln -v -frs nixos/home.nix nixos/configuration.nix
-    ln -v -frs system/.i3/home-i3status-rs.toml system/.i3/i3status-rs.toml
-    ;;
-  hp)
-    ln -v -frs nixos/hp.nix nixos/configuration.nix
-    ln -v -frs system/.i3/hp-i3status-rs.toml system/.i3/i3status-rs.toml
-    ;;
-  *)
-    echo "Is this home or hp computer? recall with $0 home or $0 hp"
-    exit 1
-    ;;
-esac
+# Link specific files, e.g., files prefixed by hotsname
+function specific_links() {
+    local prefix="$1"
 
-stow -v --target="$HOME" system
-stow -v --target="$HOME" git
-stow -v --target="$HOME" spacemacs
+    # Specialize links
+    ln -v -frs "nixos/$prefix-configuration.nix" nixos/configuration.nix
+    ln -v -frs "system/.i3/$prefix-i3status-rs.toml" system/.i3/i3status-rs.toml
+}
+
+specific_links $(hostname)
+
+stow -v --target="${HOME}" system
+stow -v --target="${HOME}" git
+stow -v --target="${HOME}" spacemacs
 
 sudo stow -v --target="/etc/nixos" nixos

@@ -43,6 +43,8 @@
     options = "--delete-older-than 30d";
   };
 
+  nix.trustedUsers = [ "root" "rfish" ];
+
   # Font: find local font with `fc-list|grep <font>`
   fonts = {
     # Basic set of font w/ reasonable coverage of Unicode (this
@@ -145,7 +147,7 @@
     (let
       matterhorn-notify-src = fetchurl {
         url = "${pkgs.matterhorn.meta.homepage}-${pkgs.matterhorn.version}/src/notification-scripts/notify";
-        sha256 = "1ich5vrpn8lzzqykabqds181rhl5mnnjphbvj92yb0b38yd9qzr3";
+        sha256 = "1vivlffsiwl58sl40mc6bzplnr8zib6ci4y5zf2mfz1h8rls3law";
       };
       mattermost-ffox-token = pkgs.fetchFromGitHub {
         owner = "ftilde";
@@ -159,6 +161,7 @@
         curl firefox sqlite  # Deps for token handling
       ];
     } ''
+      # Find it in /run/current-system/sw/share/matterhorn/
       OUTPUT="$out/share/matterhorn"
       mkdir -p "$OUTPUT"
 
@@ -177,7 +180,7 @@
     git
     emacs # (emacsWithPackages (epkgs: [epkgs.pdf-tools]))
     # See https://nixos.wiki/wiki/Vim
-    (vim_configurable.customize{
+    (vim_configurable.customize {
 		  name = "vim";
 		  vimrcConfig.packages.myplugins = with pkgs.vimPlugins; {
         # Loaded on launch
@@ -200,7 +203,8 @@
 		)
     aspell aspellDicts.en aspellDicts.fr
     ripgrep
-    zeal sqlite
+    # TODO(qtwebkit) zeal
+    sqlite
 
     # language
     racket
@@ -371,36 +375,35 @@
         (let i3-disable-dpms = {stdenv, fetchFromGitHub, python3Packages, xset}:
                python3Packages.buildPythonApplication rec {
                  pname = "i3-disable-dpms";
-                 version = "2019-12-16";
+                 version = "2020-06-26";
 
-                 src = fetchFromGitHub {
-                   owner = "altdesktop";
-                   repo = "i3ipc-python";
-                   rev = "13d6e3c8f190381cce5ed38545ac0fd4c365f00c";
-                   sha256 = "1g56faigwhmx00v3wya0npg53b6pcivl7cfyijmwzlx55arikqk7";
-                 };
+                 src = python3Packages.i3ipc.src;
 
-                 propagatedBuildInputs = with python3Packages; [ i3ipc ];
+                 propagatedBuildInputs = with python3Packages; [ (i3ipc.overrideAttrs (oldAttrs: {
+                   # FIXME: disable this next time it passes well the installation check
+                   # https://github.com/NixOS/nixpkgs/blob/fb5cb30fb0d0c96729358eed348d295d56d51f38/pkgs/development/python-modules/i3ipc/default.nix#L30-L33
+                   doInstallCheck = false;
+                 }))];
                  dontBuild = true;
                  doCheck = false;
 
                  installPhase = ''
                    mkdir -p "$out/bin"
-                   cp examples/disable-standby-fs.py "$out/bin/${pname}"
+                   substitute examples/disable-standby-fs.py "$out/bin/${pname}" \
+                       --replace 'xset' '${xset}/bin/xset'
                    chmod a+x "$out/bin/${pname}"
                  '';
 
-                 meta = with stdenv.lib; {
+                 meta = python3Packages.i3ipc.meta // {
                    homepage = https://github.com/altdesktop/i3ipc-python;
                    description = "Script to disable DPMS from the i3ipc-python library";
-                   license = licenses.bsd3;
                  };
                };
          in i3-disable-dpms {
            stdenv = pkgs.stdenv;
            fetchFromGitHub = pkgs.fetchFromGitHub;
            python3Packages = pkgs.python3Packages;
-           xset = pkgs.xset;
+           xset = pkgs.xorg.xset;
          })
       ];
     };
@@ -431,6 +434,14 @@
     enable = true;
     mediaKeys.enable = false; # Managed by i3
   };
+  # https://nixos.wiki/wiki/PulseAudio
+  # https://github.com/NixOS/nixpkgs/issues/79310
+  hardware.pulseaudio.enable = true;
+  users.extraGroups.audio.members = [ "rfish" ];
+  hardware.pulseaudio.configFile = pkgs.runCommand "default.pa" {} ''
+    sed 's/module-udev-detect$/module-udev-detect tsched=0/' \
+      ${pkgs.pulseaudio}/etc/pulse/default.pa > $out
+  '';
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;

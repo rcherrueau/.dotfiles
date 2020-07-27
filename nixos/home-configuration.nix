@@ -9,7 +9,6 @@
   imports = [
     <nixpkgs/nixos/modules/installer/scan/not-detected.nix>
     ./desktop-configuration.nix
-    ./modules/syncthing.nix
   ];
 
   # -------------------------------------------------- Hardware configuration
@@ -54,7 +53,7 @@
   # -------------------------------------------------- System configuration
 
   # Define your hostname.
-  networking.hostName = "home-rfish";
+  networking.hostName = "home";
 
   # Connect to my pi-hole
   #
@@ -63,7 +62,7 @@
   # `mkForce` ensures that the disabling of `unbound` takes precedence
   # over the definition in configuration.nix.
   # https://nixos.org/nixos/manual/#sec-modularity
-  services.unbound.enable = lib.mkForce false;
+  # services.unbound.enable = lib.mkForce false;
   networking.nameservers = [ "192.168.1.253" ];
 
   environment.systemPackages = with pkgs; [
@@ -89,7 +88,7 @@
     # or delete the hid_apple.conf file to remove the swap.
     # Swapping/unswapping require a restart
     # Maybe you should set it with `boot.extraModprobeConfig`
-    # See wiki.archlinux.org/index.php?title=Apple_Keyboard&oldid=387451
+    # See http://wiki.archlinux.org/index.php?title=Apple_Keyboard&oldid=387451
     xkbModel = "apple_laptop";
 
     desktopManager.wallpaper.mode = "fill";

@@ -7,7 +7,7 @@
 
 {
   # -------------------------------------------------- Hardware configuration
-  imports = [ 
+  imports = [
     <nixpkgs/nixos/modules/installer/scan/not-detected.nix>
     ./desktop-configuration.nix
   ];
@@ -24,14 +24,14 @@
   boot.extraModprobeConfig = "options kvm_intel nested=1";
   boot.extraModulePackages = [ ];
 
-  fileSystems."/" = { 
+  fileSystems."/" = {
     device = "/dev/disk/by-uuid/8a50958b-bff3-421a-968e-42903b15a28a";
     fsType = "ext4";
     # Supposedly better for SSD
     options = [ "noatime" "nodiratime" "discard" ];
   };
 
-  fileSystems."/boot" = { 
+  fileSystems."/boot" = {
     device = "/dev/disk/by-uuid/0E92-DE8F";
     fsType = "vfat";
   };
@@ -62,18 +62,18 @@
 
   # -------------------------------------------------- System configuration
 
+  # Networking stuff
+  networking = {
+    hostName = "hp";
+    # wpa-supplicant.
+    wireless.enable = true;
+  };
+
   # Specific packages for my laptop
   environment.systemPackages = with pkgs; [
     rfkill  # Manage wifi device
     feh     # For desktop wallpaper
   ];
-
-  # Networking stuff
-  networking = {
-    hostName = "hp-rfish";
-    # wpa-supplicant.
-    wireless.enable = true;
-  };
 
   # Customize sudo:
   # see, nixos-option security.sudo.extraRules
@@ -149,9 +149,6 @@
     # LUKS secures My HP boot, so I can safely enable `autoLogin`.
     displayManager.lightdm.autoLogin.enable = true;
   };
-
-  # Use pusleaudio to easily switch between hdmi/display port/analog audio output
-  # hardware.pulseaudio.enable = true;
 
   # Enable virtualization
   virtualisation.libvirtd = {
