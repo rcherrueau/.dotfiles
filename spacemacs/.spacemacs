@@ -25,7 +25,6 @@ This function should only modify configuration layer settings."
    ;; a layer lazily. (default t)
    dotspacemacs-ask-for-lazy-installation t
 
-   ;; If non-nil layers with lazy install support are lazy installed.
    ;; List of additional paths where to look for configuration layers.
    ;; Paths must have a trailing slash (i.e. `~/.mycontribs/')
    dotspacemacs-configuration-layer-path '()
@@ -38,7 +37,7 @@ This function should only modify configuration layer settings."
      ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
      ;; `M-m f e R' (Emacs style) to install them.
      ;; ----------------------------------------------------------- lang
-     coq
+     ;; coq
      (elm :variables
           elm-interactive-command '("elm" "repl")
           elm-reactor-command '("elm" "reactor")
@@ -61,6 +60,7 @@ This function should only modify configuration layer settings."
            rust-rls-cmd '("rustup" "run" "stable" "rls"))
      scala
      yaml
+     shell-scripts
      ;; ----------------------------------------------------------- conf
      (auto-completion :variables
                       auto-completion-return-key-behavior nil
@@ -126,16 +126,18 @@ This function should only modify configuration layer settings."
      ;; need a minor mode to do the same
      hl-todo
      ;; Do not show symbol as bullet for headers in org
-     org-bullets
+     org-superstar
      ;; I don't care of image and YouTube videos thumbnails support in
      ;; erc
      erc-image erc-yt
-     ;; ... doesn't really work
-     lsp-ui
      ;; Do not print a ~ to indicate the end of file
      vi-tilde-fringe
      ;; Do not mix company with auto-complete
      auto-complete
+     ;; No!
+     lsp-ui lsp-treemacs
+     treemacs treemacs-icons-dired treemacs-evil treemacs-persp
+     treemacs-projectile
      )
 
    ;; Defines the behaviour of Spacemacs when installing packages.
@@ -170,9 +172,9 @@ It should only modify the values of Spacemacs settings."
    ;; portable dumper in the cache directory under dumps sub-directory.
    ;; To load it when starting Emacs add the parameter `--dump-file'
    ;; when invoking Emacs 27.1 executable on the command line, for instance:
-   ;;   ./emacs --dump-file=~/.emacs.d/.cache/dumps/spacemacs.pdmp
-   ;; (default spacemacs.pdmp)
-   dotspacemacs-emacs-dumper-dump-file "spacemacs.pdmp"
+   ;;   ./emacs --dump-file=$HOME/.emacs.d/.cache/dumps/spacemacs-27.1.pdmp
+   ;; (default spacemacs-27.1.pdmp)
+   dotspacemacs-emacs-dumper-dump-file (format "spacemacs-%s.pdmp" emacs-version)
 
    ;; If non-nil ELPA repositories are contacted via HTTPS whenever it's
    ;; possible. Set it to nil if you have no way to use HTTPS in your
@@ -191,6 +193,13 @@ It should only modify the values of Spacemacs settings."
    ;; performance issues due to garbage collection operations.
    ;; (default '(100000000 0.1))
    dotspacemacs-gc-cons '(100000000 0.1)
+
+   ;; Set `read-process-output-max' when startup finishes.
+   ;; This defines how much data is read from a foreign process.
+   ;; Setting this >= 1 MB should increase performance for lsp servers
+   ;; in emacs 27.
+   ;; (default (* 1024 1024))
+   dotspacemacs-read-process-output-max (* 1024 1024)
 
    ;; If non-nil then Spacelpa repository is the primary source to install
    ;; a locked version of packages. If nil then Spacemacs will install the
@@ -220,6 +229,11 @@ It should only modify the values of Spacemacs settings."
    ;; (default 'vim)
    dotspacemacs-editing-style '(vim :variables
                                     vim-style-remap-Y-to-y$ t)
+
+   ;; If non-nil show the version string in the Spacemacs buffer. It will
+   ;; appear as (spacemacs version)@(emacs version)
+   ;; (default t)
+   dotspacemacs-startup-buffer-show-version t
 
    ;; Specify the startup banner. Default value is `official', it displays
    ;; the official spacemacs logo. An integer value is the index of text
@@ -295,8 +309,10 @@ It should only modify the values of Spacemacs settings."
    dotspacemacs-major-mode-leader-key ","
 
    ;; Major mode leader key accessible in `emacs state' and `insert state'.
-   ;; (default "C-M-m")
-   dotspacemacs-major-mode-emacs-leader-key "C-M-m"
+   ;; (default "C-M-m" for terminal mode, "<M-return>" for GUI mode).
+   ;; Thus M-RET should work as leader key in both GUI and terminal modes.
+   ;; C-M-m also should work in terminal mode, but not in GUI mode.
+   dotspacemacs-major-mode-emacs-leader-key (if window-system "<M-return>" "C-M-m")
 
    ;; These variables control whether separate commands are bound in the GUI to
    ;; the key pairs `C-i', `TAB' and `C-m', `RET'.
@@ -383,12 +399,12 @@ It should only modify the values of Spacemacs settings."
    ;; A value from the range (0..100), in increasing opacity, which describes
    ;; the transparency level of a frame when it's active or selected.
    ;; Transparency can be toggled through `toggle-transparency'. (default 90)
-   dotspacemacs-active-transparency 97
+   dotspacemacs-active-transparency 90
 
    ;; A value from the range (0..100), in increasing opacity, which describes
    ;; the transparency level of a frame when it's inactive or deselected.
    ;; Transparency can be toggled through `toggle-transparency'. (default 90)
-   dotspacemacs-inactive-transparency 97
+   dotspacemacs-inactive-transparency 90
 
    ;; If non-nil show the titles of transient states. (default t)
    dotspacemacs-show-transient-state-title t
@@ -494,6 +510,13 @@ It should only modify the values of Spacemacs settings."
    ;; (default nil)
    dotspacemacs-whitespace-cleanup 'trailing
 
+   ;; If non nil activate `clean-aindent-mode' which tries to correct
+   ;; virtual indentation of simple modes. This can interfer with mode specific
+   ;; indent handling like has been reported for `go-mode'.
+   ;; If it does deactivate it here.
+   ;; (default t)
+   dotspacemacs-use-clean-aindent-mode nil
+
    ;; Either nil or a number of seconds. If non-nil zone out after the specified
    ;; number of seconds. (default nil)
    dotspacemacs-zone-out-when-idle nil
@@ -546,8 +569,8 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
   (load custom-file)
 
   ;; Fallback on Noto Emoji for symbol
-  (set-fontset-font t 'symbol (font-spec :family "Noto Emoji" :size 15))
-  ;; (set-fontset-font t 'symbol (font-spec :family "Twitter Color Emoji"))
+  (set-fontset-font t 'symbol (font-spec :family "Noto Emoji" :size 45))
+  ;; (set-fontset-font t 'symbol (font-spec :family "Twitter Color Emoji" :size 45))
   )
 
 (defun dotspacemacs/user-load ()
@@ -645,7 +668,7 @@ https://stackoverflow.com/a/14001190)."
   ;; Add a new line at the end of file
   (setq-default require-final-newline t)
 
-  ;; Change zenburn color a bit
+  ;; Change colors a bit
   (when (custom-theme-p 'zenburn)
     (custom-theme-set-faces
      'zenburn
@@ -654,6 +677,18 @@ https://stackoverflow.com/a/14001190)."
      '(region ((t (:background "#6B3654" :extend t)) (t :inverse-video t)) t)
      ;; Change background color of block in org
      '(org-block ((t (:background "zenburn-bg" :extend t))) t)))
+
+  (when (custom-theme-p 'nord)
+    (custom-theme-set-faces
+     'nord
+     ;; Helm
+     '(helm-source-header ((t (;; :foreground "#88C0D0"
+                               ;; :background "#434C5E"
+                               :underline nil
+                               ;; :weight bold
+                               :box (:line-width -1 :style released-button)
+                               :extend t))) t)
+     ))
 
   ;; Highlight the following words in comments
   (defun add-watchwords ()
@@ -744,11 +779,12 @@ https://stackoverflow.com/a/14001190)."
   ;; emacs automatically detects the mode of a ".tex" file from the
   ;; macro into it. Sometimes it guesses the TeX-mode and other times
   ;; LaTeX-mode. So, It's safer to put stuff in TeX-mode since
-  ;; LateX-mode inherits form it, and everything here will be loaded
+  ;; LaTeX-mode inherits form it, and everything here will be loaded
   ;; by both mode.
   (with-eval-after-load 'tex-mode
-    (require 'ospl)
-    (add-hook 'tex-mode-hook #'turn-on-ospl))
+    ;; (require 'ospl)
+    ;; (add-hook 'tex-mode-hook #'turn-on-ospl)
+    )
 
   ;; -- Org
   (with-eval-after-load 'org
@@ -843,6 +879,22 @@ formating depending on the type of _SPECIAL_BLOCK."
                            (lambda (a s v b)
                              (org-export-to-buffer 'mail-ascii "*Org MAIL-ASCII Export*")))))
       :translate-alist '((special-block . mail-ascii/special-block))))
+
+  ;; -- racket
+  (with-eval-after-load 'racket-mode
+    ;; Do not display overlay information à la DrRacket.
+    (add-hook 'racket-xp-mode-hook
+              (lambda ()
+                (remove-hook 'pre-redisplay-functions
+                             #'racket-xp-pre-redisplay
+                             t)))
+
+    ;; I have to disable this right now.  It is too greedy.  It eats
+    ;; all my RAM after 20 minutes
+    (remove-hook 'racket-mode-hook 'racket-xp-mode)
+
+    ;; Terminate the Racket process if memory use exceeds 2Go.
+    (setq-default racket-memory-limit 2048))
 
   ;; -- tramp
   (with-eval-after-load 'tramp
