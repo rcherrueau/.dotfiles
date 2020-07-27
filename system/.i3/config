@@ -16,6 +16,7 @@ set_from_resource $lighterbg  i3wm.lighterbg  #f0f0f0
 set_from_resource $info       i3wm.selection  #ff0000
 set_from_resource $alert      i3wm.color9     #ff0000
 set_from_resource $good       i3wm.color10    #00ff00
+set_from_resource $warning    i3wm.color13    #00ff00
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
