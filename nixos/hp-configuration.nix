@@ -147,7 +147,7 @@
     desktopManager.wallpaper.combineScreens = false;
 
     # LUKS secures My HP boot, so I can safely enable `autoLogin`.
-    displayManager.lightdm.autoLogin.enable = true;
+    displayManager.autoLogin.enable = true;
   };
 
   # Enable virtualization

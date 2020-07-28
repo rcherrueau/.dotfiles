@@ -331,6 +331,8 @@
 
       # LightDM as login manager
       lightdm.enable = true;
+
+      autoLogin.enable = false;
       autoLogin.user = "rfish";
 
       # -- bash_profile for login shell
@@ -426,19 +428,15 @@
     ];
   };
 
-  # Audio settings (alsa)
+  # Audio settings (alsa + pulseaudio)
+  # https://nixos.wiki/wiki/PulseAudio
+  # https://github.com/NixOS/nixpkgs/issues/79310
   sound = {
     enable = true;
     mediaKeys.enable = false; # Managed by i3
   };
-  # https://nixos.wiki/wiki/PulseAudio
-  # https://github.com/NixOS/nixpkgs/issues/79310
   hardware.pulseaudio.enable = true;
   users.extraGroups.audio.members = [ "rfish" ];
-  hardware.pulseaudio.configFile = pkgs.runCommand "default.pa" {} ''
-    sed 's/module-udev-detect$/module-udev-detect tsched=0/' \
-      ${pkgs.pulseaudio}/etc/pulse/default.pa > $out
-  '';
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
