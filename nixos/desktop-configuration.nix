@@ -371,18 +371,13 @@
         # https://faq.i3wm.org/question/4217/how-to-disable-screensavermonitor-standby-when-fullscreen.1.html
         # https://github.com/altdesktop/i3ipc-python/blob/master/examples/disable-standby-fs.py
         # https://github.com/NixOS/nixpkgs/blob/c34ba30888a60065f3de99037625019a5a7d1227/pkgs/applications/window-managers/i3/wk-switch.nix
-        (let i3-disable-dpms = {stdenv, fetchFromGitHub, python3Packages, xset}:
+        (let i3-disable-dpms = {stdenv, python3Packages, xset}:
                python3Packages.buildPythonApplication rec {
                  pname = "i3-disable-dpms";
-                 version = "2020-06-26";
-
+                 version = python3Packages.i3ipc.version;
                  src = python3Packages.i3ipc.src;
 
-                 propagatedBuildInputs = with python3Packages; [ (i3ipc.overrideAttrs (oldAttrs: {
-                   # FIXME: disable this next time it passes well the installation check
-                   # https://github.com/NixOS/nixpkgs/blob/fb5cb30fb0d0c96729358eed348d295d56d51f38/pkgs/development/python-modules/i3ipc/default.nix#L30-L33
-                   doInstallCheck = false;
-                 }))];
+                 propagatedBuildInputs = with python3Packages; [ i3ipc ];
                  dontBuild = true;
                  doCheck = false;
 
@@ -400,7 +395,6 @@
                };
          in i3-disable-dpms {
            stdenv = pkgs.stdenv;
-           fetchFromGitHub = pkgs.fetchFromGitHub;
            python3Packages = pkgs.python3Packages;
            xset = pkgs.xorg.xset;
          })
@@ -492,5 +486,4 @@
     autoPrune.enable = true;
   };
   users.extraGroups.docker.members = [ "rfish" ];
-
 }
