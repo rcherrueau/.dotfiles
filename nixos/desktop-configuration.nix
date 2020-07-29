@@ -7,6 +7,7 @@
   imports = [
     ./cachix.nix
     ./modules/syncthing.nix
+    ./modules/vim.nix
   ];
 
   # Minimum swappiness without disabling it entirely (preserve ssd)
@@ -79,9 +80,6 @@
   };
   users.defaultUserShell = pkgs.zsh;
 
-  # Environment variables
-  # environment.variables.EDITOR = "emacsclient -c -a \"\"";
-  environment.variables.EDITOR = "${pkgs.vim}/bin/vim -n -u /home/rfish/.vimrc --noplugin";
 
   #------------------------------------------------------------------- App
   nixpkgs.config.allowUnfree = true;
@@ -179,28 +177,6 @@
     # development tools
     git
     emacs # (emacsWithPackages (epkgs: [epkgs.pdf-tools]))
-    # See https://nixos.wiki/wiki/Vim
-    (vim_configurable.customize {
-		  name = "vim";
-		  vimrcConfig.packages.myplugins = with pkgs.vimPlugins; {
-        # Loaded on launch
-		    start = [ vim-nix nord-vim ];
-        # Manually loadable by calling `:packadd $plugin-name`
-		    opt = [];
-		  };
-		  vimrcConfig.customRC = ''
-                    colorscheme nord
-                    function! FoldPageFeed()
-                      setl foldmethod=expr
-                      setl foldexpr=getline(v:lnum)[0]==\"\\<c-l>\"
-                      setl foldminlines=0
-                      setl foldtext='---\ new\ page\ '
-                      setl foldlevel=0
-                      set foldclose=all
-                  endfunction
-		  '';
-		  }
-		)
     aspell aspellDicts.en aspellDicts.fr
     ripgrep
     # TODO(qtwebkit) zeal
