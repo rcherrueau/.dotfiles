@@ -23,20 +23,11 @@ separator_fg = "#7b88a1"  # $foreground
 # https://github.com/greshake/i3status-rust/blob/2dc958995834b529a245c22c510b57d5c928c747/src/icons.rs#L4
 [icons]
 name = "awesome"
+
 [[block]]
 block = "disk_space"
 path = "/"
 alias = "/"
-info_type = "available"
-unit = "GB"
-interval = 20
-warning = 20.0
-alert = 10.0
-
-[[block]]
-block = "disk_space"
-path = "/home"
-alias = "/home"
 info_type = "available"
 unit = "GB"
 interval = 20
