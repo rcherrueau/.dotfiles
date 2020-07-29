@@ -333,6 +333,7 @@
       sessionCommands = ''
         ${pkgs.xcape}/bin/xcape -e 'Shift_L=Escape'
         ${pkgs.xcape}/bin/xcape -e 'Control_L=Escape'
+        ${pkgs.dunst}/bin/dunst &
       '';
     };
 
