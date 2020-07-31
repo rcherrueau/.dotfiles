@@ -105,9 +105,9 @@
    (web-entry "lin"    "Search Linguee for {query}" "https://www.linguee.com/english-french/search?source=auto&query={query}")
    (web-entry "ox"     "Search Oxford dict for {query}" "https://www.oxfordlearnersdictionaries.com/definition/english/{query}")
    ;; Science
-   (web-entry "dblp"    "CS Bib for {query}"         "http://dblp.uni-trier.de/search?q={query}")
+   (web-entry "dblp"    "CS Bib for {query}"         "https://dblp.uni-trier.de/search?q={query}")
    (web-entry "scholar" "Google Scholar for {query}" "https://scholar.google.fr/scholar?q={query}")
-   (web-entry "scihub"  "Sci-Hub for {doi}"          "https://sci-hub.ac/{query}")
+   (web-entry "scihub"  "Sci-Hub for {doi}"          "https://sci-hub.tw/{query}")
    ))
 
 
