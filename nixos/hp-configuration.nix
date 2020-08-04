@@ -147,7 +147,13 @@
     desktopManager.wallpaper.combineScreens = false;
 
     # LUKS secures My HP boot, so I can safely enable `autoLogin`.
-    displayManager.autoLogin.enable = true;
+    #
+    # A merge is not possible between `autoLogin.enable = false` from
+    # desktop-configuration.nix and the following `autoLogin.enable = truefd`. The
+    # `mkForce` ensures that this definition takes precedence
+    # over the definition in desktop-configuration.nix.
+    # https://nixos.org/nixos/manual/#sec-modularity
+    displayManager.autoLogin.enable = lib.mkForce true;
   };
 
   # Enable virtualization
