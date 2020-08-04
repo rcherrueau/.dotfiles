@@ -331,8 +331,7 @@
       #     shell can prompt the user to enter input.
       # - `~/.bashrc` :: The individual per-interactive-shell startup file
       sessionCommands = ''
-        ${pkgs.xcape}/bin/xcape -e 'Shift_L=Escape'
-        ${pkgs.xcape}/bin/xcape -e 'Control_L=Escape'
+        ${pkgs.xcape}/bin/xcape -e 'Shift_L=Escape;Control_L=Escape'
         ${pkgs.dunst}/bin/dunst &
       '';
     };
