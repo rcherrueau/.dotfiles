@@ -145,7 +145,7 @@
     (let
       matterhorn-notify-src = fetchurl {
         url = "${pkgs.matterhorn.meta.homepage}-${pkgs.matterhorn.version}/src/notification-scripts/notify";
-        sha256 = "1bb52ir0gyw6wxg1i9sjvddxsybrrkvx2l03z37pcm0pfs5qqk3x";
+        sha256 = "1vivlffsiwl58sl40mc6bzplnr8zib6ci4y5zf2mfz1h8rls3law";
       };
       mattermost-ffox-token = pkgs.fetchFromGitHub {
         owner = "ftilde";
