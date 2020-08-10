@@ -8,6 +8,7 @@
     ./cachix.nix
     ./modules/syncthing.nix
     ./modules/vim.nix
+    ./modules/email.nix
   ];
 
   # Minimum swappiness without disabling it entirely (preserve ssd)

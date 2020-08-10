@@ -77,7 +77,7 @@ URxvt*depth:                  32
 URxvt*geometry:               90x30
 URxvt*transparent:            false
 URxvt*fading:                 0
-URxvt*font:                   xft:Iosevka:size=12:antialias=true, xft:Noto Emoji
+URxvt*font:                   xft:Iosevka:size=12:antialias=true, xft:Noto Emoji:pixelsize=12
 URxvt*letterSpace:            0
 URxvt*internalBorder:         0
 URxvt*visualBell:             false

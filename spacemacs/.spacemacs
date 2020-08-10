@@ -243,7 +243,7 @@ It should only modify the values of Spacemacs settings."
    ;; directory. A string value must be a path to an image format supported
    ;; by your Emacs build.
    ;; If the value is nil then no banner is displayed. (default 'official)
-   dotspacemacs-startup-banner 'official
+   dotspacemacs-startup-banner nil
 
    ;; List of items to show in startup buffer or an association list of
    ;; the form `(list-type . list-size)`. If nil then it is disabled.
@@ -587,7 +587,18 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
   (load custom-file)
 
   ;; Fallback on Noto Emoji for symbol
-  (set-fontset-font t 'symbol (font-spec :family "Noto Emoji" :size 16)))
+  (set-fontset-font t 'symbol (font-spec :family "Noto Emoji" :size 16))
+
+  ;; ----------------------------------------------------------- workaround
+
+ ;; ;; Hack for using a different set of repositories when MELPA is down
+ ;;  (setq package-archives
+ ;;        '(("melpa" . "https://raw.githubusercontent.com/d12frosted/elpa-mirror/master/melpa/")
+ ;;          ("org"   . "https://raw.githubusercontent.com/d12frosted/elpa-mirror/master/org/")
+ ;;          ("gnu"   . "https://raw.githubusercontent.com/d12frosted/elpa-mirror/master/gnu/")))
+ ;;  (setq package-check-signature nil)
+ ;;  (package-initialize)
+  )
 
 (defun dotspacemacs/user-load ()
   "Library to load while dumping.
@@ -748,6 +759,9 @@ want."
         org-ref-bibliography-notes "~/Sync/Papers/notes.org"
         org-ref-get-pdf-filename-function 'rcherr/org-ref-get-pdf-filename)
 
+  ;; Load mail-mode when editing mail from astroid
+  (add-to-list 'auto-mode-alist '("\\.astroid@" . mail-mode))
+
   ;; ------------------------------------------------------------- Modes
 
   ;; -- company
@@ -817,6 +831,11 @@ want."
     ;; (require 'ospl)
     ;; (add-hook 'tex-mode-hook #'turn-on-ospl)
     )
+
+  ;; -- Mail
+  (with-eval-after-load 'mail-mode
+    ;; `From:` header is managed by astroid
+    (setq mail-setup-with-from nil))
 
   ;; -- Org
   (with-eval-after-load 'org
