@@ -71,7 +71,9 @@ This function should only modify configuration layer settings."
                       ;; auto-completion-enable-help-tooltip nil
                       ;; auto-completion-enable-sort-by-usage nil
                       )
-     helm
+     (ivy :variables
+          ;; Add recent files to buffer completion menu
+          ivy-use-virtual-buffers t)
      spell-checking
      syntax-checking
      ;; ----------------------------------------------------------- tool
@@ -575,9 +577,7 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
   (load custom-file)
 
   ;; Fallback on Noto Emoji for symbol
-  (set-fontset-font t 'symbol (font-spec :family "Noto Emoji" :size 45))
-  ;; (set-fontset-font t 'symbol (font-spec :family "Twitter Color Emoji" :size 45))
-  )
+  (set-fontset-font t 'symbol (font-spec :family "Noto Emoji" :size 16)))
 
 (defun dotspacemacs/user-load ()
   "Library to load while dumping.
