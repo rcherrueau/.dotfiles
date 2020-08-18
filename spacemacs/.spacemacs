@@ -889,6 +889,7 @@ formating depending on the type of _SPECIAL_BLOCK."
   ;; -- racket
   (with-eval-after-load 'racket-mode
     ;; Do not display overlay information à la DrRacket.
+    (setq racket-show-functions '(racket-show-echo-area))
     (add-hook 'racket-xp-mode-hook
               (lambda ()
                 (remove-hook 'pre-redisplay-functions
