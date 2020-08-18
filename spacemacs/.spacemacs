@@ -260,6 +260,9 @@ It should only modify the values of Spacemacs settings."
    ;; Default major mode for a new empty buffer. Possible values are mode
    ;; names such as `text-mode'; and `nil' to use Fundamental mode.
    ;; (default `text-mode')
+   dotspacemacs-new-empty-buffer-major-mode 'text-mode
+
+   ;; Default major mode of the scratch buffer (default `text-mode')
    dotspacemacs-scratch-mode 'text-mode
 
    ;; Initial message in the scratch buffer, such as "Welcome to Spacemacs!"
@@ -520,6 +523,13 @@ It should only modify the values of Spacemacs settings."
    ;; If it does deactivate it here.
    ;; (default t)
    dotspacemacs-use-clean-aindent-mode nil
+
+   ;; If non-nil shift your number row to match the entered keyboard layout
+   ;; (only in insert mode). Currently the keyboard layouts
+   ;; (qwerty-us qwertz-de) are supported.
+   ;; New layouts can be added in `spacemacs-editing' layer.
+   ;; (default nil)
+   dotspacemacs-swap-number-row nil
 
    ;; Either nil or a number of seconds. If non-nil zone out after the specified
    ;; number of seconds. (default nil)

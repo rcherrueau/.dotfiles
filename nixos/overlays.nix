@@ -6,11 +6,13 @@ self: super:
 
 {
   emacs = super.emacs.override {
-    # Compile emacs with imagemagick so org will support the property
-    # `#+ATTR_ORG: :width` that sets the size of an image. Test it
-    # with `(image-type-available-p 'imagemagick)` that should return
-    # a non-nill value
-    imagemagick = self.imagemagick;
+    # Note: Emacs 27.1 supports resizing and rotating images without
+    # ImageMagick.  The new function 'image-transforms-p' can be used
+    # to test whether any given frame supports these capabilities.  In
+    # org, sets the property `#+ATTR_ORG: :width` to change the size
+    # of an image.
+    cairo = self.cairo;
+
     # Support Xwidgets for better lsp-ui.
     withXwidgets = true;
   };
