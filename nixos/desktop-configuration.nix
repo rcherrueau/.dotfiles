@@ -129,7 +129,8 @@
     #
     # I could handle the notification in an overlay, as following, but
     # this would rebuild matterhorn which takes forever. So, I prefer
-    # the next solution
+    # the next solution that copy the script in
+    # /run/current-system/sw/share/matterhorn/.
     #
     # > matterhorn = self.haskell.lib.overrideCabal super.matterhorn (old:
     # >   {
@@ -143,10 +144,7 @@
     # https://nixos.org/nixpkgs/manual/#chap-trivial-builders
     # https://nixos.org/nixpkgs/manual/#ssec-stdenv-functions
     (let
-      matterhorn-notify-src = fetchurl {
-        url = "${pkgs.matterhorn.meta.homepage}-${pkgs.matterhorn.version}/src/notification-scripts/notify";
-        sha256 = "1vivlffsiwl58sl40mc6bzplnr8zib6ci4y5zf2mfz1h8rls3law";
-      };
+      matterhorn-notify-src = pkgs.matterhorn.src;
       mattermost-ffox-token = pkgs.fetchFromGitHub {
         owner = "ftilde";
         repo = "mattermost-session-cookie-firefox";
@@ -159,17 +157,22 @@
         curl firefox sqlite  # Deps for token handling
       ];
     } ''
-      # Find it in /run/current-system/sw/share/matterhorn/
+      # Find scripts in /run/current-system/sw/share/matterhorn/
       OUTPUT="$out/share/matterhorn"
       mkdir -p "$OUTPUT"
 
-      substitute ${matterhorn-notify-src} "$OUTPUT/matterhorn-notify" \
+      # Extract notification script from matterhorn sources
+      tar -xvzf ${matterhorn-notify-src} ${pkgs.matterhorn.name}/notification-scripts/notify
+
+      # Substitute dependencies in notification and token scripts
+      substitute ${pkgs.matterhorn.name}/notification-scripts/notify "$OUTPUT/matterhorn-notify" \
            --replace 'notify-send' '${libnotify}/bin/notify-send'
       substitute ${mattermost-ffox-token}/mattermost-session-cookie-firefox \
            "$OUTPUT/matterhorn-token" \
            --replace 'sqlite3' '${sqlite}/bin/sqlite3' \
            --replace 'curl' '${curl}/bin/curl'
 
+      # Make notification and token scripts executable
       chmod +x "$OUTPUT/matterhorn-notify"
       chmod +x "$OUTPUT/matterhorn-token"
     ''))
