@@ -54,7 +54,6 @@ This function should only modify configuration layer settings."
      javascript
      lua
      org
-     (python :variables python-pipenv-activate t)
      racket
      (rust :variables
            rust-rls-cmd '("rustup" "run" "stable" "rls"))
