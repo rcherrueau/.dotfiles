@@ -140,6 +140,7 @@ This function should only modify configuration layer settings."
      lsp-ui lsp-treemacs
      treemacs treemacs-icons-dired treemacs-evil treemacs-persp
      treemacs-projectile
+     yasnippet auto-yasnippet ivy-yasnippet yasnippet-snippets
      )
 
    ;; Defines the behaviour of Spacemacs when installing packages.
