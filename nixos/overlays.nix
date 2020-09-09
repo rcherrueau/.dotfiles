@@ -27,19 +27,21 @@ self: super:
   # Override some haskell packages
   haskellPackages = super.haskellPackages.override {
       overrides = hself: hsuper: {
-        # Note: Version 50200.10.0 fails to build right now due to a
-        # new feature in vty unavailable on the nix version. Version
-        # 50200.9.0 builds, but the version bound for mattermost-api
-        # is incorrect so we jailbreak mattermost to remove version
-        # bound.
+        # FIX in https://github.com/NixOS/nixpkgs/pull/95773
         #
-        # https://qiita.com/kimagure/items/c3fb87f7f71b9df99078
-        matterhorn = self.haskell.lib.overrideCabal hsuper.matterhorn {
-          version = "50200.9.0";
-          sha256 = "1ky022msmh1ashhw8kwxwj4lcswa6xin2537q4bx8miii07cfvaw";
-          jailbreak = true;
-          doCheck = false;
-        };
+        # # Note: Version 50200.10.0 fails to build right now due to a
+        # # new feature in vty unavailable on the nix version. Version
+        # # 50200.9.0 builds, but the version bound for mattermost-api
+        # # is incorrect so we jailbreak mattermost to remove version
+        # # bound.
+        # #
+        # # https://qiita.com/kimagure/items/c3fb87f7f71b9df99078
+        # matterhorn = self.haskell.lib.overrideCabal hsuper.matterhorn {
+        #   version = "50200.9.0";
+        #   sha256 = "1ky022msmh1ashhw8kwxwj4lcswa6xin2537q4bx8miii07cfvaw";
+        #   jailbreak = true;
+        #   doCheck = false;
+        # };
       };
   };
 }
