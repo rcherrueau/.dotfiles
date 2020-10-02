@@ -10,6 +10,7 @@
   imports = [
     <nixpkgs/nixos/modules/installer/scan/not-detected.nix>
     ./desktop-configuration.nix
+    ./modules/apple-keyboard.nix
   ];
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "usb_storage" "sd_mod" "rtsx_pci_sdmmc" ];

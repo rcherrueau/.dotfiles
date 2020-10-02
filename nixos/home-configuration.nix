@@ -41,23 +41,6 @@
   services.xserver = {
     videoDrivers = [ "nvidia" ];
 
-    # I use a french mac bluetooth keyboard.
-    #
-    # 1. To pair the keyboard, put `hardware.bluetooth.enable` to true
-    # and use `bluetoothctl`:
-    #   > scan on      # Find MAC of Clavier de apple
-    #   > pair <MAC>   # Wait for pin Code and enter it, then authorize service
-    #   > trust <MAC>  # Trust the device to never authorize it again
-    # See wiki.archlinux.org/index.php?title=Bluetooth&oldid=390632
-    # See nixos.org/w/index.php?title=FAQ&oldid=24648#How_to_add_a_custom_udev_rule_in_nixos.3F
-    #
-    # 2. Pass the following line if you want to swap alt key and
-    # command key: `echo options hid_apple swap_opt_cmd=1 | sudo tee
-    # -a /etc/modprobe.d/hid_apple.conf` or delete the hid_apple.conf
-    # file to remove the swap.  Swapping/unswapping requires a restart
-    # http://wiki.archlinux.org/index.php?title=Apple_Keyboard&oldid=387451
-    xkbModel = "apple_laptop";
-
     desktopManager.wallpaper.mode = "fill";
     desktopManager.wallpaper.combineScreens = false;
   };
