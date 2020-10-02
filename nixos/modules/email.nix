@@ -18,6 +18,7 @@ let
       '';
     }
     { # GMail
+      default = true;
       name = "gmail";
       email = "RonanCherrueau@gmail.com";
       imap.host = "imap.gmail.com";
@@ -93,84 +94,6 @@ let
     '') accounts}
   '';
 
-  # Configuration file for notmuch (man notmuch-config)
-  notmuchConfig =
-    let default-account = lib.lists.findFirst (acc: acc.name == "gmail") {} accounts;
-    in pkgs.writeText "notmuch-config" ''
-      [database]
-      path=${mailDir}
-
-      [user]
-      name=Ronan-Alexandre Cherrueau
-      primary_email=${default-account.email}
-      other_email=${lib.concatMapStringsSep ";" (lib.getAttr "email") accounts}
-
-      # Configuration for "notmuch new"
-      # - tags:	A list (separated by ';') of the tags that will be
-      #   added to all messages incorporated by "notmuch new".
-      # - ignore: A list (separated by ';') of file and directory names
-      #   that will not be searched for messages by "notmuch new".
-      [new]
-      tags=inbox;unread;
-      ignore=
-
-      # Search configuration
-      #
-      # - exclude_tags: A separated list of tags that will be excluded
-      #   from search results by default. Using an excluded tag in a
-      #   query will override that exclusion.
-      [search]
-      exclude_tags=deleted;spam;
-
-      # Maildir flags have precedence over the `new` tagging. Thus an
-      # already read mail gets its initial `unread` tag correctly
-      # removed.
-      [maildir]
-      synchronize_flags=true
-    '';
-
-  # Astroid GUI config (.conf/astroid/config)
-  # https://github.com/astroidmail/astroid/wiki/Configuration-Reference
-  astroidConfig =
-    let baseConfig = builtins.readFile "/home/rfish/.config/astroid/config";
-    in pkgs.runCommand "astroid-config" {
-         buildInputs = [ pkgs.jq ];
-       } ''
-       # Merge default config with account information
-       echo ${lib.escapeShellArg baseConfig} | \
-       jq -s '.[] as $in | $in * {
-          "astroid" : {"notmuch_config": "${notmuchConfig}"},
-          "startup": {
-            "queries": {
-              ${lib.concatMapStringsSep "," (name: ''
-              "${name}" : "tag:${name} and tag:inbox"
-              '') (map (lib.getAttr "name") accounts)}
-            }
-          },
-          "accounts": {
-            ${lib.concatMapStringsSep "," (acc: ''
-            "${acc.name}": {
-               "name": "Ronan-Alexandre Cherrueau",
-               "email": "${acc.email}",
-               "sendmail": "${msmtpWp} -i --read-recipents --account=${acc.name}",
-               "always_gpg_sign": false,
-               "save_sent": true,
-               "save_sent_to": "${mailDir}/${acc.name}/sent/cur/",
-               "save_draft_to": "${mailDir}/${acc.name}/drafts/",
-               "signature_file": "${acc.signature}",
-               "signature_separate": true,
-               "default": ${if (acc.name == "gmail") then "true" else "false"}
-            }
-            '') accounts}
-          },
-          "editor": {
-            "cmd": "emacs --parent-id %3 %1",
-            "external_editor": false,
-            "attachment_words": ["attach", "jointe", "p.-j."],
-          },
-       }' > $out
-       '';
-
   # msmtp configuration file (man msmtp)
   msmtprc = pkgs.writeText "msmtprc" ''
     # Set default values for all following accounts
@@ -181,16 +104,109 @@ let
 
     # Accounts
     ${lib.concatMapStringsSep "\n\n" (acc: ''
-    account       ${acc.name}
-    host          ${acc.smtp.host}
-    port          587
-    from          ${acc.email}
-    user          ${if acc.smtp ? "user" then acc.smtp.user else acc.email}
-    passwordeval  ${getPasswd} ${acc.keepass}
+      account       ${acc.name}
+      host          ${acc.smtp.host}
+      port          587
+      from          ${acc.email}
+      user          ${if acc.smtp ? "user" then acc.smtp.user else acc.email}
+      passwordeval  ${getPasswd} ${acc.keepass}
     '') accounts}
 
     # Set a default account
-    account default : gmail
+    account default : ${(findDefaultAccount accounts).name}
+  '';
+
+  # Configuration file for notmuch (man notmuch-config)
+  notmuchConfig = pkgs.writeText "notmuch-config" ''
+    [database]
+    path=${mailDir}
+
+    [user]
+    name=Ronan-Alexandre Cherrueau
+    primary_email=${(findDefaultAccount accounts).email}
+    other_email=${lib.concatMapStringsSep ";" (lib.getAttr "email") accounts}
+
+    # Configuration for "notmuch new"
+    # - tags:	A list (separated by ';') of the tags that will be
+    #   added to all messages incorporated by "notmuch new".
+    # - ignore: A list (separated by ';') of file and directory names
+    #   that will not be searched for messages by "notmuch new".
+    [new]
+    tags=inbox;unread;
+    ignore=
+
+    # Search configuration
+    #
+    # - exclude_tags: A separated list of tags that will be excluded
+    #   from search results by default. Using an excluded tag in a
+    #   query will override that exclusion.
+    [search]
+    exclude_tags=deleted;spam;
+
+    # Maildir flags have precedence over the `new` tagging. Thus an
+    # already read mail gets its initial `unread` tag correctly
+    # removed.
+    [maildir]
+    synchronize_flags=true
+  '';
+
+  # Astroid GUI config
+  # https://github.com/astroidmail/astroid/wiki/Configuration-Reference
+  astroidConfig = pkgs.runCommand "astroid-config" {
+    buildInputs = [ pkgs.jq ];
+  } ''
+    # Merge default config with account information
+    echo ${lib.escapeShellArg astroidDefaultConfig} | \
+    jq -s '.[] as $in | $in * {
+       "astroid" : {
+         "notmuch_config": "${notmuchConfig}",
+         "debug": { "dryrun_sending": true },
+         "hints": { "level": -1 },
+         "log": { "syslog": true },
+       },
+       "startup": {
+         "queries": {
+           ${lib.concatMapStringsSep "," (name: ''
+           "${name}" : "tag:${name} and tag:inbox"
+           '') (map (lib.getAttr "name") accounts)}
+         }
+       },
+       "editor": {
+         "cmd": "emacs --parent-id %3 %1",
+         "external_editor": false,
+         "attachment_words": ["attach", "jointe", "p.-j."],
+       },
+       "thread_index": { "cell": {
+           "line_spacing": 3,
+           "message_count_length": 5,
+           "authors_length": 33,
+           "tags_alpha": 1,
+       }},
+       "general": { "time": {
+         "diff_year": "%F",
+       }},
+       "mail": {
+         "send_delay": 20,
+       },
+       "accounts": {
+         ${lib.concatMapStringsSep "," (acc: ''
+         "${acc.name}": {
+            "name": "Ronan-Alexandre Cherrueau",
+            "email": "${acc.email}",
+            "sendmail": "${msmtpWp} -i --read-recipents --account=${acc.name}",
+            "always_gpg_sign": false,
+            "save_sent": true,
+            "save_sent_to": "${mailDir}/${acc.name}/sent/cur/",
+            "save_draft_to": "${mailDir}/${acc.name}/drafts/",
+            "signature_file": "${acc.signature}",
+            "signature_separate": true,
+            ${lib.optionalString (acc ? default) ''
+              "default": ${(lib.boolToString acc.default)}
+            ''}
+         }
+         '') accounts}
+       },
+    }' > $out
   '';
 
   # --------------------------------------------------------------------
@@ -199,19 +215,27 @@ let
   # Directory to store emails
   mailDir = config.users.users.rfish.home + "/.mail";
 
+  # Default account
+  findDefaultAccount = accounts:
+    let errorMsg = "cannot find a default email account";
+    in lib.lists.findFirst
+        # Get the acc.default key or false
+        (acc: if acc ? default then acc.default else false)
+        (abort errorMsg) accounts;
+
   # Read password from KeePassX
   getPasswd = pkgs.writers.writeDash "kpcli-read-passwd" ''
-     # Get the password
-     PASSWD=$(TERM=xterm ${pkgs.kpcli}/bin/kpcli \
-                  --kdb ${config.users.users.rfish.home}/secret/passwd.kdbx \
-                  --pwfile /etc/nixos/secret/keepass \
-                  --readonly \
-                  --command "show -f $*" \
-              | grep Pass: \
-              | sed -Er 's/ Pass: (.+)/\1/g')
+    # Get the password
+    PASSWD=$(TERM=xterm ${pkgs.kpcli}/bin/kpcli \
+                 --kdb ${config.users.users.rfish.home}/secret/passwd.kdbx \
+                 --pwfile /etc/nixos/secret/keepass \
+                 --readonly \
+                 --command "show -f $*" \
+             | grep Pass: \
+             | sed -Er 's/ Pass: (.+)/\1/g')
 
-     # Display it
-     echo "$PASSWD"
+    # Display it
+    echo "$PASSWD"
   '';
 
   # Create the directory for local email stores
@@ -221,6 +245,26 @@ let
        chown ${config.users.users.rfish.name}:${config.users.users.rfish.group} ${mailDir}/${name}/
     '') (map (lib.getAttr "name") accounts)}
   '';
+
+  # Create the default astroid config
+  #
+  # XXX: astroid cannot open DISPLAY `:` and so segfault before
+  # generating the configuration.  I workaround it with `xvfb` to get
+  # a dummy DISPLAY.
+  #
+  # Debug:
+  # - Build locally in the nix REPL with `:b astroidDefaultConfig`
+  # - Pop a shell in the nix REPL with `:s astroidDefaultConfig`
+  # - See the log of the build with `nix log <<path-of-derivation.drv>>`
+  #
+  # https://github.com/astroidmail/astroid/issues/579
+  # https://github.com/astroidmail/astroid/issues/516
+  astroidDefaultConfig = builtins.fromJSON (
+    pkgs.runCommand "astroid-default-config" {buildInputs = [ pkgs.astroid pkgs.xvfb_run ];} ''
+      export HOME=nixos/tmphome
+      ${pkgs.xvfb_run}/bin/xvfb-run -d \
+        ${pkgs.astroid}/bin/astroid --disable-log --new-config --config $out
+    '');
 
   # Wraps astroid to call the custom config.
   #
@@ -252,23 +296,6 @@ let
   };
 
   # Wraps notmuch to call the custom config
-  # notmuchWp = pkgs.runCommand "notmuch" {
-  #   buildInputs = [ pkgs.makeWrapper ];
-  # } ''
-  #   mkdir $out
-  #   # Link every top-level folder from pkgs.notmuch to our new target
-  #   ln -s ${pkgs.notmuch}/* $out
-  #   # Except the bin folder
-  #   rm $out/bin
-  #   mkdir $out/bin
-  #   # We create the bin folder ourselves and link every binary in it
-  #   ln -s ${pkgs.notmuch}/bin/* $out/bin
-  #   # Except the notmuch binary
-  #   rm $out/bin/notmuch
-  #   # Because we create this ourself, by creating a wrapper
-  #   makeWrapper ${pkgs.notmuch}/bin/notmuch $out/bin/notmuch \
-  #     --set NOTMUCH_CONFIG "${notmuchConfig}"
-  # '';
   notmuchWp = pkgs.symlinkJoin {
     name = "notmuch";
     paths = [ pkgs.notmuch ];
@@ -279,6 +306,7 @@ let
     '';
   };
 
+  # Wraps msmtp to call the custom config
   msmtpWp = pkgs.symlinkJoin {
     name = "msmtp";
     paths = [ pkgs.msmtp ];
@@ -287,7 +315,6 @@ let
       wrapProgram $out/bin/msmtp \
         --add-flags "--file=${msmtprc}"
     '';
-
   };
 
 in {
