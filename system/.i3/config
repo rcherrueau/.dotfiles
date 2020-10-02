@@ -26,7 +26,7 @@ bindsym $mod+Return exec i3-sensible-terminal
 # bindsym $mod+Shift+Return split h; exec i3-sensible-terminal; layout tabbed
 bindsym $mod+Shift+Return split v; exec i3-sensible-terminal
 
-# Change between laptop and dell-desktop mode
+# Change between laptop and IMT mode
 bindsym XF86Display exec ~/.i3/toggle-mode.sh
 
 # kill focused window
