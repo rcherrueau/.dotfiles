@@ -5,8 +5,19 @@ let
   # Email accounts definition:
 
   accounts = [
+    { # GMail
+      default = true;
+      name = "GMail";
+      email = "RonanCherrueau@gmail.com";
+      imap.host = "imap.gmail.com";
+      smtp.host = "smtp.gmail.com";
+      keepass = "/root/perso/GMail";
+      signature = pkgs.writeText "gmail-sign" ''
+        Ronan-Alexandre Cherrueau
+      '';
+    }
     { # Inria
-      name = "inria";
+      name = "Inria";
       email = "Ronan-Alexandre.Cherrueau@inria.fr";
       imap.host = "zimbra.inria.fr";
       smtp.host = "smtp.inria.fr";
@@ -17,15 +28,16 @@ let
         https://rcherrueau.github.io
       '';
     }
-    { # GMail
-      default = true;
-      name = "gmail";
-      email = "RonanCherrueau@gmail.com";
-      imap.host = "imap.gmail.com";
-      smtp.host = "smtp.gmail.com";
-      keepass = "/root/perso/GMail";
-      signature = pkgs.writeText "gmail-sign" ''
-        Ronan-Alexandre Cherrueau
+    { # IMT
+      # https://intranet.imt-atlantique.fr/assistance-support/informatique/didacticiels/
+      name = "IMT";
+      email = "Ronan-Alexandre.Cherrueau@imt-atlantique.fr";
+      imap.host = "z.imt.fr";
+      smtp.host = "z.imt.fr";
+      keepass = "/root/IMT/rcherr12";
+      signature = pkgs.writeText "inria-sign" ''
+        Ronan-A. Cherrueau
+        https://rcherrueau.github.io
       '';
     }
   ];
