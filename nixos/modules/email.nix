@@ -163,63 +163,44 @@ let
   '';
 
   # Astroid GUI config
-  # https://github.com/astroidmail/astroid/wiki/Configuration-Reference
-  astroidConfig = pkgs.runCommand "astroid-config" {
-    buildInputs = [ pkgs.jq ];
-  } ''
-    # Merge default config with account information
-    echo ${lib.escapeShellArg astroidDefaultConfig} | \
-    jq -s '.[] as $in | $in * {
-       "astroid" : {
-         "notmuch_config": "${notmuchConfig}",
-         "debug": { "dryrun_sending": true },
-         "hints": { "level": -1 },
-         "log": { "syslog": true },
-       },
-       "startup": {
-         "queries": {
-           ${lib.concatMapStringsSep "," (name: ''
-           "${name}" : "tag:${name} and tag:inbox"
-           '') (map (lib.getAttr "name") accounts)}
-         }
-       },
-       "editor": {
-         "cmd": "emacs --parent-id %3 %1",
-         "external_editor": false,
-         "attachment_words": ["attach", "jointe", "p.-j."],
-       },
-       "thread_index": { "cell": {
-           "line_spacing": 3,
-           "message_count_length": 5,
-           "authors_length": 33,
-           "tags_alpha": 1,
-       }},
-       "general": { "time": {
-         "diff_year": "%F",
-       }},
-       "mail": {
-         "send_delay": 20,
-       },
-       "accounts": {
-         ${lib.concatMapStringsSep "," (acc: ''
-         "${acc.name}": {
-            "name": "Ronan-Alexandre Cherrueau",
-            "email": "${acc.email}",
-            "sendmail": "${msmtpWp} -i --read-recipents --account=${acc.name}",
-            "always_gpg_sign": false,
-            "save_sent": true,
-            "save_sent_to": "${mailDir}/${acc.name}/sent/cur/",
-            "save_draft_to": "${mailDir}/${acc.name}/drafts/",
-            "signature_file": "${acc.signature}",
-            "signature_separate": true,
-            ${lib.optionalString (acc ? default) ''
-              "default": ${(lib.boolToString acc.default)}
-            ''}
-         }
-         '') accounts}
-       },
-    }' > $out
-  '';
+  # See https://github.com/astroidmail/astroid/wiki/Configuration-Reference
+  astroidConfig = (pkgs.formats.json {}).generate "astroid-config.json" (astroidDefaultConfig // {
+    accounts = lib.foldr (a: b: a // b) {} (map (acc: with acc; { ${name} = {
+      name = "Ronan-Alexandre Cherrueau";
+      email = "${email}";
+      sendmail = "${msmtpWp} -i --read-recipents --account=${acc.name}";
+      always_gpg_sign = false;
+      save_sent = true;
+      save_sent_to = "${mailDir}/${name}/sent/cur/";
+      save_draft_to = "${mailDir}/${name}/drafts/";
+      signature_file = "${signature}";
+      signature_separate = true;
+      default = if acc ? default then default else false;
+    };}) accounts);
+    startup.queries =
+      # { Inria = "tag:inbox and tag:Inria"; GMail = "tag:inbox and tag:GMail" }
+      lib.genAttrs (map (lib.getAttr "name") accounts) (name: "tag:inbox and tag:${name}");
+    astroid = {
+      notmuch_config = notmuchConfig;
+      debug.dryrun_sending = true;
+      hints.level = -1;
+      log.syslog = true;
+    };
+    editor = {
+      cmd = "emacs --parent-id %3 %1";
+      external_editor = false;
+      attachement_words = [ "attach" "p.-j." "jointe" ];
+    };
+    # Thread index is the "list of emails" view
+    thread_index.cell = {
+      line_spacing = 3;
+      message_count_length = 5;
+      authors_length = 33;
+      tags_alpha = 1;
+    };
+    general.time.diff_year = "%F";
+    mail.send_delay = 20;  # Wait 20 seconds before sending email
+  });
 
   # --------------------------------------------------------------------
   # Utils
@@ -271,12 +252,12 @@ let
   #
   # https://github.com/astroidmail/astroid/issues/579
   # https://github.com/astroidmail/astroid/issues/516
-  astroidDefaultConfig = builtins.fromJSON (
+  astroidDefaultConfig = builtins.fromJSON (lib.readFile (
     pkgs.runCommand "astroid-default-config" {buildInputs = [ pkgs.astroid pkgs.xvfb_run ];} ''
       export HOME=nixos/tmphome
       ${pkgs.xvfb_run}/bin/xvfb-run -d \
         ${pkgs.astroid}/bin/astroid --disable-log --new-config --config $out
-    '');
+    ''));
 
   # Wraps astroid to call the custom config.
   #
