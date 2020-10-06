@@ -92,17 +92,15 @@
                      options = [ "NOPASSWD" ]; } ]; }
   ];
 
-  # XXX: Requires merge of https://github.com/NixOS/nixpkgs/pull/97438
-  #
-  # # OpenVPN client:
-  # services.openvpn.servers = {
-  #   # Access to home freebox. Activate it with `sudo systemctl start
-  #   # openvpn-freebox`
-  #   freebox = {
-  #     autoStart = false;
-  #     config = '' config /home/rfish/openvpn/freeboxVPN.ovpn '';
-  #   };
-  # };
+  # OpenVPN client:
+  services.openvpn.servers = {
+    # Access to home freebox. Activate it with `sudo systemctl start
+    # openvpn-freebox`
+    freebox = {
+      autoStart = false;
+      config = '' config /home/rfish/openvpn/freeboxVPN.ovpn '';
+    };
+  };
 
   # Enable CUPS to print documents.
   # Find PPD Drivers on https://www.openprinting.org/printers

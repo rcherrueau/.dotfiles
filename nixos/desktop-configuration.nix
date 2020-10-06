@@ -419,19 +419,17 @@
   # $ systemctl --user status redshift.service
   services.redshift.enable = true;
 
-  # XXX: Requires merge of https://github.com/NixOS/nixpkgs/pull/97438
-  #
-  # # OpenVPN client:
-  # services.openvpn.servers = {
-  #   # Access to Grid5000. Activate it with `sudo systemctl start
-  #   # openvpn-g5k`
-  #   g5k = {
-  #     autoStart = false;
-  #     config = '' config /home/rfish/openvpn/g5k/Grid5000_VPN.ovpn '';
-  #     # Update /etc/resolv.conf with g5k DNS
-  #     updateResolvConf = true;
-  #   };
-  # };
+  # OpenVPN client:
+  services.openvpn.servers = {
+    # Access to Grid5000. Activate it with `sudo systemctl start
+    # openvpn-g5k`
+    g5k = {
+      autoStart = false;
+      config = '' config /home/rfish/openvpn/g5k/Grid5000_VPN.ovpn '';
+      # Update /etc/resolv.conf with g5k DNS
+      updateResolvConf = true;
+    };
+  };
 
   # Enable Unbound DNS and set it as DNS in resolv.conf. For
   # resolv.conf/nameservers see also nix
