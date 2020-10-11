@@ -5,13 +5,14 @@ let
   # Email accounts definition:
 
   accounts = [
-    { # GMail
+    { # Gmail
       default = true;
-      name = "GMail";
+      name = "Gmail";
       email = "RonanCherrueau@gmail.com";
       imap.host = "imap.gmail.com";
       smtp.host = "smtp.gmail.com";
       keepass = "/root/perso/GMail";
+      trash = "[Gmail]/Bin";
       signature = pkgs.writeText "gmail-sign" ''
         Ronan-Alexandre Cherrueau
       '';
@@ -23,6 +24,7 @@ let
       smtp.host = "smtp.inria.fr";
       smtp.user = "rcherrue";
       keepass = "/root/Inria/inria";
+      trash = "Trash";
       signature = pkgs.writeText "inria-sign" ''
         Ronan-A. Cherrueau
         https://rcherrueau.github.io
@@ -35,6 +37,7 @@ let
       imap.host = "z.imt.fr";
       smtp.host = "z.imt.fr";
       keepass = "/root/IMT/rcherr12";
+      trash = "Trash";
       signature = pkgs.writeText "inria-sign" ''
         Ronan-A. Cherrueau
         https://rcherrueau.github.io
@@ -44,17 +47,20 @@ let
 
   # --------------------------------------------------------------------
   # Notmuch tagging script
-  notmuchTags = pkgs.writers.writeDash "notmuch-tag-mails" ''
-    # Index new emails
-    ${notmuchWp}/bin/notmuch new
-
+  notmuchTags = pkgs.writeText "notmuch-tag-mails" ''
     # Tag new mails according to their folder path
-    # > notmuch tag +inria -- new path:inria/**
+    # > notmuch tag +inria -- path:inria/**
     ${lib.concatMapStrings (name: ''
-      ${notmuchWp}/bin/notmuch tag +${name} -- path:${name}/**
+    +${name} -- path:${name}/**
     '') (map (lib.getAttr "name") accounts)}
 
-    # GMail specific configurations
+    +ISP -- from:freetelecom.fr or from:free-mobile.fr or from:assistance.free.fr
+    +Banque -- from:ca-atlantique-vendee.fr or from:ing.com
+    +List +G5k -- list:*.lists.grid5000.fr or from:grid5000.fr
+    # Require `notmuch config set index.header.Listid List-ID` and `notmuch reindex '*'`
+    +List +Nix -- Listid:24d1741146b951f90adf436fdmc
+    +List +Racket -- Listid:2d4bcd7724e2a351c8e594233mc
+    # +deleted -- subject:[SPAM]
   '';
 
   # --------------------------------------------------------------------
@@ -98,11 +104,11 @@ let
       Channel  ${acc.name}-inbox
       Master   :${acc.name}-remote:
       Slave    :${acc.name}-local:
-      Patterns "*" "!Trash" "![Gmail]*" # Will copy all remote email accounts as is except Trash
+      Patterns "*" "![Gmail]*" "${acc.trash}" # Copy all remote email box as is except [Gmail]
+      Sync     All    # Propagate read, deletion ...
       Create   Slave  # Automatically create missing mailboxes on the Slave.
       Expunge  Slave  # Only delete on Slave
-      Sync     All
-      MaxSize  100m # Don't download any email greater than this
+      MaxSize  100m   # Don't download any email greater than this
     '') accounts}
   '';
 
@@ -128,7 +134,7 @@ let
     account default : ${(findDefaultAccount accounts).name}
   '';
 
-  # Configuration file for notmuch (man notmuch-config)
+  # notmuch configuration file (man notmuch-config)
   notmuchConfig = pkgs.writeText "notmuch-config" ''
     [database]
     path=${mailDir}
@@ -162,7 +168,7 @@ let
     synchronize_flags=true
   '';
 
-  # Astroid GUI config
+  # Astroid configuration
   # See https://github.com/astroidmail/astroid/wiki/Configuration-Reference
   astroidConfig = (pkgs.formats.json {}).generate "astroid-config.json" (astroidDefaultConfig // {
     accounts = lib.foldr (a: b: a // b) {} (map (acc: with acc; { ${name} = {
@@ -172,14 +178,15 @@ let
       always_gpg_sign = false;
       save_sent = true;
       save_sent_to = "${mailDir}/${name}/sent/cur/";
-      save_draft_to = "${mailDir}/${name}/drafts/";
+      save_draft_to = "${mailDir}/${name}/Drafts/";
       signature_file = "${signature}";
       signature_separate = true;
       default = if acc ? default then default else false;
     };}) accounts);
     startup.queries =
-      # { Inria = "tag:inbox and tag:Inria"; GMail = "tag:inbox and tag:GMail" }
+      # { Inria = "tag:inbox and tag:Inria"; Gmail = "tag:inbox and tag:Gmail" }
       lib.genAttrs (map (lib.getAttr "name") accounts) (name: "tag:inbox and tag:${name}");
+    poll.interval = 0; # Disable automatic polling
     astroid = {
       notmuch_config = notmuchConfig;
       debug.dryrun_sending = true;
@@ -187,9 +194,9 @@ let
       log.syslog = true;
     };
     editor = {
-      cmd = "emacs --parent-id %3 %1";
+      cmd = "emacs --parent-id %3 --eval '(progn (find-file \"%1\") (setq mail-setup-with-from nil) (mail-mode))'";
       external_editor = false;
-      attachement_words = [ "attach" "p.-j." "jointe" ];
+      attachement_words = lib.concatStringsSep "," [ "attach" "p.-j." "pièce jointe" "pièce-jointe" "ci-joint"];
     };
     # Thread index is the "list of emails" view
     thread_index.cell = {
@@ -197,6 +204,9 @@ let
       message_count_length = 5;
       authors_length = 33;
       tags_alpha = 1;
+      # Don't show these tags
+      hidden_tags = lib.concatStringsSep ","
+        [ "attachment" "flagged" "unread" "replied" "inbox" "List" ];
     };
     general.time.diff_year = "%F";
     mail.send_delay = 20;  # Wait 20 seconds before sending email
@@ -230,6 +240,51 @@ let
     # Display it
     echo "$PASSWD"
   '';
+
+  # Move deleted emails to trash box and delete old emails.
+  #
+  # Note: mbsync adds a unique identifier to file names (e.g.,
+  # `/path/to/mail,U=<UID>:2,SR` -- with `2` stands for the version of
+  # UID generation if I am right).  Moving files causes UID conflicts
+  # and prevent mbsync from syncing "Maildir error: UID 9610 is beyond
+  # highest assigned UID 86."  The sed command in the following
+  # removes the UID to force mbsync to regenerate one and avoid UID
+  # conflicts.
+  deleteMails =
+    let getTrashBox = acc: lib.escapeShellArg "${acc.name}/${acc.trash}";
+    in pkgs.writers.writeBash "delete-emails" ''
+      # Delete emails older than 30 days
+      ${notmuchWp}/bin/notmuch search --output=files --format=text0 \
+        tag:deleted and date:..30days \
+        | xargs -0 --no-run-if-empty rm
+
+      # Move emails of a notmuch QUERY into BOX
+      function moveToBox {
+        local QUERY="$1"
+        local BOX="$2"
+
+        for EMAIL_PATH in $(${notmuchWp}/bin/notmuch search --output=files "$QUERY")
+        do
+          # Strip UID from email name
+          EMAIL_BASENAME=$(basename "$EMAIL_PATH")
+          EMAIL_NO_UID=$(echo "$EMAIL_BASENAME" | sed -r 's/U=[0-9]+:2/U=:2/g')
+          # Move email to $BOX
+          mv "$EMAIL_PATH" "${mailDir}/$BOX/cur/$EMAIL_NO_UID"
+        done
+      }
+
+      # Move emails marked as deleted into the Trash box
+      ${lib.concatMapStrings (acc: ''
+         moveToBox "tag:${acc.name} AND tag:deleted NOT folder:${getTrashBox acc}" \
+                   ${getTrashBox acc}
+      '') accounts}
+
+      # Remove the inbox tag from deleted mails (this also
+      # systematically tags emails as +deleted in case some emails have
+      # been deleted from the webmail interface)
+      ${notmuchWp}/bin/notmuch tag -inbox +deleted -- ${lib.concatMapStringsSep " OR " (acc: ''
+         folder:${getTrashBox acc}'') accounts}
+    '';
 
   # Create the directory for local email stores
   mkLocalStores = pkgs.writers.writeDash "msbync-local-stores" ''
@@ -284,10 +339,20 @@ let
     postBuild = ''
       wrapProgram $out/bin/astroid \
         --set NOTMUCH_CONFIG "${notmuchConfig}" \
-        --add-flags "--config ${astroidConfig}"
+        --add-flags "--config=${astroidConfig}"
     '';
   };
 
+  # Wraps mbsync to call the custom config
+  mbsyncWp = pkgs.symlinkJoin {
+    name = "mbsync";
+    paths = [ pkgs.isync ];
+    buildInputs = [ pkgs.makeWrapper ];
+    postBuild = ''
+      wrapProgram $out/bin/mbsync \
+        --add-flags "--config ${mbsyncrc}"
+    '';
+  };
   # Wraps notmuch to call the custom config
   notmuchWp = pkgs.symlinkJoin {
     name = "notmuch";
@@ -312,7 +377,7 @@ let
 
 in {
   environment.systemPackages = with pkgs; [
-    isync       # to fetch email (mbsync)
+    mbsyncWp    # to fetch email (mbsync)
     notmuchWp   # to index and search email
     msmtpWp     # to send email
     astroidWp   # GUI
@@ -324,20 +389,41 @@ in {
     let HOME = config.users.users.rfish.home;
     in {
       description = "Mailbox synchronization service";
-      startAt = [ "*:00/5" ];  # Pull every 5 minutes
+      startAt = [ "*:00/10" ];  # Pull every 10 minutes
       environment.NOTMUCH_CONFIG=notmuchConfig;  # notmuch configuration file
       serviceConfig = {
         Type = "oneshot";
+        ExecStartPre =  [
+          # Build the local store if any
+          mkLocalStores
+
+          # XXX: `astroid --start-polling` ends with a coredump but
+          # seems to work!  I prefixed the command with a dash `-` to
+          # tell systemd to ignore the result.
+          "-${astroidWp}/bin/astroid --start-polling"
+
+          # Deleted emails may not work if `notmuch new` has not been
+          # executed first.  I prefixed the command with a dash `-` to
+          # tell systemd to ignore the result.
+          "-${deleteMails}"
+        ];
         # Synchronize emails
-        ExecStart = [''
-          ${pkgs.isync}/bin/mbsync --config ${builtins.trace ''
-            msmtp ${msmtprc}
-            notmuch ${notmuchConfig}
-            astroid ${astroidConfig}''
-            mbsyncrc} -Va
-        ''];
-        ExecStartPre =  [ mkLocalStores ];
-        ExecStartPost = [ notmuchTags ];
+        ExecStart = "${builtins.trace ''
+                       mbsync ${mbsyncrc}
+                       msmtp ${msmtprc}
+                       notmuch ${notmuchConfig}
+                       astroid ${astroidConfig}
+                       deleteEmail ${deleteMails}
+                       notmuchTags ${notmuchTags} ''
+                       mbsyncWp}/bin/mbsync -Va";
+        ExecStartPost = [
+          # Index new emails
+          "${notmuchWp}/bin/notmuch new"
+          # Tag emails
+          "${notmuchWp}/bin/notmuch tag --batch --input=${notmuchTags}"
+          # Stop notifying astoid
+          "-${astroidWp}/bin/astroid --stop-polling"
+        ];
       };
     };
 }
