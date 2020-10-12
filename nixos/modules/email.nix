@@ -294,7 +294,7 @@ let
     echo "$PASSWD"
   '';
 
-  # Create the default astroid config
+  # Get the default astroid config
   #
   # XXX: astroid cannot open DISPLAY `:` and so segfault before
   # generating the configuration.  I workaround it with `xvfb` to get
@@ -308,42 +308,38 @@ let
   # https://github.com/astroidmail/astroid/issues/579
   # https://github.com/astroidmail/astroid/issues/516
   astroidDefaultConfig = builtins.fromJSON (lib.readFile (
-    pkgs.runCommand "astroid-default-config" {buildInputs = [ pkgs.astroid pkgs.xvfb_run ];} ''
+    pkgs.runCommand "astroid-default-config"
+      {buildInputs = [ pkgs.astroid pkgs.xvfb_run ];} ''
       export HOME=nixos/tmphome
       ${pkgs.xvfb_run}/bin/xvfb-run -d \
         ${pkgs.astroid}/bin/astroid --disable-log --new-config --config $out
     ''));
 
-  # Wraps astroid to call the custom config.
+  # Create the directory for local email stores
+  mkLocalStores = pkgs.writers.writeDash "msbync-local-stores" ''
+    ${lib.concatMapStrings (name: ''
+       mkdir -p ${mailDir}/${name}/
+       chown ${config.users.users.rfish.name}:${config.users.users.rfish.group} ${mailDir}/${name}/
+    '') accountNames}
+  '';
+
+  # Wraps mbsync to call the custom config
   #
-  # We want astroid to be called with our custom config. I can make a
+  # We want mbsync to be called with our custom config. I can make a
   # shell script that does so:
-  # > astroidWithConf = pkgs.writers.writeDashBin "astroid" ''
-  # >   ${pkgs.astroid}/bin/astroid --config ${astroidConfig} $*
+  # > mbsyncWithConf = pkgs.writers.writeDashBin "mbsync" ''
+  # >   ${pkgs.isync}/bin/mbsync --config ${mbsyncrc} $*
   # > '';
   # However, such a shell script does not propagate man pages and
-  # other paths from the old pkgs.astroid derivation. A better
-  # solution is to go with wrapProgram.
-  #
-  # wrapProgram is done most of the time in the `postFixup` phase.  We
-  # can `override` the astroid derivation to add the wrapping of the
-  # program, but this will require the recompilation of astroid. A
-  # better solution is the following
+  # other paths from the old pkgs.isync derivation.  A general
+  # solution is to go with `wrapProgram`.  wrapProgram is done most of
+  # the time in the `postFixup` phase.  We can `override` the isync
+  # derivation to add the wrapping of the program in the postFixup
+  # phase, but this will require the recompilation of isync.  As a
+  # better solution, use `wrapProgram` with `pkgs.symlinkJoin`.
   #
   # See https://nixos.wiki/wiki/Nix_Cookbook
   # https://github.com/ahmedtd/nixpkgs/blob/49aa2483e0a6ced59b46655c523e1399e27220d1/pkgs/build-support/setup-hooks/make-wrapper.sh
-  astroidWp = pkgs.symlinkJoin {
-    name = "astroid";
-    paths = [ pkgs.astroid ];
-    buildInputs = [ pkgs.makeWrapper ];
-    postBuild = ''
-      wrapProgram $out/bin/astroid \
-        --set NOTMUCH_CONFIG "${notmuchConfig}" \
-        --add-flags "--config=${astroidConfig}"
-    '';
-  };
-
-  # Wraps mbsync to call the custom config
   mbsyncWp = pkgs.symlinkJoin {
     name = "mbsync";
     paths = [ pkgs.isync ];
@@ -353,6 +349,7 @@ let
         --add-flags "--config ${mbsyncrc}"
     '';
   };
+
   # Wraps notmuch to call the custom config
   notmuchWp = pkgs.symlinkJoin {
     name = "notmuch";
@@ -373,6 +370,65 @@ let
       wrapProgram $out/bin/msmtp \
         --add-flags "--file=${msmtprc}"
     '';
+  };
+
+  # Wraps astroid to call the custom config.
+  #
+  # Astroid assumes that files such as `poll.sh` or `keybindings` live
+  # next to the config file [0].  Because of this, I have to put the
+  # `astroidConfig` in a directory that also contains my polling
+  # script and my specific keybindings.
+  #
+  # [0] https://github.com/astroidmail/astroid/blob/437497207ea711bddc8b9bfd53e709910332e5ed/src/poll.cc#L175
+  # The astroid code uses the idiom
+  # `astroid->standard_paths().config_dir` to get the path of
+  # `poll.sh` or `keybindings`.  This path refers to the directory of
+  # the astroid configuration file.
+  astroidWp =
+    let keybindings = pkgs.writeText "keybindings" ''
+          # searching in main window
+          main_window.search=/
+
+          # beginning/end of buffer
+          thread_index.scroll_home=g
+          thread_index.scroll_end=G
+          thread_view.scroll_home=g
+          thread_view.scroll_end=G
+
+          # Specific actions
+          thread_index.run(hooks::toggle deleted thread:%1, hooks::toggle deleted thread:%1)=D
+          thread_view.run(hooks::toggle deleted id:%2, hooks::toggle deleted id:%2)=D
+        '';
+        polling = pkgs.writers.writeDash "poll.sh" "systemctl --user restart polling-email";
+        toggle = pkgs.writers.writeBash "toggle" ''
+          # Check if the thread or message matches the tag
+          if [[ $(${notmuchWp}/bin/notmuch search --exclude=false tag:$1 AND $2) ]]; then
+            notmuch tag -$1 $2   # Remove the tag
+          else
+            notmuch tag +$1 $2   # Add the tag
+          fi
+        '';
+        astroidDir = pkgs.runCommand "astroid-config-dir" {} ''
+          mkdir $out        # Astroid config directory
+          mkdir $out/hooks  # hooks directory
+
+          # Symlink the config, polling keybindings and hooks scripts
+          ln -s "${astroidConfig}" $out/config.json
+          ln -s "${polling}" $out/poll.sh
+          ln -s "${keybindings}" $out/keybindings
+          ln -s "${toggle}" $out/hooks/toggle
+        '';
+    in pkgs.symlinkJoin {
+      name = "astroid";
+      paths = [ pkgs.astroid ];
+      buildInputs = [ pkgs.makeWrapper ];
+
+      # --add-flags "--config=${astroidConfig}"
+      postBuild = ''
+        wrapProgram $out/bin/astroid \
+          --set NOTMUCH_CONFIG "${notmuchConfig}" \
+          --add-flags "--config=${astroidDir}/config.json"
+      '';
   };
 
 in {
