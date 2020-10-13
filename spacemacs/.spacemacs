@@ -727,10 +727,26 @@ https://stackoverflow.com/a/14001190)."
 
   (spacemacs/toggle-camel-case-motion-globally-on)
 
+  ;; Manage bibLaTeX references
+  (defun rcherr/org-ref-get-pdf-filename (key)
+    "Return the pdf filename associated with a bibtex KEY.
+This searches for the pattern *KEY.pdf. If one result is found it
+is returned, but if multiple results are found, e.g. there are
+related files to the KEY you are prompted for which one you
+want."
+    (let* ((cmd  (format "find /home/rfish/Sync/Papers/ -iname '*%s.pdf' -print0" key))
+           (pdfs (s-split " " (shell-command-to-string cmd) t)))
+      (cond
+       ((= (length pdfs) 0)
+        (message "There is no articles with the key %s" key))
+       ((= (length pdfs) 1)
+        (car pdfs))
+       ((> (length pdfs) 1)
+        (completing-read "Choose an article: " pdfs)))))
 
   (setq org-ref-default-bibliography '("~/prog/inria-perso/Bibliography.bib")
-        org-ref-pdf-directory "~/Sync/Papers/"
-        org-ref-bibliography-notes "~/Sync/Papers/notes.org")
+        org-ref-bibliography-notes "~/Sync/Papers/notes.org"
+        org-ref-get-pdf-filename-function 'rcherr/org-ref-get-pdf-filename)
 
   ;; ------------------------------------------------------------- Modes
 
