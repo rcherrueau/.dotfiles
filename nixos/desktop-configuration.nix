@@ -181,7 +181,7 @@
     git
     emacs # (emacsWithPackages (epkgs: [epkgs.pdf-tools]))
     aspell aspellDicts.en aspellDicts.fr
-    ripgrep
+    ripgrep bat
     # TODO(qtwebkit) zeal
     sqlite
 
@@ -277,6 +277,7 @@
 
       shellAliases = {
         l = "ls -alh"; ll = "ls -l"; ls = "ls --color=tty";
+        cat = "${pkgs.bat}/bin/bat --theme=Nord --style=plain";
         fu  = "sudo $(fc -ln -1 -1)";
         encrypt = "openssl enc -aes-256-cbc -salt";
         decrypt = "openssl enc -aes-256-cbc -salt -d";
