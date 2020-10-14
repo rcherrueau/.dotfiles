@@ -121,7 +121,7 @@
     xorg.xbacklight # Decrease screen brightness
     xcape # Escape and Control on a single key
     xdotool # Script your mouse
-    zathura xournal pdfgrep # Pdf viewer + notetaking
+    zathura xournal # Pdf viewer + notetaking
 
     # mattermost CLI
     matterhorn
@@ -181,7 +181,7 @@
     git
     emacs # (emacsWithPackages (epkgs: [epkgs.pdf-tools]))
     aspell aspellDicts.en aspellDicts.fr
-    ripgrep bat
+    ripgrep ripgrep-all bat
     # TODO(qtwebkit) zeal
     sqlite
 
@@ -278,7 +278,8 @@
       shellAliases = {
         l = "ls -alh"; ll = "ls -l"; ls = "ls --color=tty";
         cat = "${pkgs.bat}/bin/bat --theme=Nord --style=plain";
-        fu  = "sudo $(fc -ln -1 -1)";
+        pdfgrep = "${pkgs.ripgrep-all}/bin/rga --rga-adapters=poppler";
+        fu = "sudo $(fc -ln -1 -1)";
         encrypt = "openssl enc -aes-256-cbc -salt";
         decrypt = "openssl enc -aes-256-cbc -salt -d";
         p = "xdg-open-background"; r = "ranger"; ns = "nix-shell";
