@@ -36,12 +36,12 @@ self: super:
         # # bound.
         # #
         # # https://qiita.com/kimagure/items/c3fb87f7f71b9df99078
-        # matterhorn = self.haskell.lib.overrideCabal hsuper.matterhorn {
-        #   version = "50200.9.0";
-        #   sha256 = "1ky022msmh1ashhw8kwxwj4lcswa6xin2537q4bx8miii07cfvaw";
-        #   jailbreak = true;
-        #   doCheck = false;
-        # };
+        matterhorn = self.haskell.lib.overrideCabal hsuper.matterhorn {
+          version = "50200.10.1";
+          sha256 = "0m4vqxxcqvbgm6flfwqy2w47ada3r29r34yw1gyv02na7gx3rqi1";
+          jailbreak = true;
+          doCheck = false;
+        };
       };
   };
 }
