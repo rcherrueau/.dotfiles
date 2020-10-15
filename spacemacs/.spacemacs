@@ -759,9 +759,6 @@ want."
         org-ref-bibliography-notes "~/Sync/Papers/notes.org"
         org-ref-get-pdf-filename-function 'rcherr/org-ref-get-pdf-filename)
 
-  ;; Load mail-mode when editing mail from astroid
-  (add-to-list 'auto-mode-alist '("\\.astroid@" . mail-mode))
-
   ;; ------------------------------------------------------------- Modes
 
   ;; -- company
