@@ -226,6 +226,13 @@ let
       # beyond highest assigned UID 86."  The sed command in the following
       # removes the UID to force mbsync to regenerate one and avoid UID
       # conflicts.
+      #
+      # From `man mbsync`
+      # > When using the more efficient default UID mapping scheme, it
+      # > is important that the MUA renames files when moving them
+      # > between Maildir folders.  Mutt always does that, while mu4e
+      # > needs to be configured to do it: (setq
+      # > mu4e-change-filenames-when-moving t)
       function moveToBox {
         local QUERY="$1"
         local BOX="$2"
@@ -351,14 +358,19 @@ let
   };
 
   # Wraps notmuch to call the custom config
-  notmuchWp = pkgs.symlinkJoin {
-    name = "notmuch";
-    paths = [ pkgs.notmuch ];
-    buildInputs = [ pkgs.makeWrapper ];
-    postBuild = ''
-      wrapProgram $out/bin/notmuch \
-        --set NOTMUCH_CONFIG "${notmuchConfig}"
-    '';
+  notmuchWp =
+    let notmuchNoTest = pkgs.notmuch.overrideAttrs (oldAttrs:
+          {doCheck = false;}
+    );
+    in pkgs.symlinkJoin {
+      name = "notmuch";
+      # paths = [ pkgs.notmuch ];
+      paths = [ notmuchNoTest ];
+      buildInputs = [ pkgs.makeWrapper ];
+      postBuild = ''
+        wrapProgram $out/bin/notmuch \
+         --set NOTMUCH_CONFIG "${notmuchConfig}"
+      '';
   };
 
   # Wraps msmtp to call the custom config
@@ -392,15 +404,24 @@ let
           # beginning/end of buffer
           thread_index.scroll_home=g
           thread_index.scroll_end=G
-          thread_view.scroll_home=g
-          thread_view.scroll_end=G
+
+          # Email view
+          thread_view.next_message=J
+          thread_view.previous_message=K
+          thread_view.reply_all=C-r
+          thread_view.search.search=/
+          thread_view.search.next=n
+          thread_view.search.previous=N
+          thread_view.toggle_unread=U
+          thread_view.home=g
+          thread_view.end=G
 
           # Specific actions
-          thread_index.run(hooks::toggle deleted thread:%1, hooks::toggle deleted thread:%1)=D
-          thread_view.run(hooks::toggle deleted id:%2, hooks::toggle deleted id:%2)=D
+          thread_index.run(hooks::toggle-delete deleted thread:%1, hooks::toggle-delete deleted thread:%1)=D
+          thread_view.run(hooks::toggle-delete deleted id:%2, hooks::toggle-delete deleted id:%2)=D
         '';
         polling = pkgs.writers.writeDash "poll.sh" "systemctl --user restart polling-email";
-        toggle = pkgs.writers.writeBash "toggle" ''
+        toggle = pkgs.writers.writeBash "toggle-delete" ''
           # Check if the thread or message matches the tag
           if [[ $(${notmuchWp}/bin/notmuch search --exclude=false tag:$1 AND $2) ]]; then
             notmuch tag -$1 $2   # Remove the tag
@@ -416,7 +437,7 @@ let
           ln -s "${astroidConfig}" $out/config.json
           ln -s "${polling}" $out/poll.sh
           ln -s "${keybindings}" $out/keybindings
-          ln -s "${toggle}" $out/hooks/toggle
+          ln -s "${toggle}" $out/hooks/toggle-delete
         '';
     in pkgs.symlinkJoin {
       name = "astroid";
