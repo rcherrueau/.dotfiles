@@ -278,6 +278,7 @@
       shellAliases = {
         l = "ls -alh"; ll = "ls -l"; ls = "ls --color=tty";
         cat = "${pkgs.bat}/bin/bat --theme=Nord --style=plain";
+        fgrep = "${pkgs.ripgrep}/bin/rg --fixed-strings";
         pdfgrep = "${pkgs.ripgrep-all}/bin/rga --rga-adapters=poppler";
         fu = "sudo $(fc -ln -1 -1)";
         encrypt = "openssl enc -aes-256-cbc -salt";

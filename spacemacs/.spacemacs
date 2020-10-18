@@ -37,7 +37,7 @@ This function should only modify configuration layer settings."
      ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
      ;; `M-m f e R' (Emacs style) to install them.
      ;; ----------------------------------------------------------- lang
-     ;; coq
+     coq
      (elm :variables
           elm-interactive-command '("elm" "repl")
           elm-reactor-command '("elm" "reactor")
