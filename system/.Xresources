@@ -1,5 +1,5 @@
 !General config
-! Xft*dpi:                      144
+!Xft*dpi:                      144
 Xft*autohint:                 false
 Xft*lcdfilter:                lcddefault
 Xft*hintstyle:                hintfull
