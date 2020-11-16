@@ -181,8 +181,9 @@
     git
     emacs # (emacsWithPackages (epkgs: [epkgs.pdf-tools]))
     aspell aspellDicts.en aspellDicts.fr
+    manix
     ripgrep ripgrep-all bat
-    # TODO(qtwebkit) zeal
+    zeal
     sqlite
 
     # language
