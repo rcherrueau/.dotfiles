@@ -27,6 +27,7 @@ with lib;
         "${config.users.users.rfish.home}/secret" = {
           id = "secret";
           devices = [ "home" "hp" "jolla" "donatello" ];
+          ignorePerms = false;
         };
         "${config.users.users.rfish.home}/Sync" = {
           id = "default";
