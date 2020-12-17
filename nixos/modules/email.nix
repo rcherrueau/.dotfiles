@@ -3,39 +3,7 @@
 let
   # --------------------------------------------------------------------
   # Email accounts:
-  accounts = rec {
-    Gmail = {
-      default = true;
-      email = "RonanCherrueau@gmail.com";
-      imap.host = "imap.gmail.com";
-      smtp.host = "smtp.gmail.com";
-      keepass = "/root/perso/GMail";
-      trash = "[Gmail]/Bin";
-      signature = pkgs.writeText "gmail-sign" ''
-        Ronan-Alexandre Cherrueau
-      '';
-    };
-    Inria = {
-      email = "Ronan-Alexandre.Cherrueau@inria.fr";
-      imap.host = "zimbra.inria.fr";
-      smtp.host = "smtp.inria.fr";
-      smtp.user = "rcherrue";
-      keepass = "/root/Inria/inria";
-      trash = "Trash";
-      signature = pkgs.writeText "inria-sign" ''
-        Ronan-A. Cherrueau
-        https://rcherrueau.github.io
-      '';
-    };
-    IMT = {
-      # https://intranet.imt-atlantique.fr/assistance-support/informatique/didacticiels/
-      inherit (Inria) signature trash;
-      email = "Ronan-Alexandre.Cherrueau@imt-atlantique.fr";
-      imap.host = "z.imt.fr";
-      smtp.host = "z.imt.fr";
-      keepass = "/root/IMT/rcherr12";
-    };
-  };
+  accounts = (import ./email-accounts.nix);
 
   # --------------------------------------------------------------------
   # Notmuch tagging script
@@ -48,11 +16,19 @@ let
 
     +ISP -- from:freetelecom.fr or from:free-mobile.fr or from:assistance.free.fr
     +Banque -- from:ca-atlantique-vendee.fr or from:ing.com
-    +List +G5k -- list:*.lists.grid5000.fr or from:grid5000.fr
+    +Shopping -- to:"/.*\+shopping@.*/"
+
+    +List +G5k -- to:lists.grid5000.fr or from:grid5000.fr
+    +List +Types -- to:types-list@lists.seas.upenn.edu
     # Require `notmuch config set index.header.Listid List-ID` and `notmuch reindex '*'`
     +List +Nix -- Listid:24d1741146b951f90adf436fdmc
     +List +Racket -- Listid:2d4bcd7724e2a351c8e594233mc
+    +List +Scala -- Listid:ba834c562d82d9aba5eaf90bamc
     # +deleted -- subject:[SPAM]
+
+
+    # Mark mail in the sent box as `sent`
+    -inbox -unread +sent -- ${boxPathsQuery (map (getBoxFolder "sent") accountNames)}
   '';
 
   # --------------------------------------------------------------------
@@ -68,7 +44,7 @@ let
       User        ${email}
       Host        ${imap.host}
       SSLType     IMAPS
-      PassCmd     "${getPasswd} ${keepass}"
+      PassCmd     "/etc/nixos/secret/read-passwd ${lib.escapeShellArg keepass}"
     '') accountNames}
 
     # A Store defines a collection of mailboxes; basically a folder,
@@ -96,7 +72,7 @@ let
       Channel  ${name}-inbox
       Master   :${name}-remote:
       Slave    :${name}-local:
-      Patterns "*" "![Gmail]*" "${trash}" # Copy all remote email box as is except [Gmail]
+      Patterns ${lib.concatMapStringsSep " " lib.strings.escapeNixString box.inbox} "${box.trash}" "${box.drafts}" "${box.sent}"
       Sync     All    # Propagate read, deletion ...
       Create   Slave  # Automatically create missing mailboxes on the Slave.
       Expunge  Slave  # Only delete on Slave
@@ -119,7 +95,7 @@ let
       port          587
       from          ${email}
       user          ${if smtp ? user then smtp.user else email}
-      passwordeval  ${getPasswd} ${keepass}
+      passwordeval  /etc/nixos/secret/read-passwd ${lib.escapeShellArg keepass}
     '') accountNames}
 
     # Set a default account
@@ -170,9 +146,12 @@ let
       sendmail = "${msmtpWp}/bin/msmtpq --read-envelope-from --read-recipients --account=${name}";
       always_gpg_sign = false;
       save_sent = true;
-      save_sent_to = "${mailDir}/${name}/sent/cur/";
-      save_draft_to = "${mailDir}/${name}/Drafts/";
-      signature_file = "${signature}";
+      save_sent_to = "${mailDir}/${name}/${box.sent}/cur/";
+      save_draft_to = "${mailDir}/${name}/${box.drafts}/cur/";
+      signature_file = pkgs.writeText "astroid-signature" ''
+        Ronan-Alexandre Cherrueau
+        https://rcherrueau.github.io
+      '';
       signature_separate = true;
       default = if acc ? default then default else false;
     }) accounts;
@@ -182,7 +161,7 @@ let
     poll.interval = 0; # Disable automatic polling from astroid (managed by systemd)
     astroid = {
       notmuch_config = notmuchConfig;
-      debug.dryrun_sending = true;
+      debug.dryrun_sending = false;
       hints.level = -1;
       log.syslog = true;
     };
@@ -209,13 +188,12 @@ let
     };
     general.time.diff_year = "%F";
     mail.send_delay = 20;  # Wait 20 seconds before sending email
+    mail.close_on_success = true; # Close mail composition page after successfully sent
   });
 
   # Move deleted emails to trash box and delete old emails.
   deleteMails =
-    let getTrashBox = name: with accounts.${name}; "${name}/${trash}";
-        trashBoxNames = map getTrashBox accountNames;
-        trashBoxesQuery = lib.concatMapStringsSep " OR " (box: "folder:${box}") trashBoxNames;
+    let trashBoxesQuery = boxPathsQuery (map (getBoxFolder "trash") accountNames);
     in pkgs.writers.writeBash "delete-emails" ''
       # Move emails of a notmuch QUERY into BOX
       #
@@ -233,11 +211,13 @@ let
       # > between Maildir folders.  Mutt always does that, while mu4e
       # > needs to be configured to do it: (setq
       # > mu4e-change-filenames-when-moving t)
+      #
+      # XXX: This /may/ require notmuch to reindex stuff.  I have to check this.
       function moveToBox {
         local QUERY="$1"
         local BOX="$2"
 
-        for EMAIL_PATH in $(${notmuchWp}/bin/notmuch search --output=files "$QUERY")
+        for EMAIL_PATH in $(${notmuchWp}/bin/notmuch search --output=files $QUERY)
         do
           # Strip UID from email name
           EMAIL_BASENAME=$(basename "$EMAIL_PATH")
@@ -249,21 +229,22 @@ let
         done
       }
 
+      # Move emails marked as deleted into the Trash box
+      ${lib.concatMapStrings (name: ''
+         moveToBox "tag:${name} AND tag:deleted NOT (${lib.escape ["\""] trashBoxesQuery})" \
+                   "${getBoxFolder "trash" name}"
+      '') accountNames}
+
+      # Archive emails in the trash box (this also systematically
+      # tags emails as +deleted in case some emails have
+      # been deleted from the webmail interface)
+      ${notmuchWp}/bin/notmuch tag -inbox +deleted -- ${trashBoxesQuery}
+
       # # Delete emails older than 30 days
-      # ${notmuchWp}/bin/notmuch search --output=files --format=text0 \
+      # ${notmuchWp}/bin/notmuch search --exclude=false --output=files --format=text0 \
       #   tag:deleted and date:..30days \
       #   | xargs -0 --no-run-if-empty rm
 
-      # Move emails marked as deleted into the Trash box
-      ${lib.concatMapStrings (name: ''
-         moveToBox "tag:${name} AND tag:deleted NOT (${trashBoxesQuery})" \
-                   ${getTrashBox name}
-      '') accountNames}
-
-      # Remove the inbox tag for emails in trash box (this also
-      # systematically tags emails as +deleted in case some emails have
-      # been deleted from the webmail interface)
-      ${notmuchWp}/bin/notmuch tag -inbox +deleted -- ${trashBoxesQuery}
     '';
 
   # --------------------------------------------------------------------
@@ -286,20 +267,11 @@ let
   # Directory to store emails
   mailDir = config.users.users.rfish.home + "/.mail";
 
-  # Read password from KeePassX
-  getPasswd = pkgs.writers.writeDash "kpcli-read-passwd" ''
-    # Get the password
-    PASSWD=$(TERM=xterm ${pkgs.kpcli}/bin/kpcli \
-                 --kdb ${config.users.users.rfish.home}/secret/passwd.kdbx \
-                 --pwfile /etc/nixos/secret/keepass \
-                 --readonly \
-                 --command "show -f $*" \
-             | grep Pass: \
-             | sed -Er 's/ Pass: (.+)/\1/g')
+  # Folder path of a specific box
+  getBoxFolder = boxName: accName: with accounts.${accName}; "${accName}/${box.${boxName}}";
 
-    # Display it
-    echo "$PASSWD"
-  '';
+  # Notmuch query for some box
+  boxPathsQuery = boxPaths: lib.concatMapStringsSep " OR " (box: "'folder:\"${box}\"'") boxPaths;
 
   # Get the default astroid config
   #
@@ -381,7 +353,16 @@ let
     postBuild = ''
       wrapProgram $out/bin/msmtp \
         --add-flags "--file=${msmtprc}"
+
+      wrapProgram $out/bin/msmtpq \
+        --add-flags "--file=${msmtprc}"
     '';
+    # # XXX
+    # # https://github.com/NixOS/nixpkgs/blob/bff19e2ab5004676a5f94ffdcb08bbc973ab6f34/pkgs/applications/networking/msmtp/default.nix#L37
+    # postInstall = ''
+    #   substitute ${pkgs.msmtp}/bin/msmtpq $out/bin/msmtpq \
+    #     --replace @msmtp@ $out/bin/msmtp
+    # '';
   };
 
   # Wraps astroid to call the custom config.
@@ -404,6 +385,8 @@ let
           # beginning/end of buffer
           thread_index.scroll_home=g
           thread_index.scroll_end=G
+          thread_index.reply=r
+          thread_index.reply_all=R
 
           # Email view
           thread_view.next_message=J
@@ -415,12 +398,20 @@ let
           thread_view.toggle_unread=U
           thread_view.home=g
           thread_view.end=G
+          thread_view.reply=r
+          thread_view.reply_all=R
 
           # Specific actions
           thread_index.run(hooks::toggle-delete deleted thread:%1, hooks::toggle-delete deleted thread:%1)=D
           thread_view.run(hooks::toggle-delete deleted id:%2, hooks::toggle-delete deleted id:%2)=D
         '';
         polling = pkgs.writers.writeDash "poll.sh" "systemctl --user restart polling-email";
+        message-ui = pkgs.writeText "part.scss" ''
+          /* ui-version: 5 (do not change when modifying theme for yourself) */
+          $font-base-size: 16px;
+          $font-family-default: "Iosevka", monospace;
+          @import '${pkgs.astroid.src}/ui/part.scss';
+        '';
         toggle = pkgs.writers.writeBash "toggle-delete" ''
           # Check if the thread or message matches the tag
           if [[ $(${notmuchWp}/bin/notmuch search --exclude=false tag:$1 AND $2) ]]; then
@@ -432,12 +423,14 @@ let
         astroidDir = pkgs.runCommand "astroid-config-dir" {} ''
           mkdir $out        # Astroid config directory
           mkdir $out/hooks  # hooks directory
+          mkdir $out/ui     # ui directory
 
           # Symlink the config, polling keybindings and hooks scripts
           ln -s "${astroidConfig}" $out/config.json
           ln -s "${polling}" $out/poll.sh
           ln -s "${keybindings}" $out/keybindings
           ln -s "${toggle}" $out/hooks/toggle-delete
+          ln -s "${message-ui}" $out/ui/part.scss
         '';
     in pkgs.symlinkJoin {
       name = "astroid";
@@ -467,6 +460,7 @@ in {
     in {
       description = "Mailbox synchronization service";
       startAt = [ "*:00/10" ];  # Pull every 10 minutes
+      wantedBy = [ "multi-user.target" ];
       environment.NOTMUCH_CONFIG=notmuchConfig;  # notmuch configuration file
       serviceConfig = {
         Type = "oneshot";
@@ -485,9 +479,11 @@ in {
           "-${deleteMails}"
         ];
         # Synchronize emails
+        # TODO: Trigger an alert when mbsync failed
         ExecStart = "${builtins.trace ''
                        mbsync ${mbsyncrc}
                        msmtp ${msmtprc}
+                       msmtpWp ${msmtpWp}
                        notmuch ${notmuchConfig}
                        astroid ${astroidConfig}
                        deleteEmail ${deleteMails}
