@@ -247,7 +247,10 @@ let
       # [0] https://github.com/NixOS/nixpkgs/blob/41307593381d295283ed51333743ba7cee9c07e4/pkgs/applications/editors/vim/configurable.nix#L15-L27
       guiSupport = false;
     });
+   vimdiff = pkgs.writers.writeDashBin "vimdiff" ''
+     ${vim-no-gui}/bin/vim -d $*
+   '';
 in {
   environment.variables.EDITOR = "vim";
-  environment.systemPackages = [ vim-no-gui ];
+  environment.systemPackages = [ vim-no-gui vimdiff ];
 }
