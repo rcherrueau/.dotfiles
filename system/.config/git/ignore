@@ -6,7 +6,6 @@
 # Icon must ends with two \r.
 Icon
 
-
 # Thumbnails
 ._*
 
@@ -34,3 +33,7 @@ tramp
 #### Python
 venv/
 ENV/
+
+
+#### Direnv
+.envrc

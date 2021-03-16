@@ -18,7 +18,6 @@ function specific_links() {
 specific_links $(hostname)
 
 stow -v --target="${HOME}" system
-stow -v --target="${HOME}" git
 stow -v --target="${HOME}" spacemacs
 
 sudo stow -v --target="/etc/nixos" nixos
