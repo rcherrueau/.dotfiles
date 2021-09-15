@@ -69,7 +69,9 @@ This function should only modify configuration layer settings."
      ;; (rust :variables
      ;;       rust-rls-cmd '("rustup" "run" "stable" "rls"))
      rust
-     ;; scala
+     (scala :variables
+            scala-indent:use-javadoc-style t
+            scala-auto-insert-asterisk-in-comments t)
      yaml
      shell-scripts
      ;; ----------------------------------------------------------- conf
