@@ -3,22 +3,24 @@
 
 rec {
     Gmail = {
+      store = "Gmail";
+      sync = true;
       default = true;
       email = "RonanCherrueau@gmail.com";
       imap.host = "imap.gmail.com";
       smtp.host = "smtp.gmail.com";
       keepass = "/root/perso/GMail";
       box = {
-        # Copy all remote email box as is except [Gmail]
-        # XXX: I currently open 166 boxes.  That takes way too long.
-        # Narrow this to speed up downloading
-        inbox = ["*" "![Gmail]*"];
+      # Do a `mbsync --list Gmail-inbox` to list boxes
+        inbox = ["INBOX" "![Gmail]*"];
         drafts = "[Gmail]/Drafts";
         sent = "[Gmail]/Sent Mail";
         trash = "[Gmail]/Bin";
       };
     };
     Inria = {
+      store = "Inria";
+      sync = false;
       email = "Ronan-Alexandre.Cherrueau@inria.fr";
       imap.host = "zimbra.inria.fr";
       smtp.host = "smtp.inria.fr";
@@ -35,6 +37,8 @@ rec {
     IMT = {
       # https://intranet.imt-atlantique.fr/assistance-support/informatique/didacticiels/
       inherit (Inria) box;
+      store = "IMT";
+      sync = false;
       email = "Ronan-Alexandre.Cherrueau@imt-atlantique.fr";
       imap.host = "z.imt.fr";
       smtp.host = "z.imt.fr";

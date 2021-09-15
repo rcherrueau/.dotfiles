@@ -70,13 +70,13 @@ let
     # synchronized.
     ${lib.concatMapStringsSep "\n" (name: with accounts.${name}; ''
       Channel  ${name}-inbox
-      Master   :${name}-remote:
-      Slave    :${name}-local:
+      Far      :${name}-remote:  # Master
+      Near     :${name}-local:   # Slave
       Patterns ${lib.concatMapStringsSep " " lib.strings.escapeNixString box.inbox} "${box.trash}" "${box.drafts}" "${box.sent}"
-      Sync     All    # Propagate read, deletion ...
-      Create   Slave  # Automatically create missing mailboxes on the Slave.
-      Expunge  Slave  # Only delete on Slave
-      MaxSize  100m   # Don't download any email greater than this
+      Sync     All   # Propagate read, deletion ...
+      Create   Near  # Automatically create missing mailboxes on the Slave.
+      Expunge  Near  # Only delete on Slave (do `mbysnc --expunge-far ${name}-inbox` to delete)
+      MaxSize  100m  # Don't download any email greater than this
     '') accountNames}
   '';
 
@@ -135,15 +135,45 @@ let
     # removed.
     [maildir]
     synchronize_flags=true
+
+    # Extra search keys, may require `notmuch reindex '*'` to use them
+    [index]
+    header.List=List-Id
+    header.DeliveredTo=Delivered-To
   '';
 
   # Astroid configuration
   # See https://github.com/astroidmail/astroid/wiki/Configuration-Reference
-  astroidConfig = (pkgs.formats.json {}).generate "astroid-config.json" (astroidDefaultConfig // {
+
+
+  astroidConfig =
+    let
+      # Get the default astroid config
+      #
+      # XXX: astroid cannot open DISPLAY `:` and so segfault before
+      # generating the configuration.  I workaround it with `xvfb` to get
+      # a dummy DISPLAY.
+      #
+      # Debug:
+      # - Build locally in the nix REPL with `:b astroidDefaultConfig`
+      # - Pop a shell in the nix REPL with `:s astroidDefaultConfig`
+      # - See the log of the build with `nix log <<path-of-derivation.drv>>`
+      #
+      # https://github.com/astroidmail/astroid/issues/579
+      # https://github.com/astroidmail/astroid/issues/516
+      astroidDefaultConfig = builtins.fromJSON (lib.readFile (
+        pkgs.runCommand "astroid-default-config"
+          {buildInputs = [ pkgs.astroid pkgs.xvfb_run ];} ''
+          export HOME=nixos/tmphome
+          ${pkgs.xvfb_run}/bin/xvfb-run -d \
+            ${pkgs.astroid}/bin/astroid --disable-log --new-config --config $out
+        ''));
+    in (pkgs.formats.json {}).generate "astroid-config.json" (astroidDefaultConfig // {
     accounts = builtins.mapAttrs (name: acc: with acc; {
       name = "Ronan-Alexandre Cherrueau";
       email = "${email}";
-      sendmail = "${msmtpWp}/bin/msmtpq --read-envelope-from --read-recipients --account=${name}";
+      # sendmail = "${msmtpWp}/bin/msmtpq --read-envelope-from --read-recipients --account=${name}";
+      sendmail = "${msmtpWp}/bin/msmtpq --read-envelope-from -t";
       always_gpg_sign = false;
       save_sent = true;
       save_sent_to = "${mailDir}/${name}/${box.sent}/cur/";
@@ -189,6 +219,8 @@ let
     general.time.diff_year = "%F";
     mail.send_delay = 20;  # Wait 20 seconds before sending email
     mail.close_on_success = true; # Close mail composition page after successfully sent
+    thread_view.open_external_link = "${pkgs.mimeo}/bin/mimeo";
+    attachment.external_open_cmd = "${pkgs.mimeo}/bin/mimeo";
   });
 
   # Move deleted emails to trash box and delete old emails.
@@ -272,27 +304,6 @@ let
 
   # Notmuch query for some box
   boxPathsQuery = boxPaths: lib.concatMapStringsSep " OR " (box: "'folder:\"${box}\"'") boxPaths;
-
-  # Get the default astroid config
-  #
-  # XXX: astroid cannot open DISPLAY `:` and so segfault before
-  # generating the configuration.  I workaround it with `xvfb` to get
-  # a dummy DISPLAY.
-  #
-  # Debug:
-  # - Build locally in the nix REPL with `:b astroidDefaultConfig`
-  # - Pop a shell in the nix REPL with `:s astroidDefaultConfig`
-  # - See the log of the build with `nix log <<path-of-derivation.drv>>`
-  #
-  # https://github.com/astroidmail/astroid/issues/579
-  # https://github.com/astroidmail/astroid/issues/516
-  astroidDefaultConfig = builtins.fromJSON (lib.readFile (
-    pkgs.runCommand "astroid-default-config"
-      {buildInputs = [ pkgs.astroid pkgs.xvfb_run ];} ''
-      export HOME=nixos/tmphome
-      ${pkgs.xvfb_run}/bin/xvfb-run -d \
-        ${pkgs.astroid}/bin/astroid --disable-log --new-config --config $out
-    ''));
 
   # Create the directory for local email stores
   mkLocalStores = pkgs.writers.writeDash "msbync-local-stores" ''
@@ -403,7 +414,7 @@ let
 
           # Specific actions
           thread_index.run(hooks::toggle-delete deleted thread:%1, hooks::toggle-delete deleted thread:%1)=D
-          thread_view.run(hooks::toggle-delete deleted id:%2, hooks::toggle-delete deleted id:%2)=D
+          thread_view.run(hooks::toggle-delete deleted thread:%1, hooks::toggle-delete deleted thread:%1)=D
         '';
         polling = pkgs.writers.writeDash "poll.sh" "systemctl --user restart polling-email";
         message-ui = pkgs.writeText "part.scss" ''
@@ -412,7 +423,7 @@ let
           $font-family-default: "Iosevka", monospace;
           @import '${pkgs.astroid.src}/ui/part.scss';
         '';
-        toggle = pkgs.writers.writeBash "toggle-delete" ''
+        toggle-delete = pkgs.writers.writeBash "toggle-delete" ''
           # Check if the thread or message matches the tag
           if [[ $(${notmuchWp}/bin/notmuch search --exclude=false tag:$1 AND $2) ]]; then
             notmuch tag -$1 $2   # Remove the tag
@@ -429,7 +440,7 @@ let
           ln -s "${astroidConfig}" $out/config.json
           ln -s "${polling}" $out/poll.sh
           ln -s "${keybindings}" $out/keybindings
-          ln -s "${toggle}" $out/hooks/toggle-delete
+          ln -s "${toggle-delete}" $out/hooks/toggle-delete
           ln -s "${message-ui}" $out/ui/part.scss
         '';
     in pkgs.symlinkJoin {
@@ -451,6 +462,7 @@ in {
     notmuchWp   # to index and search email
     msmtpWp     # to send email
     astroidWp   # GUI
+    mimeo
   ];
 
   # Configure mbsync + notmuch
