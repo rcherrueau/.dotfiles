@@ -35,5 +35,8 @@ venv/
 ENV/
 
 
-#### Direnv
+### direnv 
+.direnv
 .envrc
+
+

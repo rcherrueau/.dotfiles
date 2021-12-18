@@ -196,6 +196,7 @@
     ''))
 
     # development tools
+    direnv
     git
     emacs # (emacsWithPackages (epkgs: [epkgs.pdf-tools]))
     aspell aspellDicts.en aspellDicts.fr
@@ -292,6 +293,9 @@
         #   #if not inside a tmux session, and if no session is started, start a new session
         #   test -z "$TMUX" && (tmux attach || tmux new-session)
         # fi
+
+        # Trigger direnv at prompt
+        eval "$(${pkgs.direnv}/bin/direnv hook zsh)"
       '';
 
       shellAliases = {
