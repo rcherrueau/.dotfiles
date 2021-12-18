@@ -89,9 +89,9 @@
     extraGroups = [ "wheel" "video" ];
     useDefaultShell = true;
     uid = 1000;
+    isNormalUser = true;
   };
   users.defaultUserShell = pkgs.zsh;
-
 
   #------------------------------------------------------------------- App
   nixpkgs.config.allowUnfree = true;
@@ -117,6 +117,12 @@
     ranger w3m xsel # w3m to display images, xsel to copy file name with `yd`
     usbutils # lsusb
     # TODO: vagrant
+
+    # Circumvent the default /run/current-system/sw/share/applications/mimeinfo.cache
+    # that is not overwritable in nixos and make my xdg-open always open pdf in
+    # chromium or inkscape.
+    # https://discourse.nixos.org/t/configure-how-xdg-open-opens-html-files/6419/17
+    mimeo
 
     # windowing
     xlibs.libXft
@@ -296,7 +302,7 @@
         fu = "sudo $(fc -ln -1 -1)";
         encrypt = "openssl enc -aes-256-cbc -salt";
         decrypt = "openssl enc -aes-256-cbc -salt -d";
-        p = "xdg-open-background"; r = "ranger"; ns = "nix-shell";
+        p = "${pkgs.mimeo}/bin/mimeo"; r = "ranger"; ns = "nix-shell";
         # emacs="emacsclient -c -a \"\""; # Start daemon or connect to it
       };
 
@@ -406,11 +412,12 @@
 
     # Mouse settings
     inputClassSections = [
-      # Set mouse speed as `xset m 3/2 0`, see xset man page.
+      # Set mouse speed as `xset m 5/2 0`, see xset man page.
+      # Mouse speed is 2.5 times as fast
       ''
       Identifier "My Mouse"
       MatchIsPointer "yes"
-      Option "AccelerationNumerator" "3"
+      Option "AccelerationNumerator" "5"
       Option "AccelerationDenominator" "2"
       Option "AccelerationThreshold" "0"
       ''

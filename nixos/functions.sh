@@ -55,13 +55,8 @@ function fp() {
   find /home/rfish/Sync/Papers/ -iname ${KEY} | sed "s/'/'\\\''/g" | sed "s/.*/'&'/g"
 }
 
-# Make xdg-open runs in background
-function xdg-open-background() {
-  xdg-open "$*" &
-}
-
 function rtfm() {
-  man $@ || xdg-open "https://www.qwant.com/?q=$@"; 
+  man $@ || mimeo "https://www.qwant.com/?q=$@"; 
 }
 
 #Make your PDF look scanned.
