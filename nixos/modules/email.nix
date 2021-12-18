@@ -6,32 +6,6 @@ let
   accounts = (import ./email-accounts.nix);
 
   # --------------------------------------------------------------------
-  # Notmuch tagging script
-  notmuchTags = pkgs.writeText "notmuch-tag-mails" ''
-    # Tag new mails according to their folder path
-    # > notmuch tag +inria -- path:inria/**
-    ${lib.concatMapStrings (name: ''
-    +${name} -- path:${name}/**
-    '') accountNames}
-
-    +ISP -- from:freetelecom.fr or from:free-mobile.fr or from:assistance.free.fr
-    +Banque -- from:ca-atlantique-vendee.fr or from:ing.com
-    +Shopping -- to:"/.*\+shopping@.*/"
-
-    +List +G5k -- to:lists.grid5000.fr or from:grid5000.fr
-    +List +Types -- to:types-list@lists.seas.upenn.edu
-    # Require `notmuch config set index.header.Listid List-ID` and `notmuch reindex '*'`
-    +List +Nix -- Listid:24d1741146b951f90adf436fdmc
-    +List +Racket -- Listid:2d4bcd7724e2a351c8e594233mc
-    +List +Scala -- Listid:ba834c562d82d9aba5eaf90bamc
-    # +deleted -- subject:[SPAM]
-
-
-    # Mark mail in the sent box as `sent`
-    -inbox -unread +sent -- ${boxPathsQuery (map (getBoxFolder "sent") accountNames)}
-  '';
-
-  # --------------------------------------------------------------------
   # Configurations files
 
   # mbsync configuration file (man mbsync)
@@ -223,62 +197,6 @@ let
     attachment.external_open_cmd = "${pkgs.mimeo}/bin/mimeo";
   });
 
-  # Move deleted emails to trash box and delete old emails.
-  deleteMails =
-    let trashBoxesQuery = boxPathsQuery (map (getBoxFolder "trash") accountNames);
-    in pkgs.writers.writeBash "delete-emails" ''
-      # Move emails of a notmuch QUERY into BOX
-      #
-      # Note: mbsync adds a unique identifier to file names (e.g.,
-      # `/path/to/mail,U=<UID>:2,SR` -- with `2` stands for the version of
-      # UID generation if I am right).  Moving files causes UID conflicts
-      # and prevent mbsync from syncing with "Maildir error: UID 9610 is
-      # beyond highest assigned UID 86."  The sed command in the following
-      # removes the UID to force mbsync to regenerate one and avoid UID
-      # conflicts.
-      #
-      # From `man mbsync`
-      # > When using the more efficient default UID mapping scheme, it
-      # > is important that the MUA renames files when moving them
-      # > between Maildir folders.  Mutt always does that, while mu4e
-      # > needs to be configured to do it: (setq
-      # > mu4e-change-filenames-when-moving t)
-      #
-      # XXX: This /may/ require notmuch to reindex stuff.  I have to check this.
-      function moveToBox {
-        local QUERY="$1"
-        local BOX="$2"
-
-        for EMAIL_PATH in $(${notmuchWp}/bin/notmuch search --output=files $QUERY)
-        do
-          # Strip UID from email name
-          EMAIL_BASENAME=$(basename "$EMAIL_PATH")
-          EMAIL_NO_UID=$(echo "$EMAIL_BASENAME" | sed -r 's/U=[0-9]+:2/U=:2/g')
-          EMAIL_IN_BOX="${mailDir}/$BOX/cur/$EMAIL_NO_UID"
-          # Move email to $BOX
-          echo "Move email from $EMAIL_PATH to $EMAIL_IN_BOX"
-          mv "$EMAIL_PATH" "$EMAIL_IN_BOX"
-        done
-      }
-
-      # Move emails marked as deleted into the Trash box
-      ${lib.concatMapStrings (name: ''
-         moveToBox "tag:${name} AND tag:deleted NOT (${lib.escape ["\""] trashBoxesQuery})" \
-                   "${getBoxFolder "trash" name}"
-      '') accountNames}
-
-      # Archive emails in the trash box (this also systematically
-      # tags emails as +deleted in case some emails have
-      # been deleted from the webmail interface)
-      ${notmuchWp}/bin/notmuch tag -inbox +deleted -- ${trashBoxesQuery}
-
-      # # Delete emails older than 30 days
-      # ${notmuchWp}/bin/notmuch search --exclude=false --output=files --format=text0 \
-      #   tag:deleted and date:..30days \
-      #   | xargs -0 --no-run-if-empty rm
-
-    '';
-
   # --------------------------------------------------------------------
   # Utils
 
@@ -298,12 +216,6 @@ let
 
   # Directory to store emails
   mailDir = config.users.users.rfish.home + "/.mail";
-
-  # Folder path of a specific box
-  getBoxFolder = boxName: accName: with accounts.${accName}; "${accName}/${box.${boxName}}";
-
-  # Notmuch query for some box
-  boxPathsQuery = boxPaths: lib.concatMapStringsSep " OR " (box: "'folder:\"${box}\"'") boxPaths;
 
   # Create the directory for local email stores
   mkLocalStores = pkgs.writers.writeDash "msbync-local-stores" ''
@@ -365,8 +277,23 @@ let
       wrapProgram $out/bin/msmtp \
         --add-flags "--file=${msmtprc}"
 
-      wrapProgram $out/bin/msmtpq \
-        --add-flags "--file=${msmtprc}"
+  # MUA application
+  muaApp =
+    let muaPath = config.users.users.rfish.home +
+                  "/prog/APE/mail/scala/target/scala-3.1.0/" +
+                  "mail-user-agent-assembly-0.1.0.jar";
+        muaWP = pkgs.writeShellScriptBin "mua" ''
+          export MBSYNC_BIN='${mbsyncWp}/bin/mbsync'
+          export NOTMUCH_BIN='${notmuchWp}/bin/notmuch'
+          export MAILDIR=${lib.escapeShellArg mailDir}
+          export ACCOUNTS=${lib.escapeShellArg (builtins.toJSON accounts)}
+          exec "${pkgs.jdk}/bin/java" "-jar" "${muaPath}" "$@"
+        '';
+    in pkgs.runCommand "mua" {
+      buildInputs = [mbsyncWp notmuchWp pkgs.jdk muaWP];
+    } ''
+      mkdir -p $out/bin
+      ln -s ${muaWP}/bin/mua $out/bin/mua
     '';
     # # XXX
     # # https://github.com/NixOS/nixpkgs/blob/bff19e2ab5004676a5f94ffdcb08bbc973ab6f34/pkgs/applications/networking/msmtp/default.nix#L37
@@ -462,17 +389,22 @@ in {
     notmuchWp   # to index and search email
     msmtpWp     # to send email
     astroidWp   # GUI
-    mimeo
+    muaApp      # Scala MUA app
   ];
 
   # Configure mbsync + notmuch
   # See https://wiki.archlinux.org/index.php?title=Isync&oldid=627584#Automatic_synchronization
-  systemd.user.services.polling-email =
-    let HOME = config.users.users.rfish.home;
-    in {
-      description = "Mailbox synchronization service";
+  systemd.user.services.polling-email = {
+      description = "Mail User Agent";
       startAt = [ "*:00/10" ];  # Pull every 10 minutes
-      wantedBy = [ "multi-user.target" ];
+      # Start mua service after the user logging.
+      # XXX: I would like to use "network-online.target" but systemd
+      # --user runs as a separate process from the systemd --system
+      # process.  User units can not reference or depend on system
+      # unit.
+      requires = [ "default.target" ];
+      after = [ "default.target" ];
+      restartIfChanged = true;
       environment.NOTMUCH_CONFIG=notmuchConfig;  # notmuch configuration file
       serviceConfig = {
         Type = "oneshot";
@@ -488,7 +420,7 @@ in {
           # Deleted emails may not work if `notmuch new` has not been
           # executed first.  I prefixed the command with a dash `-` to
           # tell systemd to ignore the result.
-          "-${deleteMails}"
+          "-${muaApp}/bin/mua delete"
         ];
         # Synchronize emails
         # TODO: Trigger an alert when mbsync failed
@@ -497,15 +429,10 @@ in {
                        msmtp ${msmtprc}
                        msmtpWp ${msmtpWp}
                        notmuch ${notmuchConfig}
-                       astroid ${astroidConfig}
-                       deleteEmail ${deleteMails}
-                       notmuchTags ${notmuchTags} ''
-                       mbsyncWp}/bin/mbsync -Va";
+                       astroid ${astroidConfig} 
+                       muaApp ${muaApp} ''
+                       muaApp}/bin/mua pull";
         ExecStartPost = [
-          # Index new emails
-          "${notmuchWp}/bin/notmuch new"
-          # Tag emails
-          "${notmuchWp}/bin/notmuch tag --batch --input=${notmuchTags}"
           # Stop notifying astoid
           "-${astroidWp}/bin/astroid --stop-polling"
         ];
