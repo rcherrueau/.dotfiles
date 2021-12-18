@@ -42,6 +42,7 @@
   hardware.bluetooth.enable = true;
 
   hardware.opengl.extraPackages = with pkgs; [ vaapiIntel vaapiVdpau ];
+  hardware.nvidia.package = config.boot.kernelPackages.nvidiaPackages.legacy_470;
 
   services.xserver = {
     videoDrivers = [ "nvidia" ];
