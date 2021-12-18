@@ -481,4 +481,15 @@
     autoPrune.enable = true;
   };
   users.extraGroups.docker.members = [ "rfish" ];
+
+  # Environment variables used in the global /etc/profile.
+  environment.variables = {
+    XDG_CONFIG_HOME="$HOME/.config";
+
+    # --RAW-CONTROL-CHARS to interpret ANSI colors
+    # --LONG-PROMPT to display percent of the file,
+    # --ignore-case to smartly ignore case during search
+    LESS="--RAW-CONTROL-CHARS --LONG-PROMPT --ignore-case --quit-if-one-screen";
+    PAGER="less $LESS";
+  };
 }
