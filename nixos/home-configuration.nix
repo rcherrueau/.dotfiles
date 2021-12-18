@@ -58,4 +58,22 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "20.03"; # Did you read the comment?
+
+  # Enable virtualization
+  virtualisation.libvirtd = {
+    enable = true;
+    onBoot = "ignore"; # Do not automatically start vms on boot
+  };
+  users.extraGroups.libvirtd.members = [ "rfish" ];
+
+  virtualisation.virtualbox.host = {
+    enable = false;
+    # Remove GUI and Qt dependency. I use VirtualBox through vagrant.
+    headless = true;
+    # `enableExtensionPack` requires to compile VirtualBox extension
+    # pack, but it takes way too long.
+    # enableExtensionPack = true;
+  };
+  users.extraGroups.vboxusers.members = [ "rfish" ];
+
 }
