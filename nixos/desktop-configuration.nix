@@ -38,11 +38,22 @@
     latitude = 47.216542; longitude = 1.553005; # Nantes
   };
 
-  # Garbage collection
-  nix.gc = {
-    automatic = true;
-    dates = "weekly";
-    options = "--delete-older-than 30d";
+  nix = {
+    # Garbage collection
+    gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 30d";
+    };
+
+    # Workaround to `nix run ...`: "experimental Nix feature
+    # 'nix-command' is disabled; use '--extra-experimental-features
+    # nix-command' to override".
+    #
+    # See https://github.com/NixOS/nixpkgs/issues/80332
+    extraOptions = ''
+     experimental-features = nix-command flakes
+    '';
   };
 
   nix.trustedUsers = [ "root" "rfish" ];
