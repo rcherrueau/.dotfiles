@@ -30,6 +30,11 @@
   # services.unbound.enable = lib.mkForce false;
   networking.nameservers = [ "192.168.1.253" ];
 
+  # Note: Remember to change firewall configuration if I start a local 
+  # server to get files
+  # > nix shell nixpkgs#python3Minimal -c  python -m http.server 8081
+  # networking.firewall.allowedTCPPorts = [ 8081 ];
+
   environment.systemPackages = with pkgs; [
     ntfs3g
   ];
