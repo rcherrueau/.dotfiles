@@ -251,9 +251,14 @@
     # bash.promptInit = "PS1=\"# \"";
     bash.enableCompletion = true;
 
+    # Favor id_ed25519 over id_rsa when doing a ssh connexion
+    ssh.hostKeyAlgorithms = [ "ssh-ed25519" "ssh-rsa" ];
+
+    # Use gnupg agent for ssh connections, git sign, pass, ...
     gnupg.agent = {
       enable = true;
-      pinentryFlavor = "curses";
+      enableSSHSupport = true;
+      pinentryFlavor = "gnome3";
     };
 
     tmux = {
@@ -440,11 +445,6 @@
 
   # Enable the OpenSSH daemon.
   services.openssh.enable = true;
-  programs.ssh.startAgent = true;
-
-  # Enable redshift daemon.
-  # $ systemctl --user status redshift.service
-  services.redshift.enable = true;
 
   # OpenVPN client:
   services.openvpn.servers = {
@@ -452,11 +452,25 @@
     # openvpn-g5k`
     g5k = {
       autoStart = false;
-      config = '' config /home/rfish/openvpn/g5k/Grid5000_VPN.ovpn '';
+      config = ''
+        client
+        remote vpn.grid5000.fr 1194 udp
+        dev tun
+
+        auth-retry interact
+        ca /home/rfish/openvpn/g5k/cavpn.crt
+        cert /home/rfish/openvpn/g5k/rcherrueau.crt
+        key /home/rfish/openvpn/g5k/rcherrueau.key
+        tls-auth /home/rfish/openvpn/g5k/ta.key
+      '';
       # Update /etc/resolv.conf with g5k DNS
       updateResolvConf = true;
     };
   };
+
+  # Enable redshift daemon.
+  # $ systemctl --user status redshift.service
+  services.redshift.enable = true;
 
   # Enable Unbound DNS and set it as DNS in resolv.conf. For
   # resolv.conf/nameservers see also nix
@@ -466,16 +480,21 @@
     # Enabling ubound automatically set:
     # networking.nameservers to [ "127.0.0.1" ];
     enable = true;
-    # forward remaining requests to https://dns.watch/
-    forwardAddresses = [
-      "84.200.69.80" "84.200.70.40" # dns.watch
-      "2001:1608:10:25::1c04:b12f" "2001:1608:10:25::9249:d69b"
-      "9.9.9.9" "149.112.112.112"   # quad9.net
-      "2620:fe::fe" "2620:fe::9"
-    ];
 
+    # See `man unbound.conf`
+    settings.forward-zone = [{
+      name = ".";
+      # forward DNS not in cache to:
+      forward-addr = [
+        "84.200.69.80" "84.200.70.40" # dns.watch
+        "2001:1608:10:25::1c04:b12f" "2001:1608:10:25::9249:d69b"
+        "9.9.9.9" "149.112.112.112"   # quad9.net
+        "2620:fe::fe" "2620:fe::9"
+      ];
+    }];
   };
-  # This is not take into account if `unbound.enable = true;`
+
+  # This is not taken into account if `unbound.enable = true;`
   networking.nameservers = [
       "84.200.69.80" "84.200.70.40" # dns.watch
       "2001:1608:10:25::1c04:b12f" "2001:1608:10:25::9249:d69b"
