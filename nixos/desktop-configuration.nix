@@ -116,6 +116,7 @@
     aria stow htop unzip unrar tree
     ranger w3m xsel # w3m to display images, xsel to copy file name with `yd`
     usbutils # lsusb
+    xclip 
     # TODO: vagrant
 
     # Circumvent the default /run/current-system/sw/share/applications/mimeinfo.cache
@@ -132,15 +133,14 @@
     firefox chromium
     imagemagick # import -window root screenshot.jpg
     inkscape gimp
-    kpcli xclip # xclip is used by kpcli to copy pass to clipboard
     mpv # replacement of mplayer
+    (pass.withExtensions (passpkgs: with passpkgs; [ pass-otp pass-update ]))
     qtox
     rxvt-unicode-unwrapped
     xorg.xbacklight # Decrease screen brightness
     xcape # Escape and Control on a single key
     xdotool # Script your mouse
     zathura xournal # Pdf viewer + notetaking
-
     # mattermost CLI
     matterhorn
     # Notification and token fetcher for authentication
@@ -201,7 +201,7 @@
     aspell aspellDicts.en aspellDicts.fr
     manix
     ripgrep ripgrep-all bat
-    zeal
+    devdocs-desktop # zeal
     sqlite
 
     # language
