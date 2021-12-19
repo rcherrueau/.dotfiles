@@ -1,5 +1,10 @@
 { config, pkgs, lib, ... }:
 
+# Debug:
+# - Build locally in the nix REPL with `:b msmtpWp`
+# - Pop a shell in the nix REPL with `:s msmtpWp`
+# - See the log of the build with `nix log <<path-of-derivation.drv>>`
+
 let
   # --------------------------------------------------------------------
   # Email accounts:
@@ -116,85 +121,6 @@ let
     header.List=List-Id
     header.DeliveredTo=Delivered-To
   '';
-
-  # Astroid configuration
-  # See https://github.com/astroidmail/astroid/wiki/Configuration-Reference
-  astroidConfig =
-    let
-      # Get the default astroid config
-      #
-      # XXX: astroid cannot open DISPLAY `:` and so segfault before
-      # generating the configuration.  I workaround it with `xvfb` to get
-      # a dummy DISPLAY.
-      #
-      # Debug:
-      # - Build locally in the nix REPL with `:b astroidDefaultConfig`
-      # - Pop a shell in the nix REPL with `:s astroidDefaultConfig`
-      # - See the log of the build with `nix log <<path-of-derivation.drv>>`
-      #
-      # https://github.com/astroidmail/astroid/issues/579
-      # https://github.com/astroidmail/astroid/issues/516
-      astroidDefaultConfig = builtins.fromJSON (lib.readFile (
-        pkgs.runCommand "astroid-default-config"
-          {buildInputs = [ pkgs.astroid pkgs.xvfb_run ];} ''
-          export HOME=nixos/tmphome
-          ${pkgs.xvfb_run}/bin/xvfb-run -d \
-            ${pkgs.astroid}/bin/astroid --disable-log --new-config --config $out
-        ''));
-    in (pkgs.formats.json {}).generate "astroid-config.json" (astroidDefaultConfig // {
-    accounts = builtins.mapAttrs (name: acc: with acc; {
-      name = "Ronan-Alexandre Cherrueau";
-      email = "${email}";
-      # sendmail = "${msmtpWp}/bin/msmtpq --read-envelope-from --read-recipients --account=${name}";
-      sendmail = "${msmtpWp}/bin/msmtpq --read-envelope-from -t";
-      always_gpg_sign = false;
-      save_sent = true;
-      save_sent_to = "${mailDir}/${name}/${boxes.sent}/cur/";
-      save_draft_to = "${mailDir}/${name}/${boxes.drafts}/cur/";
-      signature_file = pkgs.writeText "astroid-signature" ''
-        Ronan-Alexandre Cherrueau
-        https://rcherrueau.github.io
-      '';
-      signature_separate = true;
-      default = if acc ? default then default else false;
-    }) accounts;
-    startup.queries =
-      # { Inria = "tag:inbox and tag:Inria"; Gmail = "tag:inbox and tag:Gmail" }
-      lib.genAttrs accountNames (name: "tag:inbox and tag:${name}");
-    poll.interval = 0; # Disable automatic polling from astroid (managed by systemd)
-    astroid = {
-      notmuch_config = notmuchConfig;
-      debug.dryrun_sending = false;
-      hints.level = -1;
-      log.syslog = true;
-    };
-    editor = {
-      cmd = ''
-        emacs --parent-id %3 --eval '(progn (find-file "%1")
-                                            (setq mail-setup-with-from nil)
-                                            (mail-mode))'
-      '';
-      external_editor = false;
-      attachement_words = lib.concatStringsSep ","
-        [ "attach" "attachement"
-          "p.-j." "pièce jointe" "pièce-jointe" "ci-joint"];
-    };
-    # Thread index is the "list of emails" view
-    thread_index.cell = {
-      line_spacing = 3;
-      message_count_length = 5;
-      authors_length = 33;
-      tags_alpha = 1;
-      # Don't show these tags
-      hidden_tags = lib.concatStringsSep ","
-        [ "attachment" "flagged" "unread" "replied" "inbox" "List" ];
-    };
-    general.time.diff_year = "%F";
-    mail.send_delay = 20;  # Wait 20 seconds before sending email
-    mail.close_on_success = true; # Close mail composition page after successfully sent
-    thread_view.open_external_link = "${pkgs.mimeo}/bin/mimeo";
-    attachment.external_open_cmd = "${pkgs.mimeo}/bin/mimeo";
-  });
 
   # --------------------------------------------------------------------
   # Utils
@@ -315,86 +241,6 @@ let
       ln -s ${muaWP}/bin/mua $out/bin/mua
     '';
 
-  # Wraps astroid to call the custom config.
-  #
-  # Astroid assumes that files such as `poll.sh` or `keybindings` live
-  # next to the config file [0].  Because of this, I have to put the
-  # `astroidConfig` in a directory that also contains my polling
-  # script and my specific keybindings.
-  #
-  # [0] https://github.com/astroidmail/astroid/blob/437497207ea711bddc8b9bfd53e709910332e5ed/src/poll.cc#L175
-  # The astroid code uses the idiom
-  # `astroid->standard_paths().config_dir` to get the path of
-  # `poll.sh` or `keybindings`.  This path refers to the directory of
-  # the astroid configuration file.
-  astroidWp =
-    let keybindings = pkgs.writeText "keybindings" ''
-          # searching in main window
-          main_window.search=/
-
-          # beginning/end of buffer
-          thread_index.scroll_home=g
-          thread_index.scroll_end=G
-          thread_index.reply=r
-          thread_index.reply_all=R
-
-          # Email view
-          thread_view.next_message=J
-          thread_view.previous_message=K
-          thread_view.reply_all=C-r
-          thread_view.search.search=/
-          thread_view.search.next=n
-          thread_view.search.previous=N
-          thread_view.toggle_unread=U
-          thread_view.home=g
-          thread_view.end=G
-          thread_view.reply=r
-          thread_view.reply_all=R
-
-          # Specific actions
-          thread_index.run(hooks::toggle-delete deleted thread:%1, hooks::toggle-delete deleted thread:%1)=D
-          thread_view.run(hooks::toggle-delete deleted thread:%1, hooks::toggle-delete deleted thread:%1)=D
-        '';
-        polling = pkgs.writers.writeDash "poll.sh" "systemctl --user restart polling-email";
-        message-ui = pkgs.writeText "part.scss" ''
-          /* ui-version: 5 (do not change when modifying theme for yourself) */
-          $font-base-size: 16px;
-          $font-family-default: "Iosevka", monospace;
-          @import '${pkgs.astroid.src}/ui/part.scss';
-        '';
-        toggle-delete = pkgs.writers.writeBash "toggle-delete" ''
-          # Check if the thread or message matches the tag
-          if [[ $(${notmuchWp}/bin/notmuch search --exclude=false tag:$1 AND $2) ]]; then
-            notmuch tag -$1 $2   # Remove the tag
-          else
-            notmuch tag +$1 $2   # Add the tag
-          fi
-        '';
-        astroidDir = pkgs.runCommand "astroid-config-dir" {} ''
-          mkdir $out        # Astroid config directory
-          mkdir $out/hooks  # hooks directory
-          mkdir $out/ui     # ui directory
-
-          # Symlink the config, polling keybindings and hooks scripts
-          ln -s "${astroidConfig}" $out/config.json
-          ln -s "${polling}" $out/poll.sh
-          ln -s "${keybindings}" $out/keybindings
-          ln -s "${toggle-delete}" $out/hooks/toggle-delete
-          ln -s "${message-ui}" $out/ui/part.scss
-        '';
-    in pkgs.symlinkJoin {
-      name = "astroid";
-      paths = [ pkgs.astroid ];
-      buildInputs = [ pkgs.makeWrapper ];
-
-      # --add-flags "--config=${astroidConfig}"
-      postBuild = ''
-        wrapProgram $out/bin/astroid \
-          --set NOTMUCH_CONFIG "${notmuchConfig}" \
-          --add-flags "--config=${astroidDir}/config.json"
-      '';
-  };
-
 in {
   environment.systemPackages = with pkgs; [
     mbsyncWp    # to fetch email (mbsync)
@@ -423,12 +269,6 @@ in {
         ExecStartPre =  [
           # Build the local store if any
           mkLocalStores
-          # Notify astroid about new polling
-          #
-          # XXX: `astroid --start-polling` ends with a coredump but
-          # seems to work!  I prefixed the command with a dash `-` to
-          # tell systemd to ignore the result.
-          "-${astroidWp}/bin/astroid --start-polling"
           # Deleted emails may not work if `notmuch new` has not been
           # executed first.  I prefixed the command with a dash `-` to
           # tell systemd to ignore the result.
@@ -441,13 +281,9 @@ in {
                        msmtp ${msmtprc}
                        msmtpWp ${msmtpWp}
                        notmuch ${notmuchConfig}
-                       astroid ${astroidConfig} 
                        muaApp ${muaApp} ''
                        muaApp}/bin/mua pull";
-        ExecStartPost = [
-          # Stop notifying astoid
-          "-${astroidWp}/bin/astroid --stop-polling"
-        ];
+        ExecStartPost = [];
       };
     };
 }
