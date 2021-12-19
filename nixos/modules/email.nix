@@ -18,36 +18,36 @@ let
     CopyArrivalDate yes  # Keeps the time stamp based message sorting intact
 
     # Declare accounts
-    ${lib.concatMapStringsSep "\n" (name: with accounts.${name}; ''
+    ${lib.concatMapStringsSep "\n" (acc: with acc; ''
       IMAPAccount ${name}
       User        ${email}
       Host        ${imap.host}
       SSLType     IMAPS
       PassCmd     "${pkgs.pass}/bin/pass ${lib.escapeShellArg pass} | head -n1"
-    '') accountNames}
+    '') accounts}
 
     # A Store defines a collection of mailboxes; basically a folder,
     # either local or remote. Here we specify the remote and local Store:
 
     ## - The remote store (IMAPStore) is where we get the email from
     ##   (e.g., the specification of an imap account)
-    ${lib.concatMapStringsSep "\n" (name: ''
+    ${lib.concatMapStringsSep "\n" (acc: with acc; ''
       IMAPStore ${name}-remote
       Account   ${name}
-    '') accountNames}
+    '') accounts}
 
     ## - The local store (MaildirStore) is where we store the email on
     ##   our computer.
-    ${lib.concatMapStringsSep "\n" (name: ''
+    ${lib.concatMapStringsSep "\n" (acc: with acc; ''
       MaildirStore ${name}-local
       Path         ${mailDir}/${name}/
       Inbox        ${mailDir}/${name}/inbox
       SubFolders   Verbatim
-    '') accountNames}
+    '') accounts}
 
     # A Channel connects two Stores, describing the way the two are
     # synchronized.
-    ${lib.concatMapStringsSep "\n" (name: with accounts.${name}; ''
+    ${lib.concatMapStringsSep "\n" (acc: with acc; ''
       Channel  ${name}-inbox
       Far      :${name}-remote:  # Master
       Near     :${name}-local:   # Slave
@@ -56,7 +56,7 @@ let
       Create   Near  # Automatically create missing mailboxes on the Slave.
       Expunge  Near  # Only delete on Slave (do `mbysnc --expunge-far ${name}-inbox` to delete)
       MaxSize  100m  # Don't download any email greater than this
-    '') accountNames}
+    '') accounts}
   '';
 
   # msmtp configuration file (man msmtp)
@@ -68,14 +68,14 @@ let
     syslog          on
 
     # Accounts
-    ${lib.concatMapStringsSep "\n" (name: with accounts.${name}; ''
+    ${lib.concatMapStringsSep "\n" (acc: with acc; ''
       account       ${name}
       host          ${smtp.host}
-      port          587
+      port          ${if smtp ? port then smtp.port else "587"}
       from          ${email}
       user          ${if smtp ? user then smtp.user else email}
       passwordeval  ${pkgs.pass}/bin/pass ${lib.escapeShellArg pass} | head -n1
-    '') accountNames}
+    '') accounts}
 
     # Set a default account
     account default : ${defaultAccount.name}
@@ -89,9 +89,8 @@ let
 
     [user]
     name=Ronan-Alexandre Cherrueau
-    primary_email=${defaultAccount.value.email}
-    other_email=${builtins.concatStringsSep ";"
-      (lib.catAttrs "email" (builtins.attrValues accounts))}
+    primary_email=${defaultAccount.email}
+    other_email=${lib.concatMapStringsSep ";" (acc: acc.email) accounts}
 
     # Configuration for "notmuch new"
     # - tags:	A list (separated by ';') of the tags that will be
@@ -125,29 +124,23 @@ let
   # --------------------------------------------------------------------
   # Utils
 
-  # List of account names
-  accountNames = builtins.attrNames accounts;
-
-  # The default account -> {name = defaultAccountName; value = defaultAccountValues;}
+  # The default account
   defaultAccount =
     let errorMsg = "cannot find a default email account";
         # Test if an account has the `default` key set to `true`
         isDefault = acc: acc ? default && acc.default;
-        # List of account values with a special attribute name
-        accountWithNames = lib.mapAttrsToList (name: acc: acc // {name = name;} ) accounts;
         # Find the first default account
-        acc = lib.lists.findFirst isDefault (abort errorMsg) accountWithNames;
-    in { name = acc.name; value = acc; };
+    in lib.lists.findFirst isDefault (abort errorMsg) accounts;
 
   # Directory to store emails
   mailDir = config.users.users.rfish.home + "/.mail";
 
   # Create the directory for local email stores
   mkLocalStores = pkgs.writers.writeDash "msbync-local-stores" ''
-    ${lib.concatMapStrings (name: ''
-       mkdir -p ${mailDir}/${name}/
-       chown ${config.users.users.rfish.name}:${config.users.users.rfish.group} ${mailDir}/${name}/
-    '') accountNames}
+    ${lib.concatMapStrings (acc: ''
+       mkdir -p ${mailDir}/${acc.name}/
+       chown ${config.users.users.rfish.name}:${config.users.users.rfish.group} ${mailDir}/${acc.name}/
+    '') accounts}
   '';
 
   # Wraps mbsync to call the custom config
