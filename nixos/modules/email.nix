@@ -253,20 +253,33 @@ let
   };
 
   # Wraps notmuch to call the custom config
-  notmuchWp =
-    let notmuchNoTest = pkgs.notmuch.overrideAttrs (oldAttrs:
-          {doCheck = false;}
-    );
-    in pkgs.symlinkJoin {
-      name = "notmuch";
-      # paths = [ pkgs.notmuch ];
-      paths = [ notmuchNoTest ];
-      buildInputs = [ pkgs.makeWrapper ];
-      postBuild = ''
-        wrapProgram $out/bin/notmuch \
-         --set NOTMUCH_CONFIG "${notmuchConfig}"
-      '';
-  };
+  #
+  # I have to symlink man, info, emacs files manually because package
+  # notmuch defines separate outputs for these and are not part of the
+  # default "$out".  I have to access them with
+  # `notmuch.(man|info|emacs)`.
+  notmuchWp = pkgs.runCommand "notmuch" {
+    buildInputs = [ pkgs.makeWrapper ];
+  } ''
+    mkdir -p $out/bin $out/include $out/lib $out/share
+
+    # Link every top-level folder from pkgs.notmuch to our new
+    # target ....
+    ln -s ${pkgs.notmuch}/bin/* $out/bin/
+    ln -s ${pkgs.notmuch}/include/* $out/include/
+    ln -s ${pkgs.notmuch}/lib/* $out/lib/
+    ln -s ${pkgs.notmuch.man}/share/man $out/share/
+    ln -s ${pkgs.notmuch.info}/share/info $out/share/
+    ln -s ${pkgs.notmuch.emacs}/bin/* $out/bin
+    ln -s ${pkgs.notmuch.emacs}/share/emacs $out/share/
+
+    # ... except the notmuch binary ...
+    rm $out/bin/notmuch
+
+    # ... because we create this ourself, by creating a wrapper
+    makeWrapper ${pkgs.notmuch}/bin/notmuch $out/bin/notmuch \
+      --set NOTMUCH_CONFIG "${notmuchConfig}"
+  '';
 
   # Wraps msmtp to call the custom config
   msmtpWp = pkgs.symlinkJoin {
