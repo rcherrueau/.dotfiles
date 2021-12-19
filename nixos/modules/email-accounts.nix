@@ -9,8 +9,8 @@ rec {
       email = "RonanCherrueau@gmail.com";
       imap.host = "imap.gmail.com";
       smtp.host = "smtp.gmail.com";
-      keepass = "/root/perso/GMail";
-      box = {
+      pass = "perso/GMail";
+      boxes = {
       # Do a `mbsync --list Gmail-inbox` to list boxes
         inbox = ["INBOX" "![Gmail]*"];
         drafts = "[Gmail]/Drafts";
@@ -25,9 +25,9 @@ rec {
       imap.host = "zimbra.inria.fr";
       smtp.host = "smtp.inria.fr";
       smtp.user = "rcherrue";
-      keepass = "/root/Inria/inria";
+      pass = "job/Inria/inria";
       # Do a `mbsync --list Inria-inbox` to list boxes
-      box = {
+      boxes = {
         inbox = ["*" "!Junk"];
         drafts = "Drafts";
         sent = "Sent";
@@ -36,12 +36,12 @@ rec {
     };
     IMT = {
       # https://intranet.imt-atlantique.fr/assistance-support/informatique/didacticiels/
-      inherit (Inria) box;
+      inherit (Inria) boxes;
       store = "IMT";
       sync = false;
       email = "Ronan-Alexandre.Cherrueau@imt-atlantique.fr";
       imap.host = "z.imt.fr";
       smtp.host = "z.imt.fr";
-      keepass = "/root/IMT/rcherr12";
+      pass = "job/IMT/rcherr12";
     };
 }

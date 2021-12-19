@@ -18,7 +18,7 @@ let
       User        ${email}
       Host        ${imap.host}
       SSLType     IMAPS
-      PassCmd     "/etc/nixos/secret/read-passwd ${lib.escapeShellArg keepass}"
+      PassCmd     "${pkgs.pass}/bin/pass ${lib.escapeShellArg pass} | head -n1"
     '') accountNames}
 
     # A Store defines a collection of mailboxes; basically a folder,
@@ -46,7 +46,7 @@ let
       Channel  ${name}-inbox
       Far      :${name}-remote:  # Master
       Near     :${name}-local:   # Slave
-      Patterns ${lib.concatMapStringsSep " " lib.strings.escapeNixString box.inbox} "${box.trash}" "${box.drafts}" "${box.sent}"
+      Patterns ${lib.concatMapStringsSep " " lib.strings.escapeNixString boxes.inbox} "${boxes.trash}" "${boxes.drafts}" "${boxes.sent}"
       Sync     All   # Propagate read, deletion ...
       Create   Near  # Automatically create missing mailboxes on the Slave.
       Expunge  Near  # Only delete on Slave (do `mbysnc --expunge-far ${name}-inbox` to delete)
@@ -69,11 +69,12 @@ let
       port          587
       from          ${email}
       user          ${if smtp ? user then smtp.user else email}
-      passwordeval  /etc/nixos/secret/read-passwd ${lib.escapeShellArg keepass}
+      passwordeval  ${pkgs.pass}/bin/pass ${lib.escapeShellArg pass} | head -n1
     '') accountNames}
 
     # Set a default account
     account default : ${defaultAccount.name}
+
   '';
 
   # notmuch configuration file (man notmuch-config)
@@ -118,8 +119,6 @@ let
 
   # Astroid configuration
   # See https://github.com/astroidmail/astroid/wiki/Configuration-Reference
-
-
   astroidConfig =
     let
       # Get the default astroid config
@@ -150,8 +149,8 @@ let
       sendmail = "${msmtpWp}/bin/msmtpq --read-envelope-from -t";
       always_gpg_sign = false;
       save_sent = true;
-      save_sent_to = "${mailDir}/${name}/${box.sent}/cur/";
-      save_draft_to = "${mailDir}/${name}/${box.drafts}/cur/";
+      save_sent_to = "${mailDir}/${name}/${boxes.sent}/cur/";
+      save_draft_to = "${mailDir}/${name}/${boxes.drafts}/cur/";
       signature_file = pkgs.writeText "astroid-signature" ''
         Ronan-Alexandre Cherrueau
         https://rcherrueau.github.io
@@ -288,7 +287,14 @@ let
     buildInputs = [ pkgs.makeWrapper ];
     postBuild = ''
       wrapProgram $out/bin/msmtp \
-        --add-flags "--file=${msmtprc}"
+        --add-flags "--file=${msmtprc}" \
+        --add-flags "--syslog=on"
+
+      wrapProgram $out/bin/msmtpq \
+        --add-flags "--file=${msmtprc}" \
+        --add-flags "--syslog=on"
+    '';
+  };
 
   # MUA application
   muaApp =
@@ -308,13 +314,6 @@ let
       mkdir -p $out/bin
       ln -s ${muaWP}/bin/mua $out/bin/mua
     '';
-    # # XXX
-    # # https://github.com/NixOS/nixpkgs/blob/bff19e2ab5004676a5f94ffdcb08bbc973ab6f34/pkgs/applications/networking/msmtp/default.nix#L37
-    # postInstall = ''
-    #   substitute ${pkgs.msmtp}/bin/msmtpq $out/bin/msmtpq \
-    #     --replace @msmtp@ $out/bin/msmtp
-    # '';
-  };
 
   # Wraps astroid to call the custom config.
   #
