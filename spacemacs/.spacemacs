@@ -901,6 +901,8 @@ want."
   (with-eval-after-load 'org
     ;; Highlight LaTeX related syntax
     (setf org-highlight-latex-and-related '(latex))
+    ;; show entities as UTF8 characters
+    (setq org-pretty-entities t)
     ;; Do not auto-indent lines depending on the depth on the node.
     (setq org-adapt-indentation nil)
     (setq org-startup-indented nil)
@@ -911,6 +913,9 @@ want."
     (setq org-src-tab-acts-natively t)
     ;; Preserve my indentation during source block export
     (setq org-src-preserve-indentation t)
+    ;; Do not change the headline face if it is marked as TODO.
+    (setq org-fontify-todo-headline nil)
+    (setq org-fontify-done-headline nil)
     ;; Activate smartparens mode
     (smartparens-mode t)
 
@@ -943,6 +948,13 @@ want."
 
     ;; Racket support inside babel
     (add-to-list 'org-babel-load-languages '(racket . t))
+
+    ;; For latex export
+
+    ;;;; add `\usepackage[LANGUAGE]{babel}' with LANGUAGE
+    ;;;; automatically generated from the `#+LANGUAGE:' org options.
+    (add-to-list 'org-latex-packages-alist
+                 '("AUTO" "babel" t ("pdflatex")))
     )
 
   (with-eval-after-load 'toc-org
