@@ -101,6 +101,7 @@ This function should only modify configuration layer settings."
           lsp-headerline-breadcrumb-enable nil
           lsp-rust-server 'rust-analyzer)
      nixos
+     notmuch
      pdf
      restclient
      ;; TODO:
@@ -135,6 +136,10 @@ This function should only modify configuration layer settings."
      (ob-racket :location (recipe :fetcher github :repo "DEADB17/ob-racket"))
      ;; Rescript-lang support
      lsp-rescript rescript-mode
+<<<<<<< HEAD
+=======
+     (notmuch :location (recipe :fetcher file :path "/run/current-system/sw/share/emacs/site-lisp/"))
+>>>>>>> 9285a1b ([emacs] Update spacemacs)
      )
 
    ;; A list of packages that cannot be updated.
