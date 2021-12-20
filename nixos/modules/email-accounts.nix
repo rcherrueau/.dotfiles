@@ -26,7 +26,6 @@ let
     smtp.host = "smtp.inria.fr";
     smtp.user = "rcherrue";
     pass = "job/Inria/inria";
-    # Do a `mbsync --list Inria-inbox` to list boxes
     boxes = {
       inbox = ["*" "!Junk"];
       drafts = "Drafts";

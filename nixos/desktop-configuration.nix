@@ -6,9 +6,11 @@
 {
   imports = [
     ./cachix.nix
+    # Personal modules
     ./modules/syncthing.nix
     ./modules/vim.nix
     ./modules/email.nix
+    ./modules/email-ui.nix
   ];
 
   # Minimum swappiness without disabling it entirely (preserve ssd)
@@ -116,7 +118,7 @@
     aria stow htop unzip unrar tree
     ranger w3m xsel # w3m to display images, xsel to copy file name with `yd`
     usbutils # lsusb
-    xclip 
+    xclip
     # TODO: vagrant
 
     # Circumvent the default /run/current-system/sw/share/applications/mimeinfo.cache

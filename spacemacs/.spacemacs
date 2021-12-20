@@ -136,10 +136,6 @@ This function should only modify configuration layer settings."
      (ob-racket :location (recipe :fetcher github :repo "DEADB17/ob-racket"))
      ;; Rescript-lang support
      lsp-rescript rescript-mode
-<<<<<<< HEAD
-=======
-     (notmuch :location (recipe :fetcher file :path "/run/current-system/sw/share/emacs/site-lisp/"))
->>>>>>> 9285a1b ([emacs] Update spacemacs)
      )
 
    ;; A list of packages that cannot be updated.
@@ -897,10 +893,15 @@ want."
     ;; (add-hook 'tex-mode-hook #'turn-on-ospl)
     )
 
-  ;; -- Mail
-  (with-eval-after-load 'mail-mode
-    ;; `From:` header is managed by astroid
-    (setq mail-setup-with-from nil))
+  ;; ;; -- Mail
+  ;; (with-eval-after-load 'mail-mode
+  ;;   ;; `From:` header is managed by astroid
+  ;;   (setq mail-setup-with-from nil))
+
+  ;; -- Mail (notmuch/mail)
+  (with-eval-after-load 'notmuch-hello
+    (require 'rcherr-mua)
+    )
 
   ;; -- Org
   (with-eval-after-load 'org

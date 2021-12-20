@@ -1,8 +1,8 @@
 { config, pkgs, lib, ... }:
 
 # Debug:
-# - Build locally in the nix REPL with `:b msmtpWp`
-# - Pop a shell in the nix REPL with `:s msmtpWp`
+# - Build locally in the nix REPL with `:b notmuchWp`
+# - Pop a shell in the nix REPL with `:s notmuchWp`
 # - See the log of the build with `nix log <<path-of-derivation.drv>>`
 
 let
@@ -59,29 +59,6 @@ let
     '') accounts}
   '';
 
-  # msmtp configuration file (man msmtp)
-  msmtprc = pkgs.writeText "msmtprc" ''
-    # Set default values for all following accounts
-    defaults
-    auth            on
-    tls             on
-    syslog          on
-
-    # Accounts
-    ${lib.concatMapStringsSep "\n" (acc: with acc; ''
-      account       ${name}
-      host          ${smtp.host}
-      port          ${if smtp ? port then smtp.port else "587"}
-      from          ${email}
-      user          ${if smtp ? user then smtp.user else email}
-      passwordeval  ${pkgs.pass}/bin/pass ${lib.escapeShellArg pass} | head -n1
-    '') accounts}
-
-    # Set a default account
-    account default : ${defaultAccount.name}
-
-  '';
-
   # notmuch configuration file (man notmuch-config)
   notmuchConfig = pkgs.writeText "notmuch-config" ''
     [database]
@@ -122,26 +99,7 @@ let
   '';
 
   # --------------------------------------------------------------------
-  # Utils
-
-  # The default account
-  defaultAccount =
-    let errorMsg = "cannot find a default email account";
-        # Test if an account has the `default` key set to `true`
-        isDefault = acc: acc ? default && acc.default;
-        # Find the first default account
-    in lib.lists.findFirst isDefault (abort errorMsg) accounts;
-
-  # Directory to store emails
-  mailDir = config.users.users.rfish.home + "/.mail";
-
-  # Create the directory for local email stores
-  mkLocalStores = pkgs.writers.writeDash "msbync-local-stores" ''
-    ${lib.concatMapStrings (acc: ''
-       mkdir -p ${mailDir}/${acc.name}/
-       chown ${config.users.users.rfish.name}:${config.users.users.rfish.group} ${mailDir}/${acc.name}/
-    '') accounts}
-  '';
+  # Software
 
   # Wraps mbsync to call the custom config
   #
@@ -199,22 +157,6 @@ let
       --set NOTMUCH_CONFIG "${notmuchConfig}"
   '';
 
-  # Wraps msmtp to call the custom config
-  msmtpWp = pkgs.symlinkJoin {
-    name = "msmtp";
-    paths = [ pkgs.msmtp ];
-    buildInputs = [ pkgs.makeWrapper ];
-    postBuild = ''
-      wrapProgram $out/bin/msmtp \
-        --add-flags "--file=${msmtprc}" \
-        --add-flags "--syslog=on"
-
-      wrapProgram $out/bin/msmtpq \
-        --add-flags "--file=${msmtprc}" \
-        --add-flags "--syslog=on"
-    '';
-  };
-
   # MUA application
   muaApp =
     let muaPath = config.users.users.rfish.home +
@@ -234,11 +176,32 @@ let
       ln -s ${muaWP}/bin/mua $out/bin/mua
     '';
 
+  # --------------------------------------------------------------------
+  # Utils
+
+  # The default account
+  defaultAccount =
+    let errorMsg = "cannot find a default email account";
+        # Test if an account has the `default` key set to `true`
+        isDefault = acc: acc ? default && acc.default;
+        # Find the first default account
+    in lib.lists.findFirst isDefault (abort errorMsg) accounts;
+
+  # Directory to store emails
+  mailDir = config.users.users.rfish.home + "/.mail";
+
+  # Create the directory for local email stores
+  mkLocalStores = pkgs.writers.writeDash "msbync-local-stores" ''
+    ${lib.concatMapStrings (acc: ''
+       mkdir -p ${mailDir}/${acc.name}/
+       chown ${config.users.users.rfish.name}:${config.users.users.rfish.group} ${mailDir}/${acc.name}/
+    '') accounts}
+  '';
+
 in {
   environment.systemPackages = with pkgs; [
     mbsyncWp    # to fetch email (mbsync)
     notmuchWp   # to index and search email
-    msmtpWp     # to send email
     muaApp      # Scala MUA app
   ];
 
@@ -270,8 +233,6 @@ in {
         # TODO: Trigger an alert when mbsync failed
         ExecStart = "${builtins.trace ''
                        mbsync ${mbsyncrc}
-                       msmtp ${msmtprc}
-                       msmtpWp ${msmtpWp}
                        notmuch ${notmuchConfig}
                        muaApp ${muaApp} ''
                        muaApp}/bin/mua pull";
