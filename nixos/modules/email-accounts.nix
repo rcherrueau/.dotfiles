@@ -1,5 +1,12 @@
-# --------------------------------------------------------------------
-# Email accounts:
+# Email accounts
+
+# Here is a small python snippet to list all mailboxes of an account:
+#
+# $ nix shell nixpkgs\#python3Full -c python
+# >>> import email, imaplib
+# >>> mail = imaplib.IMAP4_SSL("imap.gmail.com")
+# >>> mail.login("<email>", "<password>")
+# >>> mail.list()
 
 let
   Gmail = {
@@ -11,8 +18,7 @@ let
     smtp.host = "smtp.gmail.com";
     pass = "perso/GMail";
     boxes = {
-      # Do a `mbsync --list Gmail-inbox` to list boxes
-      inbox = ["INBOX" "![Gmail]*"];
+      inbox = "INBOX";
       drafts = "[Gmail]/Drafts";
       sent = "[Gmail]/Sent Mail";
       trash = "[Gmail]/Bin";
@@ -27,7 +33,7 @@ let
     smtp.user = "rcherrue";
     pass = "job/Inria/inria";
     boxes = {
-      inbox = ["*" "!Junk"];
+      inbox = "inbox";
       drafts = "Drafts";
       sent = "Sent";
       trash = "Trash";
@@ -43,5 +49,21 @@ let
     smtp.host = "z.imt.fr";
     pass = "job/IMT/rcherr12";
   };
+  OLibre = {
+    default = true;
+    name = "OLibre";
+    sync = true;
+    email = "Ronan-Alexandre.Cherrueau@objectif-libre.com";
+    imap.host = "imap.gmail.com";
+    smtp.host = "smtp.gmail.com";
+    pass = "job/objectif-libre/notmuch-mua";
+    boxes = {
+      # Do a `mbsync --list OLibre-inbox` to ensure each box exists
+      inbox = "INBOX";
+      drafts = "[Gmail]/Drafts";
+      sent = "[Gmail]/Sent Mail";
+      trash = "[Gmail]/Trash";
+    };
+  };
 
-in [ Gmail Inria IMT ]
+in [ Gmail OLibre Inria IMT ]

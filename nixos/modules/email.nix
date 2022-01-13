@@ -41,7 +41,7 @@ let
     ${lib.concatMapStringsSep "\n" (acc: with acc; ''
       MaildirStore ${name}-local
       Path         ${mailDir}/${name}/
-      Inbox        ${mailDir}/${name}/inbox
+      Inbox        ${mailDir}/${name}/${boxes.inbox}
       SubFolders   Verbatim
     '') accounts}
 
@@ -51,7 +51,7 @@ let
       Channel  ${name}-inbox
       Far      :${name}-remote:  # Master
       Near     :${name}-local:   # Slave
-      Patterns ${lib.concatMapStringsSep " " lib.strings.escapeNixString boxes.inbox} "${boxes.trash}" "${boxes.drafts}" "${boxes.sent}"
+      Patterns "${boxes.inbox}" "${boxes.trash}" "${boxes.drafts}" "${boxes.sent}"
       Sync     All   # Propagate read, deletion ...
       Create   Near  # Automatically create missing mailboxes on the Slave.
       Expunge  Near  # Only delete on Slave (do `mbysnc --expunge-far ${name}-inbox` to delete)
@@ -160,11 +160,14 @@ let
   # MUA application
   muaApp =
     let muaPath = config.users.users.rfish.home +
-                  "/prog/APE/mail/scala/target/scala-3.1.0/" +
-                  "mail-user-agent-assembly-0.1.0.jar";
+          "/prog/APE/mail/scala/target/scala-3.1.0/" +
+          "mail-user-agent-assembly-0.1.0.jar";
+        taggingScriptPath = config.users.users.rfish.home +
+          "/prog/APE/mail/scala/taggingScript";
         muaWP = pkgs.writeShellScriptBin "mua" ''
           export MBSYNC_BIN='${mbsyncWp}/bin/mbsync'
           export NOTMUCH_BIN='${notmuchWp}/bin/notmuch'
+          export TAGGING_SCRIPT='${taggingScriptPath}'
           export MAILDIR=${lib.escapeShellArg mailDir}
           export ACCOUNTS=${lib.escapeShellArg (builtins.toJSON accounts)}
           exec "${pkgs.jdk}/bin/java" "-jar" "${muaPath}" "$@"
@@ -209,7 +212,7 @@ in {
   # See https://wiki.archlinux.org/index.php?title=Isync&oldid=627584#Automatic_synchronization
   systemd.user.services.polling-email = {
       description = "Mail User Agent";
-      startAt = [ "*:00/10" ];  # Pull every 10 minutes
+      startAt = [ "*:00/5" ];  # Pull every 5 minutes
       # Start mua service after the user logging.
       # XXX: I would like to use "network-online.target" but systemd
       # --user runs as a separate process from the systemd --system
@@ -230,12 +233,7 @@ in {
           "-${muaApp}/bin/mua delete"
         ];
         # Synchronize emails
-        # TODO: Trigger an alert when mbsync failed
-        ExecStart = "${builtins.trace ''
-                       mbsync ${mbsyncrc}
-                       notmuch ${notmuchConfig}
-                       muaApp ${muaApp} ''
-                       muaApp}/bin/mua pull";
+        ExecStart = "${muaApp}/bin/mua pull";
         ExecStartPost = [];
       };
     };

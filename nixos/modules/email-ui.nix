@@ -30,7 +30,7 @@ let
     #   msmtpd --port=2500 --command 'tee $(mktemp)'
     # And send mail to:
     #   From: debug@127.0.0.1
-    #   to: debug@127.0.0.1
+    #   To: 42@42.42
     account       debug
     auth          off
     tls           off
@@ -49,40 +49,28 @@ let
   # See https://notmuchmail.org/notmuch-emacs/
   # and https://notmuchmail.org/emacstips/
   mua-el =
-    let file-el = pkgs.writeText "rcherr-mua.el" ''
-      ;; Display emails with the newest first
-      (setq-default notmuch-search-oldest-first nil)
+    let
+      # Emacs file
+      rcherr-mua-el = ./rcherr-mua.el;
+      # Custom searches (one per `account`)
+      account-searches = lib.concatMapStrings (acc: with acc; ''
+          (:name "${name}"
+           :query "tag:${name} AND tag:inbox"
+           :search-order newest-first)
+        '') accounts;
+      # Save sent emails into `account.boxes.sent`
+      account-sentdirs = lib.concatMapStrings (acc: with acc; ''
+          ("${lib.strings.toLower email}" . "\"${name}/${boxes.sent}\" +${name} +sent")
+        '') accounts;
 
-      ;; Apply the following tags when an email is deleted
-      (setq notmuch-message-deleted-tags '("-inbox" "+deleted"))
-
-      ;; Mailing topics to display
-      (setq notmuch-saved-searches
-            '(${lib.concatMapStrings (acc: with acc; ''
-              (:name "${name}" :query "tag:${name} AND tag:inbox" :search-order newest-first)
-              '') accounts}
-              (:name "unread" :query "tag:unread" :key ,(kbd "u"))
-              (:name "drafts" :query "tag:draft" :key ,(kbd "d"))))
-
-      ;; msmtp with multiple accounts
-      ;; See https://notmuchmail.org/emacstips/#index11h2
-      (setq sendmail-program "${msmtpWp}/bin/msmtp")
-      (setq mail-specify-envelope-from t)
-      (setq message-sendmail-envelope-from 'header)
-      (setq mail-envelope-from 'header)
-      (setq message-send-mail-function #'message-send-mail-with-sendmail)
-
-      ;; Check for attachment
-      (add-hook 'notmuch-mua-send-hook 'notmuch-mua-attachment-check)
-      (setq notmuch-mua-attachment-regexp
-            "\\b\\(attache\?ment\\|attached\\|attach\\|pi[èe]ce[-\s]+jointe?\\|p\.-j\.\\|ci-joint\\)\\b")
-
-      (provide 'rcherr-mua)
-    '';
-    in  pkgs.runCommand "mua-config-dir" {} ''
-      # Copy mua.el into emacs dir
+    # Copy rcherr-mua.el into emacs dir
+    # FIXME: msmtp*q* failed even if the output is successful
+    in pkgs.runCommand "mua-config-dir" {} ''
       mkdir -p $out/share/emacs/site-lisp/
-      ln -s "${file-el}" $out/share/emacs/site-lisp/rcherr-mua.el
+      substitute "${rcherr-mua-el}" $out/share/emacs/site-lisp/rcherr-mua.el \
+        --replace "/usr/bin/msmtp" "${msmtpWp}/bin/msmtp" \
+        --replace ";;@account-searches@" ${lib.escapeShellArg account-searches} \
+        --replace ";;@account-sentdirs@" ${lib.escapeShellArg account-sentdirs}
     '';
 
   # --------------------------------------------------------------------
@@ -118,8 +106,7 @@ let
 
 in {
   environment.systemPackages = with pkgs; [
-    # To send email
-    (builtins.trace ">> msmtprc: ${msmtprc}" msmtpWp)
-    mua-el
+    msmtpWp  # To send email
+    mua-el   # To view them in emacs
   ];
 }
