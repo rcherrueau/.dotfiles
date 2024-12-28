@@ -159,8 +159,9 @@ let
 
   # MUA application
   muaApp =
-    let muaPath = config.users.users.rfish.home +
-          "/prog/APE/mail/scala/target/scala-3.1.0/" +
+    let muaPath = config.users.users.rfish.home + "/" +
+          "prog/ronanamua/" + 
+          "target/scala-3.1.0/" +
           "mail-user-agent-assembly-0.1.0.jar";
         taggingScriptPath = config.users.users.rfish.home +
           "/prog/APE/mail/scala/taggingScript";

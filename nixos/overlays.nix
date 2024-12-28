@@ -5,17 +5,24 @@
 self: super:
 
 {
-  emacs = super.emacs.override {
-    # Note: Emacs 27.1 supports resizing and rotating images without
-    # ImageMagick.  The new function 'image-transforms-p' can be used
-    # to test whether any given frame supports these capabilities.  In
-    # org, sets the property `#+ATTR_ORG: :width` to change the size
-    # of an image.
-    cairo = self.cairo;
+  # emacs = super.emacs.override {
+  #   # Note: Emacs 27.1 supports resizing and rotating images without
+  #   # ImageMagick.  The new function 'image-transforms-p' can be used
+  #   # to test whether any given frame supports these capabilities.  In
+  #   # org, sets the property `#+ATTR_ORG: :width` to change the size
+  #   # of an image.
+  #   cairo = self.cairo;
 
-    # Support Xwidgets for better lsp-ui.
-    withXwidgets = true;
-  };
+  #   # Use pure gtk+ (and remove direct calls to X11)
+  #   withPgtk = true;
+
+  #   # Support Xwidgets for better lsp-ui.
+  #   # withXwidgets = true;
+  # };
+
+  # notmuch = super.notmuch.overrideAttrs (old: {
+  #   doCheck = false;
+  # });
 
   # # Fix by the `location` attribute in `configuration.nix`
   # redshift = super.redshift.override {

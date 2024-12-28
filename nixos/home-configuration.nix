@@ -9,6 +9,7 @@
   imports = [
     /etc/nixos/hardware-configuration.nix
     ./desktop-configuration.nix
+    ./modules/apple-keyboard.nix
   ];
 
   # Use the GRUB 2 boot loader.
