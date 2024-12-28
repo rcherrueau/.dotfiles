@@ -5,7 +5,7 @@
 
 {
   imports = [
-    ./cachix.nix
+    # ./cachix.nix
     # Personal modules
     ./modules/syncthing.nix
     ./modules/vim.nix
@@ -52,13 +52,17 @@
     # 'nix-command' is disabled; use '--extra-experimental-features
     # nix-command' to override".
     #
-    # See https://github.com/NixOS/nixpkgs/issues/80332
+    # See
+    # https://nixos.wiki/wiki/Flakes
+    # https://christine.website/blog/nix-flakes-1-2022-02-21
+    # https://github.com/NixOS/nixpkgs/issues/80332
+    package = pkgs.nixFlakes;
     extraOptions = ''
      experimental-features = nix-command flakes
     '';
   };
 
-  nix.trustedUsers = [ "root" "rfish" ];
+  nix.settings.trusted-users = [ "root" "rfish" ];
 
   # Font: find local font with `fc-list|grep <font>`
   fonts = {
@@ -101,7 +105,14 @@
   # Overlays for package overriding. See,
   # - https://nixos.wiki/wiki/Overlays
   # - https://blog.flyingcircus.io/2017/11/07/nixos-the-dos-and-donts-of-nixpkgs-overlays/
-  nixpkgs.overlays = [ (import ./overlays.nix) ];
+  nixpkgs.overlays = [
+    (import ./overlays.nix)
+    # Emacs community
+    (import (builtins.fetchTarball {
+      # XXX https://github.com/nix-community/emacs-overlay/pull/429
+      url = https://github.com/nix-community/emacs-overlay/archive/e86adaf7da0f0186c8f21ccb61ff10880434436b.tar.gz;
+    }))
+  ];
 
   # My tools of the trade.
   #
@@ -113,12 +124,13 @@
   # See, http://beyermatthias.de/blog/2015/11/27/nixos-on-unstable---how-to-fix-a-broken-nixos-rebuild/
   environment.systemPackages = with pkgs; [
     # system
-    dnsutils mtr ncat traceroute tcpdump # dig
+    dnsutils mtr nmap traceroute tcpdump # dig
     nixUnstable # nix repl, nix run, ...
-    aria stow htop unzip unrar tree
+    aria stow btop unzip unrar tree
     ranger w3m xsel # w3m to display images, xsel to copy file name with `yd`
     usbutils # lsusb
     xclip
+    libimobiledevice ifuse # mount iPhone: https://nixos.wiki/wiki/IOS
     # TODO: vagrant
 
     # Circumvent the default /run/current-system/sw/share/applications/mimeinfo.cache
@@ -128,13 +140,14 @@
     mimeo
 
     # windowing
-    xlibs.libXft
+    xorg.libXft
     dunst # The lightweight notification-daemon
 
     # soft
     firefox chromium
-    imagemagick # import -window root screenshot.jpg
+    imagemagick ghostscript # import -window root screenshot.jpg
     inkscape gimp
+    libreoffice-fresh hunspellDicts.fr-classique
     mpv # replacement of mplayer
     (pass.withExtensions (passpkgs: with passpkgs; [ pass-otp pass-update ]))
     qtox
@@ -143,66 +156,69 @@
     xcape # Escape and Control on a single key
     xdotool # Script your mouse
     zathura xournal # Pdf viewer + notetaking
-    # mattermost CLI
-    matterhorn
-    # Notification and token fetcher for authentication
-    #
-    # I could handle the notification in an overlay, as following, but
-    # this would rebuild matterhorn which takes forever. So, I prefer
-    # the next solution that copy the script in
-    # /run/current-system/sw/share/matterhorn/.
-    #
-    # > matterhorn = self.haskell.lib.overrideCabal super.matterhorn (old:
-    # >   {
-    # >     # buildInput = old.matterhorn.buildInput ++ [ self.libnotify];
-    # >     postInstall = (old.postInstall or "") + ''
-    # >       cp notification-scripts/notify $out/matterhorn-notify
-    # >     '';
-    # >   });
-    #
-    # See,
-    # https://nixos.org/nixpkgs/manual/#chap-trivial-builders
-    # https://nixos.org/nixpkgs/manual/#ssec-stdenv-functions
-    (let
-      matterhorn-notify-src = pkgs.matterhorn.src;
-      mattermost-ffox-token = pkgs.fetchFromGitHub {
-        owner = "ftilde";
-        repo = "mattermost-session-cookie-firefox";
-        rev = "606c3d8728bb532bedab03e648151beec52b98f8";
-        sha256 = "10bcia9ghxlhcan0f77gr8gzq83b5ix9hgyjb0wz3ylmlds99lrb";
-      };
-    in (runCommand "matterhorn-extra" {
-      buildInputs = with pkgs; [
-        libnotify            # Deps for notification script
-        curl firefox sqlite  # Deps for token handling
-      ];
-    } ''
-      # Find scripts in /run/current-system/sw/share/matterhorn/
-      OUTPUT="$out/share/matterhorn"
-      mkdir -p "$OUTPUT"
+    protontricks
+    # # mattermost CLI
+    # matterhorn
+    # # Notification and token fetcher for authentication
+    # #
+    # # I could handle the notification in an overlay, as following, but
+    # # this would rebuild matterhorn which takes forever. So, I prefer
+    # # the next solution that copy the script in
+    # # /run/current-system/sw/share/matterhorn/.
+    # #
+    # # > matterhorn = self.haskell.lib.overrideCabal super.matterhorn (old:
+    # # >   {
+    # # >     # buildInput = old.matterhorn.buildInput ++ [ self.libnotify];
+    # # >     postInstall = (old.postInstall or "") + ''
+    # # >       cp notification-scripts/notify $out/matterhorn-notify
+    # # >     '';
+    # # >   });
+    # #
+    # # See,
+    # # https://nixos.org/nixpkgs/manual/#chap-trivial-builders
+    # # https://nixos.org/nixpkgs/manual/#ssec-stdenv-functions
+    # (let
+    #   matterhorn-notify-src = pkgs.matterhorn.src;
+    #   mattermost-ffox-token = pkgs.fetchFromGitHub {
+    #     owner = "ftilde";
+    #     repo = "mattermost-session-cookie-firefox";
+    #     rev = "606c3d8728bb532bedab03e648151beec52b98f8";
+    #     sha256 = "10bcia9ghxlhcan0f77gr8gzq83b5ix9hgyjb0wz3ylmlds99lrb";
+    #   };
+    # in (runCommand "matterhorn-extra" {
+    #   buildInputs = with pkgs; [
+    #     libnotify            # Deps for notification script
+    #     curl firefox sqlite  # Deps for token handling
+    #   ];
+    # } ''
+    #   # Find scripts in /run/current-system/sw/share/matterhorn/
+    #   OUTPUT="$out/share/matterhorn"
+    #   mkdir -p "$OUTPUT"
 
-      # Extract notification script from matterhorn sources
-      tar -xvzf ${matterhorn-notify-src} ${pkgs.matterhorn.name}/notification-scripts/notify
+    #   # Extract notification script from matterhorn sources
+    #   tar -xvzf ${matterhorn-notify-src} ${pkgs.matterhorn.name}/notification-scripts/notify
 
-      # Substitute dependencies in notification and token scripts
-      substitute ${pkgs.matterhorn.name}/notification-scripts/notify "$OUTPUT/matterhorn-notify" \
-           --replace 'notify-send' '${libnotify}/bin/notify-send'
-      substitute ${mattermost-ffox-token}/mattermost-session-cookie-firefox \
-           "$OUTPUT/matterhorn-token" \
-           --replace 'sqlite3' '${sqlite}/bin/sqlite3' \
-           --replace 'curl' '${curl}/bin/curl'
+    #   # Substitute dependencies in notification and token scripts
+    #   substitute ${pkgs.matterhorn.name}/notification-scripts/notify "$OUTPUT/matterhorn-notify" \
+    #        --replace 'notify-send' '${libnotify}/bin/notify-send'
+    #   substitute ${mattermost-ffox-token}/mattermost-session-cookie-firefox \
+    #        "$OUTPUT/matterhorn-token" \
+    #        --replace 'sqlite3' '${sqlite}/bin/sqlite3' \
+    #        --replace 'curl' '${curl}/bin/curl'
 
-      # Make notification and token scripts executable
-      chmod +x "$OUTPUT/matterhorn-notify"
-      chmod +x "$OUTPUT/matterhorn-token"
-    ''))
+    #   # Make notification and token scripts executable
+    #   chmod +x "$OUTPUT/matterhorn-notify"
+    #   chmod +x "$OUTPUT/matterhorn-token"
+    # ''))
 
     # development tools
     direnv
     git
-    emacs # (emacsWithPackages (epkgs: [epkgs.pdf-tools]))
+    # emacs
+    emacs-unstable
+    # emacs # (emacsWithPackages (epkgs: [epkgs.pdf-tools]))
     aspell aspellDicts.en aspellDicts.fr
-    manix
+    nix-doc # manix
     ripgrep ripgrep-all bat
     devdocs-desktop # zeal
     sqlite
@@ -382,7 +398,7 @@
         # fullscreen.
         # https://faq.i3wm.org/question/4217/how-to-disable-screensavermonitor-standby-when-fullscreen.1.html
         # https://github.com/altdesktop/i3ipc-python/blob/master/examples/disable-standby-fs.py
-        # https://github.com/NixOS/nixpkgs/blob/c34ba30888a60065f3de99037625019a5a7d1227/pkgs/applications/window-managers/i3/wk-switch.nix
+        # https://nixos.org/manual/nixpkgs/stable/#buildpythonpackage-function
         (let i3-disable-dpms = {stdenv, python3Packages, xset}:
                python3Packages.buildPythonApplication rec {
                  pname = "i3-disable-dpms";
@@ -390,7 +406,8 @@
                  src = python3Packages.i3ipc.src;
 
                  propagatedBuildInputs = with python3Packages; [ i3ipc ];
-                 dontBuild = true;
+                 format = "other"; # disable-standby-fs.py is not setuptools-based,
+                 dontBuild = true; # actually, we don't built it at all
                  doCheck = false;
 
                  installPhase = ''
@@ -473,7 +490,8 @@
   # Enable redshift daemon.
   # $ systemctl --user status redshift.service
   services.redshift.enable = true;
-
+  services.fwupd.enable = true;
+  services.usbmuxd.enable = true;  # iPhone
   # Enable Unbound DNS and set it as DNS in resolv.conf. For
   # resolv.conf/nameservers see also nix
   # networking.networkmanager.appendNameservers and
@@ -495,6 +513,11 @@
       ];
     }];
   };
+
+  # QMK keychron q1v2 udev DFU rule
+  services.udev.extraRules = ''
+  SUBSYSTEMS=="usb", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="df11", TAG+="uaccess"
+  '';
 
   # This is not taken into account if `unbound.enable = true;`
   networking.nameservers = [
